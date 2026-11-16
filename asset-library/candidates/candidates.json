@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-11-17T00:00:00Z",
+  "policy": "candidate_only_not_approved",
+  "candidates": [
+    {
+      "candidate_id": "polyhaven-pbr-library",
+      "name": "Poly Haven PBR texture and model catalog",
+      "source_id": "polyhaven",
+      "discovery_url": "https://polyhaven.com/textures",
+      "status": "candidate",
+      "reason": "Publisher declares CC0 for published assets; individual item pages, exact variants and file hashes must be captured before approval."
+    },
+    {
+      "candidate_id": "ambientcg-material-library",
+      "name": "ambientCG material catalog",
+      "source_id": "ambientcg",
+      "discovery_url": "https://ambientcg.com/list",
+      "status": "candidate",
+      "reason": "Publisher license documentation states CC0; exact item page, variant, archive contents and hashes still required."
+    },
+    {
+      "candidate_id": "kenney-asset-packs",
+      "name": "Kenney asset packs",
+      "source_id": "kenney",
+      "discovery_url": "https://kenney.nl/assets",
+      "status": "candidate",
+      "reason": "Verify current license and exact pack scope before approval; do not rely on third-party mirrors."
+    },
+    {
+      "candidate_id": "opengameart-item-discovery",
+      "name": "OpenGameArt individual CC0 entries",
+      "source_id": "opengameart",
+      "discovery_url": "https://opengameart.org/content/3d-assets-cc0",
+      "status": "candidate",
+      "reason": "Collection is a discovery aid only. Each item must independently show CC0-1.0 and be reviewed."
+    },
+    {
+      "candidate_id": "smithsonian3d-object-discovery",
+      "name": "Smithsonian 3D object catalog",
+      "source_id": "smithsonian3d",
+      "discovery_url": "https://3d.si.edu/",
+      "status": "candidate",
+      "reason": "Object-specific rights. Public-domain metadata is not automatically accepted as CC0; legal review required."
+    },
+    {
+      "candidate_id": "AL01-PH-001",
+      "name": "Rock Ground",
+      "source_id": "polyhaven",
+      "discovery_url": "https://polyhaven.com/a/rock_ground",
+      "license_evidence_url": "https://polyhaven.com/license",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "surface_material",
+      "subcategory": "rocky_ground",
+      "reason": "Item page identifies CC0 and exposes 1K/2K/4K/8K, Blend/glTF/MaterialX/ZIP and PBR maps. Exact archive, included files, checksum and technical inspection remain outstanding."
+    },
+    {
+      "candidate_id": "AL01-PH-002",
+      "name": "Asphalt 01",
+      "source_id": "polyhaven",
+      "discovery_url": "https://polyhaven.com/a/asphalt_01",
+      "license_evidence_url": "https://polyhaven.com/license",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "surface_material",
+      "subcategory": "asphalt",
+      "reason": "Item page identifies CC0 and exposes 1K–8K, Blend/glTF/MaterialX/ZIP and PBR maps. Exact archive, included files, checksum and technical inspection remain outstanding."
+    },
+    {
+      "candidate_id": "AL01-PH-003",
+      "name": "Fir Tree 01",
+      "source_id": "polyhaven",
+      "discovery_url": "https://polyhaven.com/a/fir_tree_01",
+      "license_evidence_url": "https://polyhaven.com/license",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "vegetation",
+      "subcategory": "conifer",
+      "reason": "Item page identifies CC0. Page reports approximately 8M triangles and 956.57 MB payload. Exact model variant, LOD and archive inspection remain outstanding; not assumed runtime-ready."
+    },
+    {
+      "candidate_id": "AL01-ACG-001",
+      "name": "Paving Stones 036",
+      "source_id": "ambientcg",
+      "discovery_url": "https://ambientcg.com/view?id=PavingStones036",
+      "license_evidence_url": "https://docs.ambientcg.com/license/",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "surface_material",
+      "subcategory": "paving",
+      "reason": "Item page lists PBR maps and 2K JPG/PNG variants (32 MB/65 MB). Exact archive contents, checksum and technical inspection remain outstanding."
+    },
+    {
+      "candidate_id": "AL01-ACG-002",
+      "name": "Concrete 049",
+      "source_id": "ambientcg",
+      "discovery_url": "https://ambientcg.com/view?id=Concrete049",
+      "license_evidence_url": "https://docs.ambientcg.com/license/",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "surface_material",
+      "subcategory": "concrete",
+      "reason": "Item page lists PBR maps and 2K JPG/PNG variants (35 MB/74 MB), dimensions approximately 1.1 m x 1.1 m. Exact archive contents, checksum and technical inspection remain outstanding."
+    },
+    {
+      "candidate_id": "AL01-KEN-001",
+      "name": "Car Kit",
+      "source_id": "kenney",
+      "discovery_url": "https://kenney-assets.itch.io/car-kit",
+      "license_evidence_url": "https://kenney.nl/support",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "vehicle_ground",
+      "subcategory": "cars_utility_vehicles",
+      "reason": "Item page explicitly states CC0 1.0 Universal and lists 40+ models in OBJ/FBX/glTF; ZIP 3.4 MB. Included LICENSE, archive contents and mesh quality must be inspected."
+    },
+    {
+      "candidate_id": "AL01-OGA-001",
+      "name": "3D Car",
+      "source_id": "opengameart",
+      "discovery_url": "https://opengameart.org/content/3d-car-0",
+      "license_evidence_url": "https://opengameart.org/content/3d-car-0",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "vehicle_ground",
+      "subcategory": "car",
+      "reason": "Item page explicitly displays CC0; reports 4,391 vertices, 8,906 triangles and 517.1 KB ZIP. Archive format, provenance, embedded content and technical quality remain unverified."
+    },
+    {
+      "candidate_id": "AL01-SI-001",
+      "name": "Command Module, Apollo 11",
+      "source_id": "smithsonian3d",
+      "discovery_url": "https://3d.si.edu/object/nasm_A19700102000",
+      "license_evidence_url": "https://3d.si.edu/object/nasm_A19700102000",
+      "license_identifier": "CC0-1.0",
+      "status": "candidate",
+      "category": "spacecraft",
+      "subcategory": "crew_capsule",
+      "reason": "Object metadata reports Restrictions & Rights: CC0 and Metadata Usage: CC0; lists combined OBJ and low-resolution OBJ/glTF/GLB downloads. Inspect package, third-party content and 3D disclaimer before approval."
+    }
+  ]
+}
