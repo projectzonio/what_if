@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-11-16T00:00:00Z",
+  "sources": [
+    {
+      "source_id": "polyhaven",
+      "name": "Poly Haven",
+      "discovery_url": "https://polyhaven.com/",
+      "license_policy_url": "https://polyhaven.com/license",
+      "source_license_claim": "CC0",
+      "scope": "Publisher states CC0 for assets published by Poly Haven.",
+      "acceptance_rule": "Record each exact asset page, selected resolution/format and downloaded file checksums. This source-level statement does not populate the accepted asset registry by itself.",
+      "status": "source_candidate"
+    },
+    {
+      "source_id": "ambientcg",
+      "name": "ambientCG",
+      "discovery_url": "https://ambientcg.com/",
+      "license_policy_url": "https://docs.ambientcg.com/license/",
+      "source_license_claim": "CC0",
+      "scope": "Publisher license documentation for ambientCG assets.",
+      "acceptance_rule": "Record each exact asset page, variant and file checksums; inspect included content and metadata.",
+      "status": "source_candidate"
+    },
+    {
+      "source_id": "kenney",
+      "name": "Kenney",
+      "discovery_url": "https://kenney.nl/assets",
+      "license_policy_url": "https://kenney.nl/support",
+      "source_license_claim": "Requires current verification per pack.",
+      "scope": "Pack-specific; do not infer a license from a different Kenney pack or a third-party mirror.",
+      "acceptance_rule": "Verify the exact pack page and its current license terms before any item is approved.",
+      "status": "source_candidate"
+    },
+    {
+      "source_id": "opengameart",
+      "name": "OpenGameArt",
+      "discovery_url": "https://opengameart.org/",
+      "license_policy_url": "https://opengameart.org/",
+      "source_license_claim": "Mixed licenses.",
+      "scope": "Individual item only.",
+      "acceptance_rule": "Accept only individual entries explicitly marked CC0-1.0; collection/category membership is not evidence.",
+      "status": "restricted_discovery"
+    },
+    {
+      "source_id": "smithsonian3d",
+      "name": "Smithsonian 3D",
+      "discovery_url": "https://3d.si.edu/",
+      "license_policy_url": "https://3d.si.edu/",
+      "source_license_claim": "Object-specific rights and metadata.",
+      "scope": "Individual object only; public-domain statements are not automatically CC0.",
+      "acceptance_rule": "Keep outside the accepted registry unless object-specific rights are explicitly reviewed and accepted under project policy.",
+      "status": "restricted_discovery"
+    }
+  ]
+}
