@@ -343,7 +343,7 @@
       "effort": "M",
       "goal": "Z ADR šablon (Proposed) udělat úplné ADR s kontextem, rozhodnutím, důsledky a stavem podle MASTER_BASELINE; přidat PE registr.",
       "scope": [
-        "Úprava decisions/*.md, nový decisions/PE_REGISTER.md."
+        "Úprava decisions/ADR/*.md, nový decisions/PE_REGISTER.md."
       ],
       "acceptance": [
         "Každé ADR má kontext/rozhodnutí/důsledky/stav; rozhodnutí závislá na uživateli jsou označena Proposed s odkazem na USER_DECISIONS."
@@ -399,7 +399,7 @@
       "effort": "S",
       "goal": "Připravit pro uživatele rozhodovací podklad: final_for_orchestrator určuje autoritativní runtime v Rustu, kód planetárního enginu a world generatoru je v C#. Varianty (ponechat C# jako nástroj/generátor, portovat jádro, běžet vedle sebe), náklady, dopad na determinismus (D1–D3), doporučení.",
       "scope": [
-        "Výstup decisions/ADR-016-planet-core-language.md (Proposed)."
+        "Výstup decisions/ADR/ADR-016-planet-core-language.md (Proposed)."
       ],
       "acceptance": [
         "Tři varianty s dopadem na kontrakty a na testy; doporučení; co se zablokuje."
@@ -409,7 +409,7 @@
       ],
       "preferred_agent": "claude",
       "preferred_model": "sonnet",
-      "write_scope": "decisions/ADR-016-planet-core-language.md",
+      "write_scope": "decisions/ADR/ADR-016-planet-core-language.md",
       "risks": "Rozhodnutí patří uživateli."
     }
   ],
