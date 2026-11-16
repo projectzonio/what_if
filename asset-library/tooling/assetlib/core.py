@@ -18,7 +18,7 @@ def sha256(path):
     return h.hexdigest()
 
 def safe_member(name):
-    n=name.replace("\\\\","/")
+    n=name.replace("\\","/")
     p=PurePosixPath(n)
     return not (p.is_absolute() or re.match(r"^[A-Za-z]:",n) or ".." in p.parts)
 
@@ -119,7 +119,7 @@ def inspect(path):
     rows=[]; errors=[]
     for p in files:
         try:
-            row={"path":str(p.relative_to(path if path.is_dir() else path.parent)).replace("\\\\","/"),
+            row={"path":str(p.relative_to(path if path.is_dir() else path.parent)).replace("\\","/"),
                  "size_bytes":p.stat().st_size,"sha256":sha256(p),"extension":p.suffix.lower(),
                  "mime_guess":mimetypes.guess_type(p.name)[0]}
             ext=p.suffix.lower()
@@ -184,7 +184,7 @@ def package_report(root):
     return out
 
 def emit(data,output=None):
-    text=json.dumps(data,ensure_ascii=False,indent=2,sort_keys=True)+"\\n"
+    text=json.dumps(data,ensure_ascii=False,indent=2,sort_keys=True)+"\n"
     if output: Path(output).write_text(text,encoding="utf-8")
     else: print(text,end="")
     return data.get("exit_code",OK)
