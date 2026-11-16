@@ -9,13 +9,9 @@ Nejdůležitější výchozí skutečnost je ve W06, sekce 10.2:
 - Události jsou immutable.
 - derived_updates samostatně eviduje čekající aktualizace.
 - Commit výslovně neznamená dokončení všech závislých subsystémů.
-To je správný základ, ale zatím jde spíše o evidenci pending stavů než o kompletní konzistenční protokol. W06 navíc v sekci 4.4 správně upozorňuje, že změna terénu ovlivňuje kolize, navigaci, hydrologii i klientskou replikaci. 
+To je správný základ, ale zatím jde spíše o evidenci pending stavů než o kompletní konzistenční protokol. W06 navíc v sekci 4.4 správně upozorňuje, že změna terénu ovlivňuje kolize, navigaci, hydrologii i klientskou replikaci.
 
-GitHub+1
-
-Další důležitá hranice: W05 přiděluje každému aktivnímu regionu právě jednoho autoritativního vlastníka a používá owner_epoch jako fencing token. W09 současně rozlišuje strong, bounded a eventual consistency. To znamená, že řešení C-05 nesmí zavést jedinou globální synchronizační bariéru pro celý svět. 
-
-GitHub+1
+Další důležitá hranice: W05 přiděluje každému aktivnímu regionu právě jednoho autoritativního vlastníka a používá owner_epoch jako fencing token. W09 současně rozlišuje strong, bounded a eventual consistency. To znamená, že řešení C-05 nesmí zavést jedinou globální synchronizační bariéru pro celý svět.
 
 GPT-05 — WORLD MUTATION AND CONSISTENCY LIFECYCLE
 PLANETARY ENGINE · C-05 · Architecture Resolution · 16 November 2026
@@ -44,11 +40,9 @@ I recommend the following conceptual lifecycle:
 
 Requested · Validated · Conflict checked
 
-
 2. AUTHORITATIVE COMMIT
 
 Canonical state + immutable event + revision
-
 
 3. DEPENDENCY GRAPH
 
@@ -58,28 +52,21 @@ Physics
 
 Collision · Geometry · Bodies
 
-
 Environment
 
 Terrain · Water · Atmosphere
-
 
 Navigation
 
 Graphs · Traversability
 
-
 Replication
 
 Snapshots · Deltas · AOI
 
-
-
-
 4. INDEPENDENT PROJECTION ACKNOWLEDGEMENTS
 
 Each subsystem reports its processed revision and readiness
-
 
 The central rule:
 
@@ -116,9 +103,7 @@ W06 §5.4 distinguishes local transactions from distributed transactions and rec
 
 W06 §5.5 recommends hybrid persistence rather than indiscriminate full event sourcing.
 
-These are compatible with the proposed resolution. 
-
-GitHub+1
+These are compatible with the proposed resolution.
 
 B2. Existing mutation result
 W06 §10.2 proposes:
@@ -144,7 +129,6 @@ W06 §10.2 proposes:
   }
 }
 
-
 This already recognizes that commitment and derived completion are different.
 
 W06 §11.2 goes further and introduces a dependency revision vector:
@@ -154,7 +138,6 @@ Collision Revision:  43
 Navigation Revision: 42
 Economy Revision:     89
 Replication Revision:120
-
 
 The example correctly illustrates that different representations can be at different revisions.
 
@@ -166,9 +149,7 @@ However, neither example fully specifies:
 - How stale data is prevented from being used in critical interactions.
 - How multiple regions establish causal consistency.
 - What exactly a replication-ready state guarantees.
-These are the missing parts of C-05. 
-
-GitHub+1
+These are the missing parts of C-05.
 
 B3. Other workers' existing assumptions
 W02 — Physics
@@ -177,42 +158,31 @@ W02 §7.1 defines an authoritative simulation tick with a command collection pha
 
 This provides a natural activation point for physics-affecting mutations.
 
-W02 also separates collision detection from ownership of physical body state. The mutation lifecycle must preserve that separation. 
-
-GitHub+1
+W02 also separates collision detection from ownership of physical body state. The mutation lifecycle must preserve that separation.
 
 W05 — Distributed regions
 
 W05 §2.6 defines single-region authority and monotonic owner_epoch fencing.
 
-Cross-region commands cannot simply assume that all region owners share one synchronized state. 
-
-GitHub+1
+Cross-region commands cannot simply assume that all region owners share one synchronized state.
 
 W07 — Replication
 
 W07 §7.1–7.5 proposes component-level replication, event-driven static entities, snapshot baselines and independently scheduled updates.
 
-It also establishes that Unity maintains authoritative, predicted and interpolated representations separately. 
-
-GitHub+2
+It also establishes that Unity maintains authoritative, predicted and interpolated representations separately.
 
 W08 — Environment
 
 W08 §1 and §9.3 describe hierarchical environmental simulation with different spatial resolutions and frequencies.
 
-A terrain mutation may therefore affect several environmental representations at different times. 
-
-GitHub+1
+A terrain mutation may therefore affect several environmental representations at different times.
 
 W09 — Distributed execution
 
 W09 §5.4 explicitly rejects global synchronization of every physics tick and proposes strong, bounded and eventual consistency according to the type of interaction.
 
-This is a critical constraint for C-05. 
-
-GitHub
-
+This is a critical constraint for C-05.
 
 C. Problem analysis
 C1. The meaning of committed is underspecified
@@ -231,9 +201,7 @@ For persistent mutations, the successful acknowledgement must correspond to a re
 
 This does not require every physics tick to synchronously write its complete state to a database.
 
-W05 and W09 already distinguish high-frequency in-memory simulation from journal and snapshot persistence. However, their durability acknowledgement and recovery-point guarantees remain unspecified. 
-
-GitHub+1
+W05 and W09 already distinguish high-frequency in-memory simulation from journal and snapshot persistence. However, their durability acknowledgement and recovery-point guarantees remain unspecified.
 
 C2. A revision number is not a consistency guarantee
 Consider:
@@ -241,7 +209,6 @@ World revision:       121
 Collision revision:    43
 Navigation revision:   42
 Environment revision:  44
-
 
 This tells us that derived representations are behind.
 
@@ -259,7 +226,6 @@ C3. Asynchronous processing creates ordering hazards
 Example:
 Mutation A: Destroy wall
 Mutation B: Build bridge
-
 
 Both affect terrain and collision.
 
@@ -344,9 +310,7 @@ Requirement from C-05:
 Requirement from W01:
 - C-05 must preserve coordinate-frame identity.
 - Environmental updates must not introduce ambiguous coordinate or unit semantics.
-Compatibility: compatible, with a required revision-provenance extension. 
-
-GitHub+1
+Compatibility: compatible, with a required revision-provenance extension.
 
 D2. W02 — Universal physics runtime
 W02 owns physical integration, contacts, collision and physical state.
@@ -361,9 +325,7 @@ Requirement from W02:
 - Mutations must arrive as queued commands or immutable inputs.
 - Other subsystems must not directly alter physical state.
 - The physics runtime must identify which world mutation frontier it has activated.
-Compatibility: compatible, but W02 needs an explicit external mutation activation contract. 
-
-GitHub+1
+Compatibility: compatible, but W02 needs an explicit external mutation activation contract.
 
 D3. W03 — Specialized physical entities
 W03 defines vehicle, character, aircraft, drone, rocket and spacecraft behavior.
@@ -376,9 +338,7 @@ Required coordination:
 - Physical entities must query current authoritative collision and environmental representations.
 - Specialized solvers must not maintain independent, conflicting copies of the world's physical geometry.
 - Changes to specialized entity configuration must be versioned separately from world geometry.
-Compatibility: compatible, with shared revision and activation metadata. 
-
-GitHub
+Compatibility: compatible, with shared revision and activation metadata.
 
 D4. W04 — Celestial simulation
 W04 operates on astronomical state and physical models at different scales.
@@ -391,9 +351,7 @@ Required coordination:
 - Celestial changes must declare their affected physical and environmental domains.
 - Global astronomical updates must not be treated as ordinary local terrain mutations.
 - Simulation-time semantics must remain explicit.
-Compatibility: compatible, provided mutation dependency scope is not restricted to geographic regions. 
-
-GitHub+1
+Compatibility: compatible, provided mutation dependency scope is not restricted to geographic regions.
 
 D5. W05 — Distributed regions
 W05 is a critical dependency.
@@ -405,9 +363,7 @@ Required coordination:
 - Cross-region operations must coordinate their participants.
 - Ownership migration must preserve journal sequence and projection checkpoints.
 - Old owners must not publish valid updates after fencing.
-Compatibility: compatible, but W05 must adopt the mutation transaction and projection checkpoint contracts defined here. 
-
-GitHub+1
+Compatibility: compatible, but W05 must adopt the mutation transaction and projection checkpoint contracts defined here.
 
 D6. W07 — Replication
 W07 requires world epoch, revision and entity-state version metadata.
@@ -417,9 +373,7 @@ Required coordination:
 - Structural events must not be confused with physics activation.
 - Clients must know whether received data is authoritative, predicted or interpolated.
 - Static objects must support event-driven updates.
-Compatibility: compatible, with additional consistency metadata. 
-
-GitHub+1
+Compatibility: compatible, with additional consistency metadata.
 
 D7. W08 — Environmental simulation
 W08 explicitly supports independent global, regional, local and interaction environmental levels.
@@ -428,9 +382,7 @@ Required coordination:
 - Mutations must invalidate only affected environmental representations.
 - Environmental projections must expose input revisions and simulation time.
 - Different environmental frequencies must remain independent.
-Compatibility: compatible and strongly aligned with dependency-driven processing. 
-
-GitHub+1
+Compatibility: compatible and strongly aligned with dependency-driven processing.
 
 D8. W09 — Distributed execution
 W09 explicitly rejects a globally synchronized physics tick.
@@ -442,10 +394,7 @@ Required coordination:
 - Cross-region critical interactions must use bounded or strong coordination.
 - Independent regions must continue executing.
 - Recovery must preserve committed mutations and fencing.
-Compatibility: compatible. W09 provides the distributed execution foundation for this proposal. 
-
-GitHub+1
-
+Compatibility: compatible. W09 provides the distributed execution foundation for this proposal.
 
 E. Alternatives
 E1. Alternative A — Universal mutation completion barrier
@@ -465,7 +414,6 @@ Navigation complete
 Replication complete
     ↓
 Mutation Complete
-
 
 Advantages:
 - Simple status interpretation.
@@ -531,7 +479,6 @@ Extensibility	Limited	Good	Excellent
 W05 compatibility	Weak	Partial	Strong
 W09 compatibility	Poor	Partial	Strong
 
-
 F. Recommended architecture
 F1. Fundamental ownership model
 The architecture must maintain one authoritative source of truth for each mutable domain.
@@ -550,9 +497,9 @@ The mutation system does not own every derived representation.
 It owns the authoritative mutation history and the contracts governing its consequences.
 F2. Proposed lifecycle
 1. Requested
-   
+
    An actor submits a mutation command.
-   
+
    The command contains:
    - Command ID.
    - Actor and authorization context.
@@ -563,51 +510,51 @@ F2. Proposed lifecycle
    - Payload and schema version.
    - Idempotency key.
 2. Validated
-   
+
    Rust validates structural correctness, authorization, world constraints, resource requirements and transaction boundaries.
-   
+
    Stale revisions or ownership epochs are rejected or explicitly reconciled.
 3. Prepared
-   
+
    All necessary authoritative transaction participants prepare their changes.
-   
+
    For ordinary single-region operations this can be a local transaction.
-   
+
    Multi-region operations use explicit coordination where atomicity is required.
 4. Committed
-   
+
    The authoritative transaction is applied atomically.
-   
+
    The immutable event and recoverable commit record are established.
-   
+
    The world revision advances in the relevant authoritative partition.
-   
+
    This is the point at which the mutation becomes an authoritative historical fact.
 5. Published
-   
+
    A durable event/outbox becomes available to dependent subsystems.
-   
+
    Delivery may be asynchronous and repeated.
-   
+
    Consumers identify events by stable IDs and process them idempotently.
 6. Projected
-   
+
    Each affected subsystem updates its own representation.
-   
+
    Processing can be parallel where dependencies allow.
-   
+
    Every projection reports its processed input frontier and output version.
 7. Activated
-   
+
    A prepared projection is atomically switched into operational use at the appropriate subsystem boundary.
-   
+
    For W02, this is an authoritative physics tick boundary.
-   
+
    Other subsystems define their own activation boundaries.
 8. Converged
-   
+
    All projections required by a particular consistency query or operation have reached the requested causal frontier.
-   
+
    This does not imply that every projection in the entire world is current.
 F3. Commit semantics
 A successful mutation acknowledgement must guarantee:
@@ -657,7 +604,6 @@ The following is an architectural contract, not a finalized wire format.
   "payload": {}
 }
 
-
 Important design decisions:
 - region_revision is monotonic within its authoritative revision domain.
 - owner_epoch fences stale owners.
@@ -671,10 +617,6 @@ Every mutation must resolve into a directed acyclic dependency graph for its req
 
 Example: building a bridge.
 #chatgpt-mermaid-_r_ctm_{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;fill:rgb(26, 28, 31);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_ctm_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_ctm_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_ctm_ .error-icon{fill:rgba(255, 255, 255, 0.96);}#chatgpt-mermaid-_r_ctm_ .error-text{fill:rgb(26, 28, 31);stroke:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_ctm_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_ctm_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_ctm_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_ctm_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_ctm_ .marker{fill:rgba(26, 28, 31, 0.494);stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-_r_ctm_ .marker.cross{stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-_r_ctm_ svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;}#chatgpt-mermaid-_r_ctm_ p{margin:0;}#chatgpt-mermaid-_r_ctm_ .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .cluster-label text{fill:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .cluster-label span{color:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_ctm_ .label text,#chatgpt-mermaid-_r_ctm_ span{fill:rgb(26, 28, 31);color:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .node rect,#chatgpt-mermaid-_r_ctm_ .node circle,#chatgpt-mermaid-_r_ctm_ .node ellipse,#chatgpt-mermaid-_r_ctm_ .node polygon,#chatgpt-mermaid-_r_ctm_ .node path{fill:rgb(224, 237, 254);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .rough-node .label text,#chatgpt-mermaid-_r_ctm_ .node .label text,#chatgpt-mermaid-_r_ctm_ .image-shape .label,#chatgpt-mermaid-_r_ctm_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_ctm_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .rough-node .label,#chatgpt-mermaid-_r_ctm_ .node .label,#chatgpt-mermaid-_r_ctm_ .image-shape .label,#chatgpt-mermaid-_r_ctm_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_ctm_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_ctm_ .root .anchor path{fill:rgba(26, 28, 31, 0.494)!important;stroke-width:0;stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-_r_ctm_ .arrowheadPath{fill:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-_r_ctm_ .edgePath .path{stroke:rgba(26, 28, 31, 0.494);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .flowchart-link{stroke:rgba(26, 28, 31, 0.494);fill:none;}#chatgpt-mermaid-_r_ctm_ .edgeLabel{background-color:rgb(255, 255, 255);text-align:center;}#chatgpt-mermaid-_r_ctm_ .edgeLabel p{background-color:rgb(255, 255, 255);}#chatgpt-mermaid-_r_ctm_ .edgeLabel rect{opacity:0.5;background-color:rgb(255, 255, 255);fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_ctm_ .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#chatgpt-mermaid-_r_ctm_ .cluster rect{fill:rgba(255, 255, 255, 0.96);stroke:rgba(26, 28, 31, 0.08);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .cluster text{fill:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ .cluster span{color:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;background:rgba(255, 255, 255, 0.96);border:1px solid rgba(26, 28, 31, 0.08);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_ctm_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(26, 28, 31);}#chatgpt-mermaid-_r_ctm_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_ctm_ .icon-shape,#chatgpt-mermaid-_r_ctm_ .image-shape{background-color:rgb(255, 255, 255);text-align:center;}#chatgpt-mermaid-_r_ctm_ .icon-shape p,#chatgpt-mermaid-_r_ctm_ .image-shape p{background-color:rgb(255, 255, 255);padding:2px;}#chatgpt-mermaid-_r_ctm_ .icon-shape .label rect,#chatgpt-mermaid-_r_ctm_ .image-shape .label rect{opacity:0.5;background-color:rgb(255, 255, 255);fill:rgb(255, 255, 255);}#chatgpt-mermaid-_r_ctm_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_ctm_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_ctm_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_ctm_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_ctm_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_ctm_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_ctm_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_ctm_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_ctm_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_ctm_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_ctm_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_ctm_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(0, 79, 153);}#chatgpt-mermaid-_r_ctm_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_ctm_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_ctm_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .node rect,#chatgpt-mermaid-_r_ctm_ .node circle,#chatgpt-mermaid-_r_ctm_ .node ellipse,#chatgpt-mermaid-_r_ctm_ .node polygon,#chatgpt-mermaid-_r_ctm_ .node path{fill:rgb(229, 243, 255);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_ctm_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_ctm_ .mermaid-decision .label-container{fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_ctm_ .edgePaths .flowchart-link{stroke:rgba(26, 28, 31, 0.494);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_ctm_ .marker{fill:rgba(26, 28, 31, 0.494);stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-_r_ctm_ :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}BuildingPlaced committedCollision geometryEnvironmental impactStatic replicationPhysics activationHydrology projectionVehicle interactionsWater simulationNavigation updateRoute planningClient presentation
-
-
-
-
 
 The graph is mutation-specific.
 
@@ -720,7 +662,6 @@ Region B:
   Navigation applied: 85
   Replication published: 87
 
-
 This is an illustrative representation.
 
 It is not a proposal for a single global counter.
@@ -755,7 +696,6 @@ Proposed consistency token
     }
   ]
 }
-
 
 applied_revision and active_revision must remain separate.
 
@@ -857,7 +797,6 @@ Coordinator
     +-- Publish regional events
     |
     +-- Independent projection processing
-
 
 The authoritative commit decision must be unique and recoverable.
 

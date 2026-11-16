@@ -10,10 +10,6 @@ V dokumentech už existuje základ pro správné řešení, ale není dotažený
 - W06, 7.1–7.3: výslovně odděluje simulation authority, persistence ownership a network visibility.
 Tohle je důležité: problém není v chybějícím regionálním systému. Problém je v tom, že regionální vlastnictví zatím neurčuje, kdo smí autoritativně řešit celý propojený fyzikální systém.
 
-Zdroje: 
-
-GitHub+4
-
 GPT-03 — Distributed Regions and Physics Islands
 Architecture Resolution · C-03 · Planetary Engine · 16 November 2026
 
@@ -37,20 +33,15 @@ Global spatial world
 
 Independent spatial partitioning
 
-
 Region A
 
 Process 01
 Spatial owner
 
-
 Region B
 
 Process 02
 Spatial owner
-
-
-
 
 Physics Island PI-001
 Single physics authority — Process 01
@@ -94,10 +85,6 @@ W01 even provides the exact architectural examples:
 - Two aircraft sharing an atmospheric region do not necessarily interact physically.
 This is the correct foundation. The missing part is the ownership contract connecting those concepts.
 
-Source: 
-
-GitHub+1
-
 B.3 W02: physical coupling
 W02, sections 9.1–9.2, defines a graph:
 - Nodes represent physical bodies.
@@ -108,10 +95,6 @@ It also states that a vehicle with four wheels and suspension is one coupled con
 Independent islands can execute concurrently, while connected bodies cannot simply be solved independently.
 
 This establishes the physical correctness requirement for distributed execution.
-
-Source: 
-
-GitHub+1
 
 B.4 W05: distributed ownership
 W05, section 2.6, defines:
@@ -129,20 +112,12 @@ Section 2.6 also proposes three cross-region interaction mechanisms:
 3. Ownership migration.
 However, the document does not establish how these mechanisms work when a single physical constraint graph spans multiple owners.
 
-Source: 
-
-GitHub+1
-
 B.5 W09: distributed execution
 W09, sections 5.1–5.5, allows regions to represent more than geographical squares.
 
 It proposes independent regional timelines and rejects global synchronization of every physics tick.
 
 This is compatible with PIAM provided that a physics island has its own timeline and synchronization boundary.
-
-Source: 
-
-GitHub+1
 
 B.6 Important distinction: proposals versus decisions
 The documents contain recommendations, not an accepted and implemented distributed physics protocol.
@@ -327,9 +302,7 @@ W09 must clarify that regional clocks and island clocks are different concepts.
 
 An island spanning multiple regions has one physical integration timeline, even when those regions have independent execution schedules.
 
-Source references: 
-
-GitHub+5
+Source references:
 
 E. Alternatives
 Three technically credible architectures were evaluated.
@@ -448,8 +421,6 @@ PhysicsIslandOwnership {
 
     lifecycle_state: enum
 }
-
-
 
 Suggested lifecycle:
 - ACTIVE
@@ -761,46 +732,37 @@ Physics island ownership must be independent of spatial region ownership.
 
 One physics island has one authoritative solver owner at a committed simulation step.
 
-
 ADR-DISTPHYS-002 — Complete island authority
 
 A process must not independently commit different parts of one connected island using separate authoritative solvers.
-
 
 ADR-DISTPHYS-003 — Independent authority epochs
 
 Physics island authority uses its own monotonically increasing fencing epoch, independent of region ownership epochs.
 
-
 ADR-DISTPHYS-004 — Ghost entity semantics
 
 Ghost entities are read-only replicated state. They cannot commit physical mutations.
-
 
 ADR-DISTPHYS-005 — Atomic island migration
 
 Physical authority migration transfers complete island state, including constraints, solver state and temporal metadata.
 
-
 ADR-DISTPHYS-006 — Island merge and split
 
 Changes in physical connectivity require explicit island topology transitions and authority arbitration.
-
 
 ADR-DISTPHYS-007 — Island simulation time
 
 A physics island has one committed physical timeline independent of regional execution clocks.
 
-
 ADR-DISTPHYS-008 — No default distributed constraint solver
 
 Distributed iterative constraint solving is not required for the foundational architecture. It may be introduced as a specialized future capability.
 
-
 ADR-DISTPHYS-009 — Island-based load balancing
 
 Physics workload must be measured at island level, not exclusively at region level.
-
 
 H.1 Priority
 Priority	ADRs	Reason
@@ -1028,7 +990,6 @@ None
 Repository modifications
 
 None
-
 
 Architecture resolution completed conditionally.
 

@@ -1,12 +1,8 @@
 Potvrzeno. Repozitář `projectzonio/what_if` je veřejně dostupný a podařilo se mi jej otevřít.
 
-
-
 Přístup ověřen
 
-[projectzonio/what_if – GitHub](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)
-
-
+[projectzonio/what_if – GitHub](https://github.com/projectzonio/what_if)
 
 Obsahuje všech devět požadovaných dokumentů `w1.md` až `w9.md`. Nebudu tedy požadovat jejich nahrávání.
 
@@ -32,13 +28,7 @@ The architecture has three principal guarantee levels:
 | D2 — Reproducible  | Replay under a defined numerical tolerance              | Physics, environment, economy, scientific simulation   |
 | D3 — Bitwise       | Identical output for identical versioned inputs         | Selected discrete systems and deterministic algorithms |
 
-This extends the three-level proposal already present in W06 §7.4, rather than introducing a competing global synchronization model.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+This extends the three-level proposal already present in W06 §7.4, rather than introducing a competing global synchronization model.
 
 The most important architectural distinction:
 
@@ -79,13 +69,7 @@ W01 §3.4, lines 420–435, proposes canonical boundary sampling and a determini
 
 It also requires generator updates to use explicit versions instead of silently changing persisted geometry.
 
-This is a good foundation, but it does not yet define the complete reproducibility contract for imported data, generator dependencies or numerical implementation changes.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+This is a good foundation, but it does not yet define the complete reproducibility contract for imported data, generator dependencies or numerical implementation changes.
 
 W02 — Physics runtime
 
@@ -105,13 +89,7 @@ Importantly, it identifies solver state that must be preserved:
 - RNG state.
 - Reference-frame state.
 
-W02 also explicitly warns that Rapier internal snapshots are not stable across different library builds and configurations. It consequently separates internal rollback snapshots from permanent persistence formats.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+W02 also explicitly warns that Rapier internal snapshots are not stable across different library builds and configurations. It consequently separates internal rollback snapshots from permanent persistence formats.
 
 W05 — Authoritative distributed runtime
 
@@ -121,13 +99,7 @@ W05 §9.5, lines 795–816, proposes region migration using ownership epochs and
 
 W05 §6.2, lines 589–614, proposes a hybrid persistence strategy involving an event journal and snapshots.
 
-This provides the basis for replay across process migration, but does not completely specify how pending events, concurrent cross-region interactions and execution history are transferred.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+2
-
-
+This provides the basis for replay across process migration, but does not completely specify how pending events, concurrent cross-region interactions and execution history are transferred.
 
 W06 — World mutation and alternate timelines
 
@@ -139,13 +111,7 @@ W06 §7.4 explicitly rejects assuming global deterministic lockstep and proposes
 
 W06 §7.6 establishes region-specific mutation sequences and ownership.
 
-This is the closest existing proposal to the recommended architecture.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+2
-
-
+This is the closest existing proposal to the recommended architecture.
 
 W07 — Unity prediction
 
@@ -153,13 +119,7 @@ W07 §5.6, lines 800–825, defines client prediction, authoritative reconciliat
 
 The client is explicitly not the authority over physical state. It can predict selected local actions and correct its internal state using server snapshots.
 
-W07 does not establish that Unity and Rust produce identical physics results.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+W07 does not establish that Unity and Rust produce identical physics results.
 
 W08 — Scientific reproducibility
 
@@ -167,13 +127,7 @@ W08 §10.4, lines 620–633, explicitly distinguishes authoritative physical sta
 
 It warns that parallel floating-point calculations cannot automatically be expected to produce bitwise-identical results across different hardware.
 
-It also identifies important replay inputs: model version, initial state, simulation timestamp, random seed, numerical configuration, external forcing and state transitions.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+It also identifies important replay inputs: model version, initial state, simulation timestamp, random seed, numerical configuration, external forcing and state transitions.
 
 W09 — Distributed fidelity
 
@@ -181,13 +135,7 @@ W09 §3.1–3.3, lines 265–313, defines L0–L3 simulation fidelity and requir
 
 W09 §11.5 and §12 establish communication and performance boundaries.
 
-The architecture therefore already recognizes that identical entities can be represented by different numerical models at different fidelity levels.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+2
-
-
+The architecture therefore already recognizes that identical entities can be represented by different numerical models at different fidelity levels.
 
 ### B.3 Existing architecture status
 

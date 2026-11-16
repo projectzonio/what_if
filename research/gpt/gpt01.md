@@ -8,15 +8,11 @@ Otevřel jsem všech devět dokumentů. Budu vycházet z jejich skutečného obs
 
 Architecture research · Cross-worker consolidation · 16 November 2026
 
-
-
 Resolved conditionally
 
 Implementation prohibited
 
-
-
-Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)\
+Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if)\
 Scope: C-01 — Conflicting world time models\
 Role: Principal Systems Architect — Independent Resolution Worker
 
@@ -98,7 +94,7 @@ W01 §2.7, lines 308–325, also establishes that global coordinates, local simu
 
 Finding: W01 is compatible with a canonical simulation timeline. Its integer-time proposal needs a more precise representation contract.
 
-Source: [W01](https://github.com/projectzonio/what_if/blob/main/w1.md?utm_source=chatgpt.com).
+Source: [W01](https://github.com/projectzonio/what_if/blob/main/w1.md).
 
 ## B.3 W02 — Physics runtime
 
@@ -116,7 +112,7 @@ Finding: W02 describes a physics execution cadence, not a requirement for global
 
 The 60 Hz recommendation should remain a candidate physics profile.
 
-Source: [W02](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com).
+Source: [W02](https://github.com/projectzonio/what_if/blob/main/w2.md).
 
 ## B.4 W03 — Physical entities and model time
 
@@ -136,7 +132,7 @@ Finding: W03 already rejects the idea that every physical subsystem must execute
 
 Its common simulation clock should be interpreted as a shared temporal coordinate, not a shared execution loop.
 
-Source: [W03](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com).
+Source: [W03](https://github.com/projectzonio/what_if/blob/main/w3.md).
 
 ## B.5 W04 — Celestial and universe simulation
 
@@ -156,7 +152,7 @@ W04 also introduces a dedicated Time Service in §4.1, lines 626–663.
 
 Finding: W04 correctly establishes the shared temporal foundation but does not fully define distributed regional execution or causal consistency.
 
-Source: [W04](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com).
+Source: [W04](https://github.com/projectzonio/what_if/blob/main/w4.md).
 
 ## B.6 W05 — Distributed ownership and migration
 
@@ -177,7 +173,7 @@ Finding: Ownership epochs solve authority fencing. They do not establish tempora
 
 A transferred region needs a canonical simulation-time checkpoint and a committed event position, not merely a tick counter.
 
-Source: [W05](https://github.com/projectzonio/what_if/blob/main/w5.md?utm_source=chatgpt.com).
+Source: [W05](https://github.com/projectzonio/what_if/blob/main/w5.md).
 
 ## B.7 W06 — Gameplay and branching
 
@@ -198,7 +194,7 @@ Finding: W06 requires timeline identity to become a persistent world-level conce
 
 A branch cannot be identified solely by a timestamp or snapshot ID.
 
-Source: [W06](https://github.com/projectzonio/what_if/blob/main/w6.md?utm_source=chatgpt.com).
+Source: [W06](https://github.com/projectzonio/what_if/blob/main/w6.md).
 
 ## B.8 W07 — Multiplayer and client synchronization
 
@@ -216,7 +212,7 @@ Finding: W07 is highly compatible with the proposed architecture.
 
 However, its single server simulation tick must be generalized to a regional execution coordinate and canonical world-time position.
 
-Source: [W07](https://github.com/projectzonio/what_if/blob/main/w7.md?utm_source=chatgpt.com).
+Source: [W07](https://github.com/projectzonio/what_if/blob/main/w7.md).
 
 ## B.9 W08 — Environmental simulation
 
@@ -226,7 +222,7 @@ W08 §9.1, lines 567–574, places environmental authority in Rust.
 
 Finding: Environmental simulation must consume canonical world time while retaining its own update cadence and numerical integration strategy.
 
-Source: [W08](https://github.com/projectzonio/what_if/blob/main/w8.md?utm_source=chatgpt.com).
+Source: [W08](https://github.com/projectzonio/what_if/blob/main/w8.md).
 
 ## B.10 W09 — Runtime and distributed scheduling
 
@@ -242,7 +238,7 @@ Finding: W09 correctly identifies the distributed execution problem, but the phr
 
 Independent clocks must not imply independent definitions of world time.
 
-Source: [W09](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com).
+Source: [W09](https://github.com/projectzonio/what_if/blob/main/w9.md).
 
 # C. Problem analysis
 
@@ -1483,14 +1479,14 @@ All nine worker documents were examined, with the following sections providing t
 
 | Source                                                                                | Relevant sections                                  |
 | ------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| [W01](https://github.com/projectzonio/what_if/blob/main/w1.md?utm_source=chatgpt.com) | §2.7–2.8, spatial precision and astronomical time  |
-| [W02](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com) | §3.1, fixed timestep and 60 Hz proposal            |
-| [W03](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com) | §6.3–6.4, model time and determinism               |
-| [W04](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com) | §3.7 and §4.1, universal time architecture         |
-| [W05](https://github.com/projectzonio/what_if/blob/main/w5.md?utm_source=chatgpt.com) | §2.6 and §9.2–9.3, ownership and migration         |
-| [W06](https://github.com/projectzonio/what_if/blob/main/w6.md?utm_source=chatgpt.com) | §7.6, §8.1, regional migration and branches        |
-| [W07](https://github.com/projectzonio/what_if/blob/main/w7.md?utm_source=chatgpt.com) | §8, time synchronization                           |
-| [W08](https://github.com/projectzonio/what_if/blob/main/w8.md?utm_source=chatgpt.com) | §8.5 and §9, environmental simulation              |
-| [W09](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com) | §2.2 and §5.4–5.5, scheduling and distributed time |
+| [W01](https://github.com/projectzonio/what_if/blob/main/w1.md) | §2.7–2.8, spatial precision and astronomical time  |
+| [W02](https://github.com/projectzonio/what_if/blob/main/w2.md) | §3.1, fixed timestep and 60 Hz proposal            |
+| [W03](https://github.com/projectzonio/what_if/blob/main/w3.md) | §6.3–6.4, model time and determinism               |
+| [W04](https://github.com/projectzonio/what_if/blob/main/w4.md) | §3.7 and §4.1, universal time architecture         |
+| [W05](https://github.com/projectzonio/what_if/blob/main/w5.md) | §2.6 and §9.2–9.3, ownership and migration         |
+| [W06](https://github.com/projectzonio/what_if/blob/main/w6.md) | §7.6, §8.1, regional migration and branches        |
+| [W07](https://github.com/projectzonio/what_if/blob/main/w7.md) | §8, time synchronization                           |
+| [W08](https://github.com/projectzonio/what_if/blob/main/w8.md) | §8.5 and §9, environmental simulation              |
+| [W09](https://github.com/projectzonio/what_if/blob/main/w9.md) | §2.2 and §5.4–5.5, scheduling and distributed time |
 
 Deliverable status: Architecture resolution completed. No repository files modified, no implementation performed, and no benchmark results invented. The remaining conditions are explicitly assigned to cross-worker integration and validation.

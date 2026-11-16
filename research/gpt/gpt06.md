@@ -2,17 +2,13 @@
 
 ## Multirate Simulation Scheduler
 
-
-
 Architecture resolution: conditionally resolved
 
 Research only — no implementation
 
-
-
 Role: Principal Systems Architect — Independent Architecture Resolution Worker
 
-Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)
+Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if)
 
 Scope: C-06 — Conflicting simulation frequencies and scheduling assumptions.
 
@@ -127,7 +123,7 @@ Its proposed domain scheduling distinguishes interactive rigid bodies, vehicle d
 
 Importantly, it allows multiple substeps within one authoritative world interval.
 
-Source: [W02 §7.1–7.2](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com), lines 619–674.
+Source: [W02 §7.1–7.2](https://github.com/projectzonio/what_if/blob/main/w2.md), lines 619–674.
 
 ## B.3 W03 — Specialized physical models
 
@@ -149,7 +145,7 @@ These are research starting points, not measured requirements.
 
 The drone controller example is particularly important: an internal controller can execute more frequently than the world-level physics interval, provided its state is integrated consistently over that interval.
 
-Source: [W03 §6.3](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com), lines 1537–1559.
+Source: [W03 §6.3](https://github.com/projectzonio/what_if/blob/main/w3.md), lines 1537–1559.
 
 ## B.4 W04 — Astronomical simulation
 
@@ -166,7 +162,7 @@ It also establishes that accelerating simulation time must not automatically inc
 
 The scheduler requests a simulation interval; the numerical solver determines the appropriate internal integration steps.
 
-Source: [W04 §3.7](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com), lines 519–577.
+Source: [W04 §3.7](https://github.com/projectzonio/what_if/blob/main/w4.md), lines 519–577.
 
 ## B.5 W05 — Regional simulation
 
@@ -183,7 +179,7 @@ W05 also separates Tokio networking from dedicated simulation workers.
 
 This is important: asynchronous networking must not determine authoritative physics execution order.
 
-Sources: [W05 §2.3](https://github.com/projectzonio/what_if/blob/main/w5.md?utm_source=chatgpt.com), lines 283–310; [W05 §4](https://github.com/projectzonio/what_if/blob/main/w5.md?utm_source=chatgpt.com), lines 488–515.
+Sources: [W05 §2.3](https://github.com/projectzonio/what_if/blob/main/w5.md), lines 283–310; [W05 §4](https://github.com/projectzonio/what_if/blob/main/w5.md), lines 488–515.
 
 ## B.6 W06 — Gameplay scheduling
 
@@ -201,7 +197,7 @@ W06 §12.2 provides a useful initial frequency model:
 
 W06 explicitly recommends event-driven processing for production completion, resource availability, ownership transfers and market transactions.
 
-Source: [W06 §12.2–12.3](https://github.com/projectzonio/what_if/blob/main/w6.md?utm_source=chatgpt.com), lines 1483–1516.
+Source: [W06 §12.2–12.3](https://github.com/projectzonio/what_if/blob/main/w6.md), lines 1483–1516.
 
 ## B.7 W07 — Client synchronization
 
@@ -216,7 +212,7 @@ The client receives server tick, simulation timestamp, world epoch and entity ve
 
 Unity's fixed update must not become the authoritative world clock.
 
-Source: [W07 §8](https://github.com/projectzonio/what_if/blob/main/w7.md?utm_source=chatgpt.com), lines 1041–1117.
+Source: [W07 §8](https://github.com/projectzonio/what_if/blob/main/w7.md), lines 1041–1117.
 
 ## B.8 W08 — Environmental simulation
 
@@ -233,7 +229,7 @@ These are different computational representations of one environment, not four i
 
 The worker explicitly identifies mismatched temporal resolutions and incorrect interpolation as critical risks.
 
-Sources: [W08 §1](https://github.com/projectzonio/what_if/blob/main/w8.md?utm_source=chatgpt.com), lines 170–180; [W08 risk register](https://github.com/projectzonio/what_if/blob/main/w8.md?utm_source=chatgpt.com), lines 666–675.
+Sources: [W08 §1](https://github.com/projectzonio/what_if/blob/main/w8.md), lines 170–180; [W08 risk register](https://github.com/projectzonio/what_if/blob/main/w8.md), lines 666–675.
 
 ## B.9 W09 — Distributed performance architecture
 
@@ -254,7 +250,7 @@ Crucially, W09 explicitly states that these operations need not all complete syn
 
 W09 also proposes region-local scheduling, adaptive fidelity and specialized physics islands.
 
-Sources: [W09 §2.2](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com), lines 221–238; [W09 §13](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com), lines 794–835.
+Sources: [W09 §2.2](https://github.com/projectzonio/what_if/blob/main/w9.md), lines 221–238; [W09 §13](https://github.com/projectzonio/what_if/blob/main/w9.md), lines 794–835.
 
 # C. Problem analysis
 
@@ -1571,23 +1567,15 @@ The following repository documents were inspected for cross-system dependencies 
 
 | Document                                                                              | Relevant evidence           |
 | ------------------------------------------------------------------------------------- | --------------------------- |
-| [W01](https://github.com/projectzonio/what_if/blob/main/w1.md?utm_source=chatgpt.com) | §2.8, lines 326–334; §4.1   |
-| [W02](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com) | §7.1–7.2, lines 619–674     |
-| [W03](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com) | §6.3, lines 1537–1559       |
-| [W04](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com) | §3.7, lines 519–577         |
-| [W05](https://github.com/projectzonio/what_if/blob/main/w5.md?utm_source=chatgpt.com) | §2.3, lines 283–310; §4     |
-| [W06](https://github.com/projectzonio/what_if/blob/main/w6.md?utm_source=chatgpt.com) | §12.2–12.3, lines 1483–1516 |
-| [W07](https://github.com/projectzonio/what_if/blob/main/w7.md?utm_source=chatgpt.com) | §8, lines 1041–1117         |
-| [W08](https://github.com/projectzonio/what_if/blob/main/w8.md?utm_source=chatgpt.com) | §1, lines 170–180; §10      |
-| [W09](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com) | §2.2, lines 221–238; §13–14 |
-
-Evidence citations:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+10
-
-
+| [W01](https://github.com/projectzonio/what_if/blob/main/w1.md) | §2.8, lines 326–334; §4.1   |
+| [W02](https://github.com/projectzonio/what_if/blob/main/w2.md) | §7.1–7.2, lines 619–674     |
+| [W03](https://github.com/projectzonio/what_if/blob/main/w3.md) | §6.3, lines 1537–1559       |
+| [W04](https://github.com/projectzonio/what_if/blob/main/w4.md) | §3.7, lines 519–577         |
+| [W05](https://github.com/projectzonio/what_if/blob/main/w5.md) | §2.3, lines 283–310; §4     |
+| [W06](https://github.com/projectzonio/what_if/blob/main/w6.md) | §12.2–12.3, lines 1483–1516 |
+| [W07](https://github.com/projectzonio/what_if/blob/main/w7.md) | §8, lines 1041–1117         |
+| [W08](https://github.com/projectzonio/what_if/blob/main/w8.md) | §1, lines 170–180; §10      |
+| [W09](https://github.com/projectzonio/what_if/blob/main/w9.md) | §2.2, lines 221–238; §13–14 |
 
 Research boundary: No implementation, production code, or repository modifications were performed. Numerical frequencies and performance budgets remain proposals pending benchmarking.
 

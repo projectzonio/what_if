@@ -11,7 +11,7 @@ Architecture resolution
 Implementation prohibited
 
 Project: Planetary Engine\
-Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)\
+Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if)\
 Assigned problem: C-04 — Inconsistent entity state representations\
 Role: Principal Systems Architect — Independent Architecture Resolution Worker\
 Scope: W01–W09
@@ -92,13 +92,7 @@ W01 section 2.7 proposes hierarchical coordinates with frame identifiers, anchor
 
 Its section 6.3 also proposes a WorldState containing entity identity, simulation instant, position, orientation, linear velocity, angular velocity and world revision.
 
-This is a strong foundation, but it does not fully define identity, lifecycle, capabilities or authority.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+This is a strong foundation, but it does not fully define identity, lifecycle, capabilities or authority.
 
 W02 — Physics and ECS
 
@@ -111,13 +105,7 @@ W02 section 8.1 explicitly recommends data-oriented ECS:
 
 W02 section 7 also defines a multi-rate simulation pipeline.
 
-This is compatible with the proposed architecture, provided ECS identifiers are not confused with persistent entity identities.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+This is compatible with the proposed architecture, provided ECS identifiers are not confused with persistent entity identities.
 
 W03 — Physical composition
 
@@ -127,13 +115,7 @@ Its central physical entity model includes position, velocity, orientation, mass
 
 W03 section 2.4 explicitly requires one physical identity across surface-to-orbit transitions.
 
-This is an important existing decision that should be preserved.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+This is an important existing decision that should be preserved.
 
 W04 — Astronomical entities
 
@@ -141,13 +123,7 @@ W04 section 3.1 recognizes that planets, stars, satellites, asteroids and galaxi
 
 Its section 5.1 proposes a celestial entity contract containing entity ID, type, parent ID, physical model, gravity model, mass, reference frame, state epoch and physical state.
 
-The important distinction is that celestial hierarchy is not equivalent to physical interaction hierarchy.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+The important distinction is that celestial hierarchy is not equivalent to physical interaction hierarchy.
 
 W05 — Server state
 
@@ -168,13 +144,7 @@ W05 section 9.4 proposes an EntitySnapshot with:
 
 This is a useful transport-oriented snapshot proposal, but it is insufficient as the canonical entity model.
 
-For example, it does not independently describe the coordinate frame, temporal scale, entity lifecycle or component schema versions.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+For example, it does not independently describe the coordinate frame, temporal scale, entity lifecycle or component schema versions.
 
 W06 — Persistence and authority
 
@@ -184,13 +154,7 @@ W06 sections 2.2, 7.2 and 8.1 establish three particularly important principles:
 - Explicit authority epochs.
 - Branches based on shared parent state and copy-on-write differences.
 
-These should become part of the common entity architecture.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+2
-
-
+These should become part of the common entity architecture.
 
 W07 — Replication
 
@@ -202,13 +166,7 @@ Its section 20 proposes three separate client representations:
 2. Presentation state.
 3. Rendering state.
 
-This is compatible with the canonical entity model and should be adopted.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+This is compatible with the canonical entity model and should be adopted.
 
 W08 — Environment
 
@@ -216,25 +174,13 @@ W08 section 10.4 distinguishes authoritative physical state from scientific repr
 
 It requires recording model versions, initial conditions, timestamps, random seeds and numerical configuration.
 
-Environmental state therefore needs its own temporal and provenance semantics, rather than being embedded indiscriminately into every entity.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+Environmental state therefore needs its own temporal and provenance semantics, rather than being embedded indiscriminately into every entity.
 
 W09 — Distributed execution
 
 W09 section 3.1 defines L0–L3 simulation representations and explicitly states that these are different computational representations of the same logical entity.
 
-Its section 5.1 defines region ownership and migration with ownership epochs and fencing.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Its section 5.1 defines region ownership and migration with ownership epochs and fencing.
 
 ### B3. Existing architectural status
 
@@ -406,13 +352,7 @@ Compatibility: high.
 
 Required clarification: the coordinate encoding must not become part of EntityID or entity type.
 
-W01 section 6.2 already provides a suitable conceptual foundation.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+W01 section 6.2 already provides a suitable conceptual foundation.
 
 W02 — Universal Physics
 
@@ -576,13 +516,7 @@ Disadvantages:
 - Does not define external serialization.
 - Does not establish temporal validity.
 
-W02 and W06 already identify the limitations of treating ECS as the complete architecture.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+W02 and W06 already identify the limitations of treating ECS as the complete architecture.
 
 ### E3. Alternative C — Persistent identity with canonical state envelope and capability composition
 
@@ -795,13 +729,7 @@ Important rules:
 - Reactivation preserves identity.
 - A physically detached component or vehicle stage can become a new entity through an explicit creation event.
 
-W03 section 6.3 already describes rocket staging as a physical event that creates a new entity. This is consistent with the lifecycle model.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+W03 section 6.3 already describes rocket staging as a physical event that creates a new entity. This is consistent with the lifecycle model.
 
 ### F5. Spatial representation
 
@@ -1021,13 +949,7 @@ The reconstruction must not pretend that unavailable historical information was 
 
 The fidelity manager owns the transition policy. Specialized domain modules own the conversion logic.
 
-This is consistent with W09 section 3.2, which assigns fidelity transitions to domain-specific functions.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+This is consistent with W09 section 3.2, which assigns fidelity transitions to domain-specific functions.
 
 ### F11. Authority and ownership
 
@@ -1183,13 +1105,7 @@ It has a separate BranchID and independent revision history.
 
 Use copy-on-write or immutable checkpoint references as proposed by W06.
 
-A branch merge must validate its mutations against the target branch's current state rather than blindly applying historical events.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+A branch merge must validate its mutations against the target branch's current state rather than blindly applying historical events.
 
 ### F15. Proposed canonical interfaces
 

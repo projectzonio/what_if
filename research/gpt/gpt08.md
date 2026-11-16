@@ -1,6 +1,6 @@
 Repozitář `projectzonio/what_if` je skutečně veřejně přístupný. Ověřil jsem přístup a otevřel všech devět dokumentů `w1.md` až `w9.md`.
 
-[Otevřít Planetary Engine – GitHub](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)
+[Otevřít Planetary Engine – GitHub](https://github.com/projectzonio/what_if)
 
 Začínám tedy vlastní architektonickou analýzu GPT-08 nad společným návrhem, nikoliv pouze nad W08.
 
@@ -18,7 +18,7 @@ Research only
 
 W01–W09 reviewed
 
-Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)\
+Repository: [projectzonio/what_if](https://github.com/projectzonio/what_if)\
 Assigned problem: C-08 — Inconsistent fidelity and model transitions\
 Scope: Unified entity and environmental simulation fidelity architecture.
 
@@ -86,13 +86,7 @@ This is correct and must be preserved.
 
 W01 also proposes replaceable environmental providers, allowing different physical fidelity levels without changing the entities consuming environmental information.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: Spatial representation and computational physical fidelity must not be coupled through a single LOD variable.
 
@@ -108,13 +102,7 @@ This establishes an important distinction:
 - Numerical integration step size is not necessarily the same as authoritative world tick frequency.
 - Changing the solver must not silently change the meaning of simulation time.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: Fidelity transitions must be compatible with multiple numerical integration strategies.
 
@@ -134,13 +122,7 @@ W03 also identifies an unresolved decision: common external fidelity tiers versu
 
 Its recommendation is common external tiers with subsystem-specific internal implementations.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: The common-tier concept is useful, but must not become a universal model taxonomy that forces incompatible simulation domains into identical levels.
 
@@ -154,13 +136,7 @@ The transition must preserve position and velocity, while considering accelerati
 
 W04 explicitly recommends state-transfer operations with measurable error budgets.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: This is a model transition, not a visual LOD operation.
 
@@ -178,13 +154,7 @@ W05, section 2.6, lines 376–417, defines a region ownership model with:
 
 The old owner must not continue authoritative simulation after ownership changes.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: Fidelity transitions must be subordinate to authoritative ownership. A model cannot independently claim authority merely because it has been activated.
 
@@ -194,13 +164,7 @@ W06, sections 7.2–7.6 and 8, provides entity authority, ordered commands, seve
 
 It explicitly rejects assuming global deterministic lockstep across all simulation domains.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+Reference:
 
 Assessment: Transitions must be recorded as authoritative, replayable operations, without requiring bitwise deterministic execution everywhere.
 
@@ -214,13 +178,7 @@ It proposes three representations:
 - Presentation state.
 - Rendering state.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub
-
-
+Reference:
 
 Assessment: Unity must not trigger authoritative physical transitions by changing its visual LOD or camera representation.
 
@@ -237,13 +195,7 @@ Crucially, these must not become four disconnected simulations.
 
 Section 12.2, lines 672–682, proposes explicit mass, momentum, energy and water conservation budgets.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: Environmental transitions require explicit coupling and conservation, not merely interpolation between two resolutions.
 
@@ -265,13 +217,7 @@ It also makes two particularly important recommendations:
 - Fidelity decisions depend on distance, importance, interaction, available capacity and gameplay context.
 - Conversion between fidelity levels is domain-specific, not a universal generic conversion of physical components.
 
-Reference:&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Reference:
 
 Assessment: W09 provides the strongest starting point for the common entity transition architecture.
 
@@ -937,10 +883,6 @@ A generic component copy is not sufficient.
 
 ### Example: vehicle
 
-[Understanding Multibody Dynamics and Simpack](https://images.openai.com/static-rsc-4/G4ydBUbZroVIU6zVLTnfoH28v3c2gWXO8EPtByhOe5OGi6MlEwyFwT3TmcxLC0dp7_ioJxVJJOLvryA6pMAb_fuFsKZo54OAGTOeW6DXuWfqetUq2A62vhla_muYKLJWTFRH9zwhEEw1_ObiD4ZSu5Z4NRZI9nrifjkOfOvuerA?purpose=inline)
-
-[blog.3ds.com](https://blog.3ds.com/brands/simulia/understanding-multibody-dynamics-simpack/?utm_source=chatgpt.com)
-
 A vehicle transitions from simplified vehicle dynamics to detailed suspension and tire simulation.
 
 The transformation needs to preserve:
@@ -965,10 +907,6 @@ It must not silently invent physically exact wheel states.
 
 ### Example: astronomy
 
-[Scientific Machine Learning Research Bootcamp | Vizuara AI Labs](https://images.openai.com/static-rsc-4/GAhhLc8H8NgAtyhbZrGavS7yFd81b1gM3pOUs0T3Nuc0RhZEKeGaumU331QIRqwJYrESsupXOVYYiBVA94OyQz9NGhQaJRkdhTjxJ1bUFEehLLFO6i8IRfLMi8NegrCNSkofOgrZyzg3U4nNxmIV_pPp4MdkR65BkFVaZps835E?purpose=inline)
-
-[sciml-research.vizuara.ai](https://sciml-research.vizuara.ai/?utm_source=chatgpt.com)
-
 A planet transitions from analytical Keplerian propagation to numerical N-body integration.
 
 Required transfer:
@@ -988,10 +926,6 @@ The resulting difference in acceleration and subsequent trajectory is an expecte
 The error budget must distinguish initialization discontinuity from subsequent numerical divergence.
 
 ### Example: environment
-
-[Towards eliminating a decade-old climate model bias – Institute for Atmospheric and Climate Science | ETH Zurich](https://images.openai.com/static-rsc-4/BwGCQ1OypySae8EiUSp7z5Aqj8GtlXkErKr47fh_3Fr-F2377daLTeO_K3HhFdcM6Dbf3SPIdoxgOHftip6AyUDEmhArmX-_KdOeRBToyTkTSNud_HWgP5xJPJfPXUpz375noqCB6Lh0jv1q0vORshEeU8B7zZ6HTXz6Q0n0Myk?purpose=inline)
-
-[iac.ethz.ch](https://iac.ethz.ch/news-and-events/news-en/2023/03/towards-eliminating-a-decade-old-climate-model-bias.html?utm_source=chatgpt.com)
 
 A global environmental model activates a regional high-resolution atmospheric simulation.
 
@@ -1669,7 +1603,7 @@ Final status: Resolved conditionally.
 
 Integration priority: High. The transition contract affects almost every simulation domain.
 
-Source repository: [projectzonio/what_if](https://github.com/projectzonio/what_if?utm_source=chatgpt.com)
+Source repository: [projectzonio/what_if](https://github.com/projectzonio/what_if)
 
 Important limitation: This resolution is based on the publicly accessible contents of the nine worker documents. It does not claim that the proposed ADRs have been accepted, that the contracts have been implemented, or that validation benchmarks have been executed.
 

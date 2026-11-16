@@ -1,6 +1,6 @@
 Máš pravdu. Ověřil jsem repozitář přímo na GitHubu:
 
-[projectzonio/what_if – Planetary Engine](https://github.com/projectzonio/what_if?utm_source=chatgpt.com).
+[projectzonio/what_if – Planetary Engine](https://github.com/projectzonio/what_if).
 
 Repozitář je veřejný a GitHub skutečně zobrazuje všech devět požadovaných dokumentů `w1.md` až `w9.md`. Předchozí požadavek na ZIP tedy nebyl oprávněný. Omlouvám se.
 
@@ -26,7 +26,7 @@ Zatím nejdůležitější rozpor:
 
 To znamená, že samotné rozhraní `evaluate_gravity` zatím nemá jednoznačně vymezeného vlastníka ani jasně stanovený vztah k planetárnímu environmentálnímu modelu.
 
-Zdrojové dokumenty: [W01](https://github.com/projectzonio/what_if/blob/main/w1.md?utm_source=chatgpt.com), [W02](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com), [W03](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com) a [W04](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com).
+Zdrojové dokumenty: [W01](https://github.com/projectzonio/what_if/blob/main/w1.md), [W02](https://github.com/projectzonio/what_if/blob/main/w2.md), [W03](https://github.com/projectzonio/what_if/blob/main/w3.md) a [W04](https://github.com/projectzonio/what_if/blob/main/w4.md).
 
 # GPT-02 — C-02 Architecture Resolution
 
@@ -86,13 +86,7 @@ W01 already establishes the correct conceptual foundation:
 - Gravity providers can use constant gravity, point masses, multi-body models and spherical harmonics.
 - Gravity is evaluated at a specified position and time.
 
-Most importantly, W01 section 2.5, lines 268–280, explicitly states that gravitational acceleration must be returned separately from apparent acceleration in rotating frames. It assigns the application of inertial terms to the physics integrator.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+Most importantly, W01 section 2.5, lines 268–280, explicitly states that gravitational acceleration must be returned separately from apparent acceleration in rotating frames. It assigns the application of inertial terms to the physics integrator.
 
 ### B2. W02 — Universal Physics Runtime
 
@@ -107,13 +101,7 @@ Its authoritative tick already contains:
 5. Constraint preparation and solving.
 6. State integration and correction.
 
-W02 also explicitly supports multi-rate scheduling and independent domain solvers.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://raw.githubusercontent.com\&sz=32)
-
-GitHub+2
-
-
+W02 also explicitly supports multi-rate scheduling and independent domain solvers.
 
 However, its force-evaluation phase lists gravity alongside vehicle, aircraft and propulsion providers without sufficiently distinguishing gravity-field evaluation from physical force composition.
 
@@ -129,13 +117,7 @@ It proposes:
 
 This is a good initial ownership proposal.
 
-W03 also defines a specialized force contribution contract containing the receiving entity, force vector, application point, reference frame, source component and validity interval.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+W03 also defines a specialized force contribution contract containing the receiving entity, force vector, application point, reference frame, source component and validity interval.
 
 ### B4. W04 — Celestial and astronomical simulation
 
@@ -151,13 +133,7 @@ W04 introduces:
 
 Its section 5.3 defines `GravityRequest` and `GravityResponse`, with target position, reference frame, epoch, source entities, approximation tolerance, requested fidelity, acceleration, potential and estimated error.
 
-This is a valuable proposal. However, W04 also proposes a celestial runtime with its own authoritative state and scheduling responsibilities. That creates an ownership overlap with W02.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+2
-
-
+This is a valuable proposal. However, W04 also proposes a celestial runtime with its own authoritative state and scheduling responsibilities. That creates an ownership overlap with W02.
 
 ### B5. Other workers
 
@@ -169,13 +145,7 @@ The remaining documents introduce constraints that the gravity architecture must
 - W08: environmental fidelity levels and coupling between astronomical, planetary and local environmental models.
 - W09: physics islands, regional ownership, recovery and scalable execution.
 
-These are architectural constraints, not reasons to create separate gravity implementations.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://raw.githubusercontent.com\&sz=32)
-
-GitHub+4
-
-
+These are architectural constraints, not reasons to create separate gravity implementations.
 
 ## C. Problem analysis
 
@@ -817,12 +787,12 @@ Hlavní podklady pro toto rozhodnutí:
 
 Zásadní zdrojové pasáže:
 
-- [W01 – Non-inertial acceleration](https://github.com/projectzonio/what_if/blob/main/w1.md?utm_source=chatgpt.com#L268)
-- [W02 – Simulation lifecycle](https://github.com/projectzonio/what_if/blob/main/w2.md?utm_source=chatgpt.com#L619)
-- [W03 – Gravity ownership](https://github.com/projectzonio/what_if/blob/main/w3.md?utm_source=chatgpt.com#L533)
-- [W04 – Gravitational models](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com#L324)
-- [W04 – Gravity interface](https://github.com/projectzonio/what_if/blob/main/w4.md?utm_source=chatgpt.com#L683)
-- [W09 – Distributed physics constraints](https://github.com/projectzonio/what_if/blob/main/w9.md?utm_source=chatgpt.com#L794)
+- [W01 – Non-inertial acceleration](https://github.com/projectzonio/what_if/blob/main/w1.md#L268)
+- [W02 – Simulation lifecycle](https://github.com/projectzonio/what_if/blob/main/w2.md#L619)
+- [W03 – Gravity ownership](https://github.com/projectzonio/what_if/blob/main/w3.md#L533)
+- [W04 – Gravitational models](https://github.com/projectzonio/what_if/blob/main/w4.md#L324)
+- [W04 – Gravity interface](https://github.com/projectzonio/what_if/blob/main/w4.md#L683)
+- [W09 – Distributed physics constraints](https://github.com/projectzonio/what_if/blob/main/w9.md#L794)
 
 ### Můj závěr pro centrálního integrátora
 
