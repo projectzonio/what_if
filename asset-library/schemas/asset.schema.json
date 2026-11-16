@@ -5,47 +5,148 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "asset_id", "name", "category", "status", "source", "license",
-    "files", "unity", "provenance"
+    "asset_id",
+    "name",
+    "category",
+    "status",
+    "source",
+    "license",
+    "files",
+    "unity",
+    "provenance"
   ],
   "properties": {
-    "asset_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$" },
-    "name": { "type": "string", "minLength": 1 },
-    "description": { "type": "string" },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
     "category": {
       "type": "string",
-      "enum": ["terrain", "surface_material", "water", "vegetation", "rocks", "architecture", "infrastructure", "vehicle_ground", "rail", "maritime", "aviation", "spacecraft", "orbital", "atmosphere", "weather", "effect", "other"]
+      "enum": [
+        "terrain",
+        "surface_material",
+        "water",
+        "vegetation",
+        "rocks",
+        "architecture",
+        "infrastructure",
+        "vehicle_ground",
+        "rail",
+        "maritime",
+        "aviation",
+        "spacecraft",
+        "orbital",
+        "atmosphere",
+        "weather",
+        "effect",
+        "other"
+      ]
     },
-    "subcategory": { "type": "string" },
-    "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
-    "biomes": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
-    "status": { "const": "approved" },
+    "subcategory": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "biomes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "status": {
+      "const": "approved"
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["publisher", "asset_page_url", "download_page_url"],
+      "required": [
+        "publisher",
+        "asset_page_url",
+        "download_page_url"
+      ],
       "properties": {
-        "publisher": { "type": "string", "minLength": 1 },
-        "creator": { "type": "string" },
-        "asset_page_url": { "type": "string", "format": "uri" },
-        "download_page_url": { "type": "string", "format": "uri" },
-        "source_version": { "type": "string" }
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "creator": {
+          "type": "string"
+        },
+        "asset_page_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "download_page_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "source_version": {
+          "type": "string"
+        }
       }
     },
     "license": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spdx_id", "evidence_url", "scope_note", "verified", "verified_at", "verified_by"],
+      "required": [
+        "spdx_id",
+        "evidence_url",
+        "scope_note",
+        "verified",
+        "verified_at",
+        "verified_by",
+        "third_party_content_reviewed",
+        "restrictions_reviewed"
+      ],
       "properties": {
-        "spdx_id": { "const": "CC0-1.0" },
-        "evidence_url": { "type": "string", "format": "uri" },
-        "secondary_evidence_urls": { "type": "array", "items": { "type": "string", "format": "uri" } },
-        "scope_note": { "type": "string", "minLength": 12 },
-        "verified": { "const": true },
-        "verified_at": { "type": "string", "format": "date-time" },
-        "verified_by": { "type": "string", "minLength": 1 },
-        "third_party_content_reviewed": { "const": true },
-        "restrictions_reviewed": { "const": true }
+        "spdx_id": {
+          "const": "CC0-1.0"
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "secondary_evidence_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "scope_note": {
+          "type": "string",
+          "minLength": 12
+        },
+        "verified": {
+          "const": true
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verified_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "third_party_content_reviewed": {
+          "const": true
+        },
+        "restrictions_reviewed": {
+          "const": true
+        }
       }
     },
     "files": {
@@ -54,15 +155,45 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["role", "filename", "format", "sha256"],
+        "required": [
+          "role",
+          "filename",
+          "format",
+          "sha256"
+        ],
         "properties": {
-          "role": { "type": "string", "enum": ["model", "texture", "hdr", "metadata", "archive", "other"] },
-          "filename": { "type": "string" },
-          "format": { "type": "string" },
-          "resolution": { "type": "string" },
-          "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
-          "download_url": { "type": "string", "format": "uri" },
-          "size_bytes": { "type": "integer", "minimum": 0 }
+          "role": {
+            "type": "string",
+            "enum": [
+              "model",
+              "texture",
+              "hdr",
+              "metadata",
+              "archive",
+              "other"
+            ]
+          },
+          "filename": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          },
+          "download_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
     },
@@ -70,35 +201,105 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "workflow": { "type": "string", "enum": ["metallic_roughness", "specular_glossiness", "unlit", "not_applicable", "unknown"] },
-        "maps": { "type": "array", "items": { "type": "string", "enum": ["base_color", "normal", "roughness", "metallic", "ao", "height", "opacity", "emissive", "orm", "other"] }, "uniqueItems": true },
-        "uv": { "type": "boolean" },
-        "tileable": { "type": "boolean" }
+        "workflow": {
+          "type": "string",
+          "enum": [
+            "metallic_roughness",
+            "specular_glossiness",
+            "unlit",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "maps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "base_color",
+              "normal",
+              "roughness",
+              "metallic",
+              "ao",
+              "height",
+              "opacity",
+              "emissive",
+              "orm",
+              "other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "uv": {
+          "type": "boolean"
+        },
+        "tileable": {
+          "type": "boolean"
+        }
       }
     },
     "unity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["compatible", "tested"],
+      "required": [
+        "compatible",
+        "tested"
+      ],
       "properties": {
-        "compatible": { "type": "boolean" },
-        "tested": { "type": "boolean" },
-        "minimum_unity_version": { "type": "string" },
-        "render_pipeline": { "type": "array", "items": { "type": "string", "enum": ["Built-in", "URP", "HDRP", "pipeline_agnostic"] } },
-        "import_notes": { "type": "string" },
-        "lods_present": { "type": "boolean" },
-        "collider_notes": { "type": "string" }
+        "compatible": {
+          "type": "boolean"
+        },
+        "tested": {
+          "type": "boolean"
+        },
+        "minimum_unity_version": {
+          "type": "string"
+        },
+        "render_pipeline": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Built-in",
+              "URP",
+              "HDRP",
+              "pipeline_agnostic"
+            ]
+          }
+        },
+        "import_notes": {
+          "type": "string"
+        },
+        "lods_present": {
+          "type": "boolean"
+        },
+        "collider_notes": {
+          "type": "string"
+        }
       }
     },
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["record_created_at", "recorded_by"],
+      "required": [
+        "record_created_at",
+        "recorded_by"
+      ],
       "properties": {
-        "record_created_at": { "type": "string", "format": "date-time" },
-        "recorded_by": { "type": "string" },
-        "revision": { "type": "integer", "minimum": 1 },
-        "notes": { "type": "string" }
+        "record_created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recorded_by": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "notes": {
+          "type": "string"
+        }
       }
     }
   }
