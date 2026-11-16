@@ -64,7 +64,7 @@
       "title": "Stopa zdrojů odzadu: final_for_orchestrator -> GPT-01..08 -> W01–W09 -> W10 (tabulka PE/INT/C/NC)",
       "phase": "M0",
       "priority": "P0",
-      "status": "review",
+      "status": "done",
       "dependencies": [],
       "role": "Research",
       "effort": "M",
@@ -96,9 +96,11 @@
         "completed_at": "2026-11-16T22:06:02Z"
       },
       "evidence": [
-        "agent_pool/agents/claude/outbox/20261116T215755957488Z_WI-001.md"
+        "agent_pool/agents/claude/outbox/20261116T215755957488Z_WI-001.md",
+        "agent_pool/shared/reviews/WI-001.md"
       ],
-      "evidence_branch": "agent/claude/WI-001"
+      "reviewer": "claude-opus-5.5-orchestrator",
+      "reviewed_at": "2026-11-16T22:19:00Z"
     },
     {
       "id": "WI-002",

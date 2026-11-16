@@ -1,3 +1,4 @@
 {"ts": "2026-11-16T21:57:55Z", "task": "WI-001", "from": "todo", "to": "queued", "agent": "claude", "job_id": "20261116T215755957488Z_WI-001", "cmd": "handoff"}
 {"ts": "2026-11-16T21:59:18Z", "task": "WI-001", "from": "queued", "to": "in_progress", "agent": "claude", "job_id": "20261116T215755957488Z_WI-001", "cmd": "claim"}
 {"ts": "2026-11-16T22:06:02Z", "task": "WI-001", "from": "in_progress", "to": "review", "agent": "claude", "job_id": "20261116T215755957488Z_WI-001", "cmd": "review"}
+{"ts": "2026-11-16T22:19:00Z", "task": "WI-001", "from": "review", "to": "done", "agent": "claude", "job_id": "20261116T215755957488Z_WI-001", "cmd": "approve"}
