@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "planetary-assetlib"
+version = "0.1.0"
+description = "Offline-first validation CLI for Planetary Engine Asset Library"
+requires-python = ">=3.10"
+dependencies = ["jsonschema>=4.21,<5"]
+
+[project.optional-dependencies]
+images = ["Pillow>=10,<13"]
+archives = ["py7zr>=0.20,<2"]
+
+[project.scripts]
+assetlib = "assetlib.core:main"
+
+[tool.setuptools]
+packages = ["assetlib"]
