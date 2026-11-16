@@ -30,7 +30,7 @@ Rules: `AGENTS.md`, your brief `agent_pool/shared/briefs/WI-0xx.md` (newest date
 - Keep context down: Grep/Read with offset+limit, filter logs, think in short steps. A failed batch is a wake: read the summary, think once, do not rerun blindly.
 
 ## Finish (in this order)
-1. `scripts/check.ps1` and `scripts/verify-hygiene.ps1` exit 0 (foreground, `timeout: 600000`).
+1. `scripts/check.ps1` and `scripts/verify-hygiene.ps1` exit 0 (foreground, `timeout: 600000`). Run PowerShell scripts as `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/<name>.ps1`: this machine has `LocalMachine = AllSigned`, plain `-File` fails with "not digitally signed" (WI-001).
 2. Outbox `agent_pool/agents/claude/outbox/<job>_WI-0xx.md`: summary, exact commands + exit codes, changed paths, failures as failures, unmeasured items, citations spot-check list, "Pro orchestrátora", questions at the end.
 3. Commit everything on `agent/claude/WI-0xx` (the evidence must be a committed blob on the branch).
 4. `pool.py review WI-0xx --evidence <outbox>` once, at the very end (`--amend` to add evidence later). Check `pool.py status` shows `review`.

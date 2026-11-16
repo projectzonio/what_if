@@ -6,6 +6,7 @@ sources:
   - audit/CONFLICTS.md
   - audit/OPEN_QUESTIONS.md
   - audit/WORKER_10_REVIEW.md
+  - integration/SOURCE_TRACE.md
   - architecture/README.md
 updated: 2026-11-16
 status: provisional

@@ -4,7 +4,7 @@
 
 | Ticket | Stav | P | Fáze | Agent/model | Dependencies | Název |
 |---|---|---|---|---|---|---|
-| [WI-001](tasks/WI-001.md) | todo | P0 | M0 | claude/sonnet | — | Stopa zdrojů odzadu: final_for_orchestrator -> GPT-01..08 -> W01–W09 -> W10 (tabulka PE/INT/C/NC) |
+| [WI-001](tasks/WI-001.md) | review | P0 | M0 | claude/sonnet | — | Stopa zdrojů odzadu: final_for_orchestrator -> GPT-01..08 -> W01–W09 -> W10 (tabulka PE/INT/C/NC) |
 | [WI-002](tasks/WI-002.md) | todo | P0 | M1 | claude/sonnet | WI-001 | Blokátor 1: autorita interakce mezi fyzikálními ostrovy (PE-017, INT-08, INT-11, C-05, C-06) |
 | [WI-003](tasks/WI-003.md) | todo | P0 | M1 | claude/sonnet | WI-001 | Blokátor 3: aktivace mutací a závislé fyzikální reprezentace (PE-011, INT-03, INT-12, C-04) |
 | [WI-004](tasks/WI-004.md) | todo | P0 | M1 | claude/sonnet | WI-001 | Blokátor 2: kauzálně konzistentní obnova více regionů (PE-013, INT-07, C-09, NC-37, NC-46) |
