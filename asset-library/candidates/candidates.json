@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "updated_at": "2026-11-16T00:00:00Z",
+  "policy": "candidate_only_not_approved",
+  "candidates": [
+    {
+      "candidate_id": "polyhaven-pbr-library",
+      "name": "Poly Haven PBR texture and model catalog",
+      "source_id": "polyhaven",
+      "discovery_url": "https://polyhaven.com/textures",
+      "status": "candidate",
+      "reason": "Publisher declares CC0 for published assets; individual item pages, exact variants and file hashes must be captured before approval."
+    },
+    {
+      "candidate_id": "ambientcg-material-library",
+      "name": "ambientCG material catalog",
+      "source_id": "ambientcg",
+      "discovery_url": "https://ambientcg.com/list",
+      "status": "candidate",
+      "reason": "Publisher license documentation states CC0; exact item page, variant, archive contents and hashes still required."
+    },
+    {
+      "candidate_id": "kenney-asset-packs",
+      "name": "Kenney asset packs",
+      "source_id": "kenney",
+      "discovery_url": "https://kenney.nl/assets",
+      "status": "candidate",
+      "reason": "Verify current license and exact pack scope before approval; do not rely on third-party mirrors."
+    },
+    {
+      "candidate_id": "opengameart-item-discovery",
+      "name": "OpenGameArt individual CC0 entries",
+      "source_id": "opengameart",
+      "discovery_url": "https://opengameart.org/content/3d-assets-cc0",
+      "status": "candidate",
+      "reason": "Collection is a discovery aid only. Each item must independently show CC0-1.0 and be reviewed."
+    },
+    {
+      "candidate_id": "smithsonian3d-object-discovery",
+      "name": "Smithsonian 3D object catalog",
+      "source_id": "smithsonian3d",
+      "discovery_url": "https://3d.si.edu/",
+      "status": "candidate",
+      "reason": "Object-specific rights. Public-domain metadata is not automatically accepted as CC0; legal review required."
+    }
+  ]
+}
