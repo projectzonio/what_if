@@ -10,8 +10,10 @@ Architektonický výzkum univerzální simulační platformy: jeden autoritativn
 | --- | --- |
 | Výzkumy W01–W09 | hotovo, `research/worker-0N/w0N-original.md` |
 | Audit W10 v0.1 (cross-system validace) | hotovo, `audit/WORKER_10_REVIEW.md` |
-| Doplňující výzkumy W01–W09 podle W10 §12 | probíhá, `research/worker-0N/w0N-supplement-01.md` |
-| Druhý audit W10 → Master Architecture Baseline | čeká |
+| Doplňující výzkumy W01–W09 podle W10 §12 | hotovo, `research/worker-0N/w0N-supplement-01.md` (Claude Sonnet subagenti) |
+| Sloučení: rozpory, otevřené otázky, kontrakty | hotovo, `audit/CONFLICTS.md`, `audit/OPEN_QUESTIONS.md`, `integration/` |
+| Rozhodnutí uživatele (OQ priorita 1) | čeká |
+| Druhý audit W10 → Master Architecture Baseline | čeká, prompt pro GPT v `audit/W10_ROUND2_PROMPT.md` |
 | `architecture/` | čeká na druhý audit |
 
 ## Struktura
