@@ -1,0 +1,423 @@
+{
+  "schema_version": "1.1",
+  "project": "What If (Planetary Engine)",
+  "purpose": "Perzistentní fyzikální vesmír: architektura Planetary Engine (W01–W10 + GPT-01..08), planetární engine a world generator",
+  "target_workspace": "D:\\workspace\\what_if",
+  "delivery_note": "Založeno 2026-11-16 jako převzetí workflow race_game; canonical backlog v .planning/what-if, handoffy v agent_pool.",
+  "task_statuses": [
+    "todo",
+    "in_progress",
+    "blocked",
+    "review",
+    "done"
+  ],
+  "priority_definition": {
+    "P0": "Kritická cesta k Master Baseline",
+    "P1": "Nutné pro uzavřenou architekturu",
+    "P2": "Stage 1 implementace"
+  },
+  "phases": [
+    {
+      "id": "M0",
+      "name": "Základy a sledovatelnost",
+      "gate": "Zdroje čtené odzadu jsou indexované (SOURCE_TRACE), uživatel má rozhodovací balík, mezery kódu jsou známé.",
+      "required_tasks": [
+        "WI-001",
+        "WI-007",
+        "WI-009"
+      ]
+    },
+    {
+      "id": "M1",
+      "name": "Integrační blokátory a Master Baseline",
+      "gate": "Čtyři blokátory z final_for_orchestrator §9.2 mají kontrakty; MASTER_BASELINE hotový.",
+      "required_tasks": [
+        "WI-002",
+        "WI-003",
+        "WI-004",
+        "WI-005",
+        "WI-006"
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Propagace do W01–W09 a ADR",
+      "gate": "Integrační poznámky k W01–W09 a úplná ADR.",
+      "required_tasks": [
+        "WI-008",
+        "WI-010"
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "Stage 1 implementace",
+      "gate": "Kontraktní crates a rozhodnutí o jazyku planetárního jádra.",
+      "required_tasks": [
+        "WI-011",
+        "WI-012"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "WI-001",
+      "title": "Stopa zdrojů odzadu: final_for_orchestrator -> GPT-01..08 -> W01–W09 -> W10 (tabulka PE/INT/C/NC)",
+      "phase": "M0",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Z research/gpt/final_for_orchestrator.md udělat sledovatelný index: pro každé PE-001..020, INT-01..12, C-01..09 a čtyři blokátory (§9.2) vypsat přesné zdroje (soubor §/řádky) ve vrstvách final -> GPT -> supplement -> original -> audit a stav shody. Je to vstup pro všechny ostatní tickety.",
+      "scope": [
+        "Číst odzadu: nejdřív final_for_orchestrator, pak research/gpt/gpt01..08, pak supplementy a originály W01–W09, nakonec audit/.",
+        "Výstup integration/SOURCE_TRACE.md: tabulka ID -> rozhodnutí -> zdroje po vrstvách -> shoda/rozpor -> poznámka.",
+        "Seznam tvrzení z final_for_orchestrator, která se v nižších vrstvách nedají najít nebo jim odporují (např. i128 vs i64 času)."
+      ],
+      "acceptance": [
+        "Každé PE-001..020, INT-01..12 a C-01,02,04..07,09 má řádek se zdroji aspoň ve 2 vrstvách nebo explicitní „bez opory“.",
+        "Odkazy path:řádky se dají otevřít (náhodný vzorek 15 odkazů ověřen a vypsán).",
+        "Sekce „Tvrzení bez opory“ a „Rozpory mezi vrstvami“ existují, i když jsou prázdné."
+      ],
+      "verification": [
+        "Orchestrátor: 15 odkazů z tabulky otevřít a porovnat."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "integration/SOURCE_TRACE.md",
+      "risks": "Dokumenty jsou dlouhé (10–100 kB); číst grepem po sekcích, ne celé."
+    },
+    {
+      "id": "WI-002",
+      "title": "Blokátor 1: autorita interakce mezi fyzikálními ostrovy (PE-017, INT-08, INT-11, C-05, C-06)",
+      "phase": "M1",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Navrhnout protokol, kdo vlastní náraz dvou nezávisle vlastněných physics islands (vlak × náklaďák), kdo určuje okamžik kolize, kdo commitne impuls a co dělat při neshodě na kontaktním manifoldu. Bez globální fyzikální autority. Včetně migrace ostrova nezávislé na solveru (INT-11).",
+      "scope": [
+        "Číst GPT-03, W02 §9, W05 §2.6, W09 §5, final §5.1 a §3.4.",
+        "Deterministická arbitráž + časově kvalifikovaný záznam nárazu; vztah k RegionHandoff/EntityTransfer/DomainHandoff.",
+        "Výstup architecture/blockers/B1-cross-island-interaction.md."
+      ],
+      "acceptance": [
+        "Výstup má sekce: Problém (s citací zdrojů path:řádky), Navržený kontrakt (typy, pole, invarianty), Protokol (kroky, selhání, retry), Vztah k PE-/INT-/C- ID, Co zůstává otevřené, Validační kritéria V1–V8 z final_for_orchestrator §8, které se týkají blokátoru.",
+        "Žádné vymyšlené číselné hodnoty: každé číslo je označené „návrh, nezměřeno“ nebo má zdroj. Rozpory se zdroji se hlásí, ne mlčky řeší.",
+        "Rozhodnutí patřící uživateli (final_for_orchestrator §7.1 USER-001..010, audit/OPEN_QUESTIONS) se neřeší, jen se vypíšou s doporučením.",
+        "Původní dokumenty (research/**) se nepřepisují.",
+        "Pokrývá souběžné nárazy, zpožděnou informaci o kolizi a migraci ostrova uprostřed kontaktu."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola proti V3 a C-06 z audit/CONFLICTS.md."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "architecture/blockers/B1-cross-island-interaction.md",
+      "risks": "Hrozí, že protokol vyžaduje globální čas; ostrov musí zůstat na sdílené časové ose světa (final §2.1)."
+    },
+    {
+      "id": "WI-003",
+      "title": "Blokátor 3: aktivace mutací a závislé fyzikální reprezentace (PE-011, INT-03, INT-12, C-04)",
+      "phase": "M1",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Definovat vztah mezi strukturálním commitem, aktivací kolizní geometrie, effective world instant, regionálním watermarkem a replikační verzí (příklad mostu z final §4.1). Revision vector místo skalárního world_revision.",
+      "scope": [
+        "Číst GPT-05, W06 §4–5 a §10, W02 §5, W08 §5, W07 §7, final §2.5, §3.5, §5.2.",
+        "Aktivační bariéry per závislost, pravidlo „které revize jsou bezpečné pro fyzikální interakci“, obnova částečně dokončených odvozených stavů.",
+        "Výstup architecture/blockers/B3-mutation-activation.md."
+      ],
+      "acceptance": [
+        "Výstup má sekce: Problém (s citací zdrojů path:řádky), Navržený kontrakt (typy, pole, invarianty), Protokol (kroky, selhání, retry), Vztah k PE-/INT-/C- ID, Co zůstává otevřené, Validační kritéria V1–V8 z final_for_orchestrator §8, které se týkají blokátoru.",
+        "Žádné vymyšlené číselné hodnoty: každé číslo je označené „návrh, nezměřeno“ nebo má zdroj. Rozpory se zdroji se hlásí, ne mlčky řeší.",
+        "Rozhodnutí patřící uživateli (final_for_orchestrator §7.1 USER-001..010, audit/OPEN_QUESTIONS) se neřeší, jen se vypíšou s doporučením.",
+        "Původní dokumenty (research/**) se nepřepisují.",
+        "Příklad zničeného mostu je rozepsán krok po kroku (commit, aktivace kolizí, navigace, hydrologie, Unity) včetně chybových větví."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola proti V4 a C-04."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "architecture/blockers/B3-mutation-activation.md",
+      "risks": "Konflikt skalární vs vektorová revize (W06 vs W02/W08) – nesmí se vrátit globální revize."
+    },
+    {
+      "id": "WI-004",
+      "title": "Blokátor 2: kauzálně konzistentní obnova více regionů (PE-013, INT-07, C-09, NC-37, NC-46)",
+      "phase": "M1",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Navrhnout konstrukci kauzálního řezu pro obnovu: epochy vlastnictví, snapshoty regionů, stav physics islands, meziregionální zprávy, pozice událostí, pokrok domén, BranchId. Watermark regionu se nesmí vracet zpět, zatímco sousedé zůstanou v kauzálně pozdějším stavu.",
+      "scope": [
+        "Číst GPT-07, GPT-01, W05 §3–4, W06 §8, W09 §5, final §2.7, §3.6, §5.4.",
+        "Hybrid checkpoint + replay; vztah k What-If větvím (INT-07).",
+        "Výstup architecture/blockers/B2-causal-recovery.md."
+      ],
+      "acceptance": [
+        "Výstup má sekce: Problém (s citací zdrojů path:řádky), Navržený kontrakt (typy, pole, invarianty), Protokol (kroky, selhání, retry), Vztah k PE-/INT-/C- ID, Co zůstává otevřené, Validační kritéria V1–V8 z final_for_orchestrator §8, které se týkají blokátoru.",
+        "Žádné vymyšlené číselné hodnoty: každé číslo je označené „návrh, nezměřeno“ nebo má zdroj. Rozpory se zdroji se hlásí, ne mlčky řeší.",
+        "Rozhodnutí patřící uživateli (final_for_orchestrator §7.1 USER-001..010, audit/OPEN_QUESTIONS) se neřeší, jen se vypíšou s doporučením.",
+        "Původní dokumenty (research/**) se nepřepisují.",
+        "Obsahuje algoritmus konstrukce řezu a postup, když žádný konzistentní řez neexistuje."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola proti V5."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "architecture/blockers/B2-causal-recovery.md",
+      "risks": "Závisí na semantice větví (final §5.4), která je neuzavřená; hlásit jako otevřenou otázku."
+    },
+    {
+      "id": "WI-005",
+      "title": "Blokátor 4: přechody mezi doménami a úrovněmi věrnosti, transakce, větvení (PE-014, PE-018, PE-019, INT-05, INT-06)",
+      "phase": "M1",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Navrhnout sdílenou sémantiku pro přechody fidelity (zachování veličin, chyby, jediná autorita), kopling modelů různé věrnosti (final §5.3), komponentní autoritu entity a saga/transakce mezi doménami (ekonomika × fyzické zdroje), životní cyklus entity při vzniku a zániku.",
+      "scope": [
+        "Číst GPT-04, GPT-08, W03 §6, W04 §3.4, W08 §6, W09 §3, final §2.4, §2.8, §5.3, §5.5, §5.6.",
+        "Výstup architecture/blockers/B4-cross-domain-transitions.md."
+      ],
+      "acceptance": [
+        "Výstup má sekce: Problém (s citací zdrojů path:řádky), Navržený kontrakt (typy, pole, invarianty), Protokol (kroky, selhání, retry), Vztah k PE-/INT-/C- ID, Co zůstává otevřené, Validační kritéria V1–V8 z final_for_orchestrator §8, které se týkají blokátoru.",
+        "Žádné vymyšlené číselné hodnoty: každé číslo je označené „návrh, nezměřeno“ nebo má zdroj. Rozpory se zdroji se hlásí, ne mlčky řeší.",
+        "Rozhodnutí patřící uživateli (final_for_orchestrator §7.1 USER-001..010, audit/OPEN_QUESTIONS) se neřeší, jen se vypíšou s doporučením.",
+        "Původní dokumenty (research/**) se nepřepisují.",
+        "Přechod nesmí vytvořit dvě autoritativní reprezentace; selhání přechodu ponechá platnou reprezentaci."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola proti V6."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "architecture/blockers/B4-cross-domain-transitions.md",
+      "risks": "Nejširší blokátor; při překročení odhadu rozdělit na fidelity / transakce / větve."
+    },
+    {
+      "id": "WI-006",
+      "title": "Master Architecture Baseline (integrace blokátorů B1–B4 do jednoho dokumentu)",
+      "phase": "M1",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-002",
+        "WI-003",
+        "WI-004",
+        "WI-005",
+        "WI-007"
+      ],
+      "role": "Architecture",
+      "effort": "L",
+      "goal": "Sloučit výstupy WI-002..005 a rozhodnutí uživatele z WI-007 do jednoho architecture/MASTER_BASELINE.md: sdílené kontrakty (čas, prostor, gravitace, autorita, mutace, perzistence), registr PE-001..020 se stavem, validační plán a benchmark brány. Vyřešit rozpory mezi blokátory.",
+      "scope": [
+        "Číst všechny výstupy blokátorů a integration/SOURCE_TRACE.md; final_for_orchestrator §3, §7, §8, §10.",
+        "Výstup architecture/MASTER_BASELINE.md a aktualizovaný integration/INTERFACE_CONTRACTS.md."
+      ],
+      "acceptance": [
+        "Každé PE-001..020 má stav (Accepted-conditional / Needs research / Rejected) a odkaz na zdroj.",
+        "Kritické rozpory C-01..C-09 a INT-01..12 mají rozhodnutí nebo explicitní „čeká na uživatele“.",
+        "Žádný nový rozpor mezi MASTER_BASELINE a blokátory; kontrola vypsána."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola křížových odkazů a PE tabulky."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "opus",
+      "write_scope": "architecture/MASTER_BASELINE.md, integration/INTERFACE_CONTRACTS.md",
+      "risks": "Největší riziko: čtyři kontrakty (fyzika, perzistence, mutace, čas) postavené každý na jiném modelu vlastnictví (final §10.1)."
+    },
+    {
+      "id": "WI-007",
+      "title": "Balík rozhodnutí pro uživatele: USER-001..010 a OQ-01..33 s doporučeními",
+      "phase": "M0",
+      "priority": "P0",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "S",
+      "goal": "Sloučit USER-001..010 z final_for_orchestrator §7.1 s audit/OPEN_QUESTIONS.md (OQ-01..33) do jednoho rozhodovacího balíku: otázka, doporučení, dopad na architekturu, co se zablokuje bez odpovědi. Rozhodnutí nedělat.",
+      "scope": [
+        "Výstup decisions/USER_DECISIONS.md, řazeno podle toho, co blokuje WI-002..006."
+      ],
+      "acceptance": [
+        "Každá otázka má doporučení a „co se zablokuje“; USER-001..010 jsou namapované na OQ-ID.",
+        "Max. 12 otázek označeno „potřeba před WI-006“, ostatní „lze odložit“."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola mapování USER<->OQ."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "decisions/USER_DECISIONS.md",
+      "risks": "Nepředbíhat rozhodnutí uživatele."
+    },
+    {
+      "id": "WI-008",
+      "title": "Doplnit W01–W09 odkazy na integrované kontrakty (bez přepisu originálů)",
+      "phase": "M2",
+      "priority": "P1",
+      "status": "todo",
+      "dependencies": [
+        "WI-006"
+      ],
+      "role": "Research",
+      "effort": "L",
+      "goal": "Pro každý W0N napsat research/worker-0N/w0N-integration-note.md podle final §6: původní návrh, přijaté integrační rozhodnutí, odmítnuté nebo upravené předpoklady, nový sdílený kontrakt, závislosti. Prioritně dokumenty označené Critical (W01, W02, W04, W05, W06, W08, W09).",
+      "scope": [
+        "Sekce k aktualizaci: final §6.1 (tabulka).",
+        "Originály a supplementy se nemění."
+      ],
+      "acceptance": [
+        "9 souborů w0N-integration-note.md; každý má pět povinných bodů z final §6.",
+        "Odkazy na MASTER_BASELINE a PE-ID jsou platné."
+      ],
+      "verification": [
+        "Orchestrátor: vzorek 3 poznámek proti MASTER_BASELINE."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "research/worker-0*/w0*-integration-note.md",
+      "risks": "Velký rozsah; lze rozdělit na Critical a High dávky."
+    },
+    {
+      "id": "WI-009",
+      "title": "Analýza mezer: C# What If kód (src/WhatIf.*) proti kontraktům z baseline",
+      "phase": "M0",
+      "priority": "P1",
+      "status": "todo",
+      "dependencies": [
+        "WI-001"
+      ],
+      "role": "Research",
+      "effort": "M",
+      "goal": "Porovnat existující planetární engine a world generator (src/WhatIf.Planet*, src/WhatIf.WorldGen) s kontrakty z final_for_orchestrator §3 (SpatialState, čas, FrameId/Anchor/Cell/Local, kostka-koule). Určit, co se dá převzít, co je třeba změnit a co je jen experiment. Kód nemění.",
+      "scope": [
+        "Číst wiki/entity/what-if-planet-*.md, .planning/what-if/docs/what-if-planet-*.md, src/WhatIf.Planet/Frame.cs, CubeSphere.cs, Anchors.",
+        "Výstup integration/CODE_GAP_ANALYSIS.md."
+      ],
+      "acceptance": [
+        "Tabulka kontrakt -> kód (soubor:řádky) -> stav (shoda/mezera/konflikt) -> doporučení.",
+        "Seznam míst, kde je kód v rozporu s velikostí buňky 2^15 m, i128 časem nebo oddělením frame/anchor/cell/local."
+      ],
+      "verification": [
+        "Orchestrátor: 5 odkazů path:řádky otevřít."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "integration/CODE_GAP_ANALYSIS.md",
+      "risks": "Experimentální kód neprezentovat jako hotové rozhodnutí; čísla z experimentů jsou z konkrétních běhů."
+    },
+    {
+      "id": "WI-010",
+      "title": "Dokončení ADR-001..015 a registru PE-001..020 ve složce decisions/",
+      "phase": "M2",
+      "priority": "P1",
+      "status": "todo",
+      "dependencies": [
+        "WI-006"
+      ],
+      "role": "Architecture",
+      "effort": "M",
+      "goal": "Z ADR šablon (Proposed) udělat úplné ADR s kontextem, rozhodnutím, důsledky a stavem podle MASTER_BASELINE; přidat PE registr.",
+      "scope": [
+        "Úprava decisions/*.md, nový decisions/PE_REGISTER.md."
+      ],
+      "acceptance": [
+        "Každé ADR má kontext/rozhodnutí/důsledky/stav; rozhodnutí závislá na uživateli jsou označena Proposed s odkazem na USER_DECISIONS."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola konzistence se stavem v MASTER_BASELINE."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "opus",
+      "write_scope": "decisions/**",
+      "risks": "Nepovyšovat na Accepted, co vyžaduje rozhodnutí uživatele."
+    },
+    {
+      "id": "WI-011",
+      "title": "Rust workspace: kontraktní crates (čas, prostor, identita, revize) pro Stage 1 (jeden proces)",
+      "phase": "M3",
+      "priority": "P2",
+      "status": "todo",
+      "dependencies": [
+        "WI-006",
+        "WI-009"
+      ],
+      "role": "Implementation",
+      "effort": "L",
+      "goal": "Založit Rust workspace (cargo je dostupný) s knihovnami pro WorldInstant/WorldDuration, SpatialState, EntityId, RevisionVector podle MASTER_BASELINE, s testy a bez síťové vrstvy. Spouštět až po schválení WI-006 a odpovědi uživatele na jazykovou volbu (WI-012).",
+      "scope": [
+        "Nový adresář rust/ (Cargo workspace), testy v crates.",
+        "Kontrakty přesně podle baseline; čísla (kvantum času, buňka 2^15 m) jako konfigurovatelné konstanty s odkazem na PE-ID."
+      ],
+      "acceptance": [
+        "cargo test a cargo clippy bez chyb.",
+        "Každý veřejný typ cituje PE-/INT- ID z baseline."
+      ],
+      "verification": [
+        "Orchestrátor: cargo test; kontrola, že žádný typ nepřidává nepopsané pole."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "rust/**",
+      "risks": "Čeká na rozhodnutí o jazyku a časové reprezentaci (i128)."
+    },
+    {
+      "id": "WI-012",
+      "title": "Rozhodnutí: co s C# planetárním jádrem a WorldGen (zůstane, port do Rust, nebo obojí)",
+      "phase": "M3",
+      "priority": "P2",
+      "status": "todo",
+      "dependencies": [
+        "WI-006",
+        "WI-009"
+      ],
+      "role": "Research",
+      "effort": "S",
+      "goal": "Připravit pro uživatele rozhodovací podklad: final_for_orchestrator určuje autoritativní runtime v Rustu, kód planetárního enginu a world generatoru je v C#. Varianty (ponechat C# jako nástroj/generátor, portovat jádro, běžet vedle sebe), náklady, dopad na determinismus (D1–D3), doporučení.",
+      "scope": [
+        "Výstup decisions/ADR-016-planet-core-language.md (Proposed)."
+      ],
+      "acceptance": [
+        "Tři varianty s dopadem na kontrakty a na testy; doporučení; co se zablokuje."
+      ],
+      "verification": [
+        "Orchestrátor: kontrola proti CODE_GAP_ANALYSIS."
+      ],
+      "preferred_agent": "claude",
+      "preferred_model": "sonnet",
+      "write_scope": "decisions/ADR-016-planet-core-language.md",
+      "risks": "Rozhodnutí patří uživateli."
+    }
+  ],
+  "pool_path": "agent_pool",
+  "execution_policy": {
+    "mode": "manual_dispatch",
+    "default_timeout_minutes": 120,
+    "max_parallel_implementation_workers": 2,
+    "review_required": true
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "whatif-rag-evaluation.v1",
+  "description": "Retrieval checks for agent navigation, run by evaluate_rag.py. Queries are written the way an agent types them (Czech, English, mixed), not reworded into keywords known to work. Excluded from the indexed corpus (build-rag-index.js SKIP_REL_FILES). knownGap = measured deficiency, reported but not failing. expectedSkill / noSkillCard check the rag-query Skill cards (2026-10-24).",
+  "cases": [
+    {
+      "id": "stale-pool-copy-never-indexed",
+      "query": "task_pool status dispatch job_id reviewer",
+      "top": 8,
+      "forbidden": [
+        ".planning/race-game/task_pool.json"
+      ]
+    },
+    {
+      "id": "external-tools-catalog",
+      "query": "externí nástroje zonio",
+      "top": 3,
+      "expectedAny": [
+        "wiki/concept/external-tools-zonio.md"
+      ]
+    },
+    {
+      "id": "recover-file-from-transcript",
+      "query": "obnovit soubor z transcriptu po git checkout",
+      "top": 3,
+      "expectedAny": [
+        "wiki/concept/external-tools-zonio.md"
+      ]
+    },
+    {
+      "id": "obsidian-conventions",
+      "query": "obsidian wikilinky frontmatter",
+      "top": 3,
+      "expectedAny": [
+        "wiki/concept/obsidian-wiki-conventions.md"
+      ]
+    },
+    {
+      "id": "branch-scope-review",
+      "query": "zkontrolovat, že větev mění jen vlastněné cesty z briefu",
+      "top": 5,
+      "expectedAny": [
+        "tools/review/branch-scope.py",
+        "tools/review/README.md",
+        "wiki/concept/workflow-tools.md"
+      ]
+    },
+    {
+      "id": "pool-commands",
+      "query": "pool.py claim review approve",
+      "top": 3,
+      "expectedAny": [
+        "agent_pool/scripts/pool.py",
+        "agent_pool/README.md"
+      ]
+    },
+    {
+      "id": "no-generated-output",
+      "query": "latest rag index chunks jsonl",
+      "top": 8,
+      "forbidden": [
+        "artifacts/"
+      ]
+    },
+    {
+      "id": "skill-orchestrator-release",
+      "query": "Uvolni tickety a připrav startovací prompty",
+      "top": 5,
+      "expectedSkill": "wi-orchestrator"
+    },
+    {
+      "id": "skill-worker-start",
+      "query": "Pracuj na RG-084 podle briefu, sekce Prepared handoff",
+      "top": 5,
+      "expectedSkill": "wi-worker"
+    },
+    {
+      "id": "harness-heredoc",
+      "query": "bash heredoc unexpected EOF while looking for matching",
+      "top": 3,
+      "expectedAny": [
+        "wiki/concept/agent-harness-traps.md"
+      ]
+    },
+    {
+      "id": "graph-worldgen-generator",
+      "query": "tunnels viaducts terrain generator",
+      "top": 5,
+      "expectedAny": [
+        "wiki/entity/worldgen.md"
+      ],
+      "expectedNeighbourAny": [
+        "src/WhatIf.WorldGen/Generator.cs"
+      ]
+    },
+    {
+      "id": "graph-review-tools",
+      "query": "branch-scope manual-test recompute-s1",
+      "top": 5,
+      "expectedAny": [
+        "wiki/entity/review-tools.md"
+      ],
+      "expectedNeighbourAny": [
+        "tools/review/README.md"
+      ]
+    },
+    {
+      "id": "pitcheck-headless-mesh",
+      "query": "uzavřenost sítě portálu bez Unity pitcheck",
+      "top": 5,
+      "expectedAny": [
+        "wiki/concept/workflow-tools.md",
+        "tools/worldgen/pitcheck/README.md"
+      ]
+    },
+    {
+      "id": "wi-project-overview",
+      "query": "co je projekt what if a kde je planetární engine, pool a wiki",
+      "top": 3,
+      "expectedAny": [
+        "wiki/entity/what-if-project.md"
+      ]
+    },
+    {
+      "id": "wi-source-precedence",
+      "query": "v jakém pořadí číst GPT výstupy a originály W01-W09 (odzadu)",
+      "top": 3,
+      "expectedAny": [
+        "wiki/decision/source-precedence.md"
+      ]
+    },
+    {
+      "id": "wi-four-blockers",
+      "query": "čtyři blokátory formální baseline cross-island autorita kauzální obnova aktivace mutací",
+      "top": 5,
+      "expectedAny": [
+        "research/gpt/final_for_orchestrator.md",
+        "wiki/concept/planetary-engine-research.md"
+      ]
+    },
+    {
+      "id": "wi-canonical-time",
+      "query": "WorldInstant i128 regionální watermark IslandStep kanonický čas",
+      "top": 5,
+      "expectedAny": [
+        "research/gpt/final_for_orchestrator.md",
+        "audit/CONFLICTS.md",
+        "audit/WORKER_10_REVIEW.md"
+      ]
+    },
+    {
+      "id": "wi-skill-orchestrator",
+      "query": "převezmi orchestraci what if, uvolni tickety, review ticketu",
+      "top": 3,
+      "expectedAny": [
+        ".claude/skills/wi-orchestrator/SKILL.md",
+        "wiki/concept/orchestration-workflow.md"
+      ],
+      "expectedSkill": "wi-orchestrator"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-110: command line for the road-graph generator (see worldgen-generator.md for the arguments). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>WhatIf.WorldGen.Cli</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\WhatIf.WorldGen\WhatIf.WorldGen.csproj" />
+  </ItemGroup>
+</Project>

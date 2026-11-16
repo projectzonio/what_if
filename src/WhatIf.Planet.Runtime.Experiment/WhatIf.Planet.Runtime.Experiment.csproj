@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-172: console that runs the streaming runtime rows t1-t8 (drive-4x, cold spawn, flight, determinism in a fresh process) and writes the result docs. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet.Runtime\WhatIf.Planet.Runtime.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.Anchors.Experiment\WhatIf.Planet.Anchors.Experiment.csproj" />
+  </ItemGroup>
+</Project>

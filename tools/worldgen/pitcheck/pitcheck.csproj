@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-127: headless mesh check. References the DLLs of tools/game-unity/compile-check.ps1 (game scripts as check.dll + first-party plugins + Unity stubs); no Unity process, no notebook slot.
+       If check.dll is missing for this worktree, compile-check.ps1 runs first (needs a Library/ScriptAssemblies of any worktree, see that script). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>CS1591;CS0649;CS0414;CS0169;CS0618;CS8981</NoWarn>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../'))</RepoRoot>
+    <RepoName>$([System.IO.Path]::GetFileName($(RepoRoot.TrimEnd('\').TrimEnd('/'))))</RepoName>
+    <CheckDir>D:\workspace\dev-cache\compile-check\$(RepoName)</CheckDir>
+    <UnityManaged>D:\Program Files\Unity\Hub\Editor\6000.3.26f1\Editor\Data\Managed\UnityEngine</UnityManaged>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs" /></ItemGroup>
+  <Target Name="EnsureCompileCheck" BeforeTargets="ResolveAssemblyReferences;CoreCompile" Condition="!Exists('$(CheckDir)\out\check.dll')">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(RepoRoot)tools\game-unity\compile-check.ps1&quot;" />
+  </Target>
+  <ItemGroup>
+    <Reference Include="check"><HintPath>$(CheckDir)\out\check.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="NightRacer.Streaming"><HintPath>$(CheckDir)\plug\NightRacer.Streaming.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="WhatIf.WorldGen"><HintPath>$(CheckDir)\plug\WhatIf.WorldGen.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(UnityManaged)\UnityEngine.CoreModule.dll</HintPath><Private>true</Private></Reference>
+  </ItemGroup>
+</Project>

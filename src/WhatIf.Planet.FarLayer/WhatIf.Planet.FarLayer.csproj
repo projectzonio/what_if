@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-171: What If planet far layer: CDLOD quadtree per cube face over a height function, hole mask at sector granularity, skirt numbers.
+       netstandard2.1, references only WhatIf.Planet, no Unity types, no packages. C# 8. The height source is a Func<Vec3, double> (PlanetSurface.Height). -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.Planet.FarLayer</AssemblyName>
+    <RootNamespace>WhatIf.Planet.FarLayer</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet\WhatIf.Planet.csproj" />
+  </ItemGroup>
+</Project>

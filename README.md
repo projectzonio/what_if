@@ -2,7 +2,9 @@
 
 Architektonický výzkum univerzální simulační platformy: jeden autoritativní fyzikální svět od povrchu planety po meziplanetární prostor. Postava, auto, letadlo, raketa a kosmická loď sdílí stejný čas, stejné souřadnice a stejnou identitu objektů.
 
-**Fáze:** výzkum a konsolidace architektury. Implementace zatím zakázaná. Pracovní stack: Rust (autoritativní runtime), Node.js (control plane), Unity (jen klient), Python (vědecká a validační vrstva).
+**Fáze:** konsolidace architektury (Master Architecture Baseline) a práce nad převzatým planetárním enginem a world generatorem v C#. Nová implementace autoritativního runtime (Rust) začíná až po schválení baseline. Pracovní stack: Rust (autoritativní runtime), Node.js (control plane), Unity (jen klient), Python (vědecká a validační vrstva).
+
+**Agentní workflow:** pool, tickety `WI-xxx`, skilly orchestrátor/worker a znalostní vrstva (wiki, RAG, GraphRAG-lite) převzaté z race_game 2026-11-16. Vstup pro agenty: `AGENTS.md`, `.planning/what-if/README.md`, `agent_pool/README.md`. Zdroje se čtou odzadu: `research/gpt/final_for_orchestrator.md` je nejvyšší vrstva.
 
 ## Stav (2026-11-16)
 
@@ -12,18 +14,24 @@ Architektonický výzkum univerzální simulační platformy: jeden autoritativn
 | Audit W10 v0.1 (cross-system validace) | hotovo, `audit/WORKER_10_REVIEW.md` |
 | Doplňující výzkumy W01–W09 podle W10 §12 | hotovo, `research/worker-0N/w0N-supplement-01.md` (Claude Sonnet subagenti) |
 | Sloučení: rozpory, otevřené otázky, kontrakty | hotovo, `audit/CONFLICTS.md`, `audit/OPEN_QUESTIONS.md`, `integration/` |
-| Rozhodnutí uživatele (OQ priorita 1) | čeká |
-| Druhý audit W10 → Master Architecture Baseline | čeká, prompt pro GPT v `audit/W10_ROUND2_PROMPT.md` |
-| `architecture/` | čeká na druhý audit |
+| GPT-01..08 (osm návrhů řešení konfliktů) a integrované hodnocení | hotovo, `research/gpt/` (`final_for_orchestrator.md`) |
+| Rozhodnutí uživatele (OQ priorita 1) | čeká, podklad WI-007 |
+| Master Architecture Baseline | rozpracováno tickety WI-002..006 v `.planning/what-if/task_pool.json` (blokátory B1–B4) |
+| `architecture/` | čeká na WI-002..006 |
 
 ## Struktura
 
 ```
 research/worker-01..09/   původní výzkumy (w0N-original.md) a doplňky (w0N-supplement-NN.md)
+research/gpt/             GPT-01..08 a final_for_orchestrator.md (integrované hodnocení, nejvyšší vrstva)
 architecture/             konsolidovaná architektura (po druhém auditu W10)
 integration/              graf závislostí, kontrakty rozhraní, integrační roadmapa
 decisions/ADR/            rozhodnutí ADR-001..015 (zatím Proposed)
 audit/                    audit W10, rejstřík rozporů, otevřené otázky, zdroje, zadání doplňků
+src/ tests/ tools/        planetární engine a world generator (C#), experimenty, nástroje
+.planning/what-if/        backlog (task_pool.json), procesní rozhodnutí, historie z race_game
+agent_pool/ wiki/         pool a znalostní vrstva (druhý mozek)
+.claude/skills/           wi-orchestrator, wi-worker, wi-knowledge
 ```
 
 ## Workery

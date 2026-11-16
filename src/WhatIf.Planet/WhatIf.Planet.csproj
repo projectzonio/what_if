@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-161 (WI-ADR-001 experiment): What If planet library. Cube-sphere ids, tangent frames, sector frames, CPU double noise.
+       netstandard2.1, no package or project references, no Unity types. Own SplitMix64 (System.Random differs across runtimes). C# 8. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.Planet</AssemblyName>
+    <RootNamespace>WhatIf.Planet</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="WhatIf.Planet.Tests" />
+  </ItemGroup>
+</Project>

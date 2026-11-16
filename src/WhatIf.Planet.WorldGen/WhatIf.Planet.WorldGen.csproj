@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-165: the only bridge between the What If planet (WhatIf.Planet) and WhatIf.WorldGen: SectorPlanetInput v1 + the sector adapter
+       (one deformed level-15 sector -> WorldGen terrain on the planet). netstandard2.1, no package references, no Unity types. C# 8. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.Planet.WorldGen</AssemblyName>
+    <RootNamespace>WhatIf.Planet.WorldGen</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet\WhatIf.Planet.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.Surface\WhatIf.Planet.Surface.csproj" />
+    <ProjectReference Include="..\WhatIf.WorldGen\WhatIf.WorldGen.csproj" />
+  </ItemGroup>
+</Project>

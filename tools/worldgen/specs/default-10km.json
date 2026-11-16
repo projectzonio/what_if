@@ -1,0 +1,9 @@
+{
+  "seed": 1,
+  "size_km": 10,
+  "city": { "x": 0, "z": 0, "radius_m": 1400 },
+  "villages": 4,
+  "village_spacing_km": { "min": 3, "max": 8 },
+  "motorway": { "entry_x": -5000, "entry_z": -2200, "exit_x": 5000, "exit_z": 1600 },
+  "allow_provisional": []
+}

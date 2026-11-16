@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-168: What If planet surface layer (continents, ocean/sea, lakes, forest) as a pure function of (seed, direction).
+       netstandard2.1, references only WhatIf.Planet, no Unity types, no packages. C# 8. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.Planet.Surface</AssemblyName>
+    <RootNamespace>WhatIf.Planet.Surface</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet\WhatIf.Planet.csproj" />
+  </ItemGroup>
+</Project>

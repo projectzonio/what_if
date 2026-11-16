@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-177: anchor spike 1 - variant B (WhatIf.Planet.Anchors; the region-first variant A was removed in RG-185) on the same 5 x 5 regions,
+       rows n1-n5, c1-c2 and the top views. Reuses the RG-169 block search and PNG writer of WhatIf.Planet.Experiment (read-only). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet.Anchors\WhatIf.Planet.Anchors.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.WorldGen\WhatIf.Planet.WorldGen.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.Experiment\WhatIf.Planet.Experiment.csproj" />
+  </ItemGroup>
+</Project>

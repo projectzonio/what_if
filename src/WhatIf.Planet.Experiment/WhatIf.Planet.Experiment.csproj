@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-161: console that runs the WI-ADR-001 checks (a)-(d). Height source: WhatIf.Planet.PlanetNoise (WhatIf.WorldGen only through WhatIf.Planet.WorldGen, RG-165). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet\WhatIf.Planet.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.WorldGen\WhatIf.Planet.WorldGen.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-172: What If planet streaming runtime (Unity-free): wanted sets, region/sector caches, 2 background workers, far layer feed.
+       netstandard2.1, no packages, no Unity types. C# 8. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.Planet.Runtime</AssemblyName>
+    <RootNamespace>WhatIf.Planet.Runtime</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatIf.Planet\WhatIf.Planet.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.WorldGen\WhatIf.Planet.WorldGen.csproj" />
+    <ProjectReference Include="..\WhatIf.Planet.FarLayer\WhatIf.Planet.FarLayer.csproj" />
+  </ItemGroup>
+</Project>

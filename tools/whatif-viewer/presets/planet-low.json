@@ -1,0 +1,18 @@
+{
+  "schema": "nightracer.graphics-lab.v1",
+  "name": "planet-low",
+  "resolution": "1920x1080",
+  "fullscreen": "exclusive",
+  "vsync": 0,
+  "frameCap": -1,
+  "light": true,
+  "shadows": "hard",
+  "shadowResolution": 1024,
+  "shadowDistance": 60,
+  "shadowCascades": 1,
+  "msaa": 1,
+  "postAA": "none",
+  "postProcessing": "off",
+  "hdr": false,
+  "renderScale": 1.0
+}

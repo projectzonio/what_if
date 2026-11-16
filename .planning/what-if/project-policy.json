@@ -1,0 +1,15 @@
+{
+  "project": "What If",
+  "confirmed_on": "2026-11-16",
+  "confirmed_by": "user",
+  "source_precedence": [
+    "research/gpt/final_for_orchestrator.md",
+    "research/gpt/gpt01..08",
+    "research/worker-0N/w0N-supplement-01.md",
+    "research/worker-0N/w0N-original.md",
+    "audit/"
+  ],
+  "source_note": "GPT práci se bere odzadu (user, 2026-11-16); GPT výstupy jsou návrhy, ne přijatá rozhodnutí; hodnoty jsou „návrh, nezměřeno“, dokud se neměří.",
+  "subagent_models": "Sonnet pro subagenty; Opus jen pro WI-006 a WI-010 (rozpočet, user 2026-11-16)",
+  "distribution": "privátní repo projectzonio/what_if, žádná distribuce zatím nerozhodnuta"
+}

@@ -1,0 +1,31 @@
+__pycache__/
+*.pyc
+agent_pool/.task_pool.lock
+
+# .NET / Rust build output and per-worktree generated artifacts (knowledge index, session exports, test logs, scratch)
+artifacts/
+bin/
+obj/
+target/
+*.user
+.vs/
+.cache/
+
+# Local worktrees live outside the repo; guard against accidental nesting
+*-worktrees/
+
+# Raw per-step run data stays local (commit summaries + SHA-256 lists instead)
+agent_pool/shared/benchmarks/results/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.idea/
+.vscode/
+.obsidian/workspace*.json
+Thumbs.db
+*.log
+!/agent_pool/agents/*/logs/*.log

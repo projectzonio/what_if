@@ -1,0 +1,790 @@
+# What If planet experiment (RG-162, WI-ADR-001 row 3: per-face quadtree leaf sectors; replaces the RG-161 table; RG-165 adds group w = WorldGen adapter; RG-167 adds group e = adapter v2, region chart)
+
+- Hardware: 12th Gen Intel(R) Core(TM) i3-1215U; 8 logical CPUs; power plan: 381b4222-f694-41f0-9685-ff5bb260df2e  (Rovnováha); Microsoft Windows NT 10.0.19045.0; dotnet 8.0.403
+- Commit: 6c61558218e73cbd3d7ab24be049f9996c05f7c2
+- Wall time of the whole experiment: 182 s
+- Library `src/WhatIf.Planet` (netstandard2.1; QuadSector, Lattice, Border, Portal, CorridorGraph), console `src/WhatIf.Planet.Experiment`; terrain height = `PlanetNoise.Height` (3D value noise, 4 octaves, 150 m, cells 4096..512 m); WhatIf.WorldGen is reached only through the adapter `src/WhatIf.Planet.WorldGen` (RG-165, group w; doc `what-if-planet-worldgen-adapter.md`).
+- Check (d): 3 separate processes under the measurement lock, single thread, Release, warm; max spread of the medians 4.8 %.
+- Metric change (user 2026-11-12, RG-164): r2 road length is measured only on arcs whose both ends are >= 1 km (along the true arc) from the nearest shifted portal (a portal > 1 cm from its raw crossing); 8 of 3000 arcs (0.27 %) are excluded and reported as diag rows, the old all-arcs maximum 0.5236 % stays visible. The shift line is now: single-portal snap shift (candidate B, `Portal.Snap`) <= 256 m and 0 portals off the segment; candidate A's lateral offset and slide along a border are diag. Geometry unchanged (library not touched).
+- Group w (RG-165): w5 timed in the same 3 cost processes as check (d) (global warm-up >= 1 s, then 5 warm + 51 timed builds per case and seed); w1-w4 run once in the checks process; sectors: face centre F0.r16384.c16384, cube-edge midpoint F0.r16384.c32767, cube vertex F0.r32767.c32767, each with its 4 neighbours; seeds as (a)-(d); taper band 32 m.
+- Group e (RG-167, adapter v2): one WorldGen world (terrain + roads) per level-10 region in the region chart (`RegionWorld`, `SectorBuild`), taper 32 m on region borders only. Sites: face-centre F0.L10.r512.c512, cube-edge-mid F0.L10.r512.c1023, cube-vertex F0.L10.r1023.c1023, region-corner-4 F0.L10.r256.c768; e1, e3, e4 per seed; e2, e6, e8 and the e10 protocol rows on seed 1 only (run time: Generator.Run takes 3-21 s per region on the planet relief); e10 sector build timed in 3 separate `ecost` processes after the (d) runs (region worlds built first in parallel, untimed; then global warm-up >= 1 s, 5 warm + 51 timed builds per site), plus one diag timing of every seed in the checks process; e10 region world build timed sequentially for the first seed, the other worlds are built in parallel (their time is an upper bound under load).
+- Row kinds: `protocol` rows decide the verdict; `diag` rows are extra evidence and never turn a FAIL into a PASS.
+
+## Verdict per check (decision rule of what-if-planet-adr-draft.md §4)
+
+| check | verdict | protocol rows failing | meaning for WI-ADR-001 |
+|---|---|---|---|
+| a | PASS | 0 of 160 | check passed |
+| b | PASS | 0 of 36 | check passed |
+| c | PASS | 0 of 16 | check passed |
+| d | PASS | 0 of 36 | check passed |
+| r1 | PASS | 0 of 2 | check passed |
+| r2 | PASS | 0 of 5 | check passed |
+| r3 | PASS | 0 of 2 | check passed |
+| r4 | PASS | 0 of 5 | check passed |
+| r5 | PASS | 0 of 2 | check passed |
+| w1 | PASS | 0 of 9 | check passed |
+| w2 | PASS | 0 of 18 | check passed |
+| w3 | PASS | 0 of 9 | check passed |
+| w4 | PASS | 0 of 0 | check passed |
+| w5 | PASS | 0 of 18 | check passed |
+| e1 | PASS | 0 of 12 | check passed |
+| e2 | PASS | 0 of 16 | check passed |
+| e3 | PASS | 0 of 8 | check passed |
+| e4 | PASS | 0 of 36 | check passed |
+| e6 | PASS | 0 of 0 | check passed |
+| e8 | PASS | 0 of 0 | check passed |
+| p1 | PASS | 0 of 16 | check passed |
+| p2 | PASS | 0 of 4 | check passed |
+| p3 | PASS | 0 of 6 | check passed |
+| p4 | PASS | 0 of 1 | check passed |
+| p5 | FAIL | 1 of 3 | p5 fails -> the sector build v3 does not fit the background-thread budget: optimise (surface octaves, carve) or report to the orchestrator. |
+| p7 | PASS | 0 of 2 | check passed |
+| p8 | PASS | 0 of 1 | check passed |
+| e10 | FAIL | 4 of 20 | e10 fails -> the v2.1 sector build of the worst sector does not fit 2.0 ms median / 3 ms P95 (streaming budget BudgetMs 3 ms; RG-169 needs >= 1 ms for the surface base): report to the orchestrator. |
+
+**Overall: NOT all checks pass -> WI-ADR-001 stays Proposed; apply the decision rule of each failing check.**
+
+## Deformation report (report only, no threshold)
+
+Level-15 sectors, h = 0, sphere R = 6 378 000 m; quad corners joined by chords. Edge = chord of a sector side (m), angle = interior corner angle (deg), area = two flat triangles, spacing = distance of consecutive vertices along a sector side (m).
+
+| set | sectors | edge length min / max (m) | corner angle min / max (deg) | area ratio max : min | vertex spacing min / max (m) |
+|---|---|---|---|---|---|
+| face 0 diagonal (k, k) | 32768 | 280.84 (F0.r3544.c3544) / 305.74 (F0.r16383.c16383) | 60.002 (F0.r0.c0) / 120.000 (F0.r0.c0) | 1.2990 (71959 .. 93478 m2) | 4.388 / 4.777 |
+| face 0 edge row (row 0) | 32768 | 216.19 (F0.r0.c16383) / 305.74 (F0.r0.c16380) | 60.002 (F0.r0.c0) / 120.000 (F0.r0.c0) | 1.0886 (66100 .. 71959 m2) | 3.378 / 4.777 |
+| face 0 middle row (row 2^14) | 32768 | 216.19 (F0.r16384.c0) / 305.74 (F0.r16384.c1368) | 89.998 (F0.r16384.c0) / 90.002 (F0.r16384.c0) | 1.4142 (66100 .. 93478 m2) | 3.378 / 4.777 |
+| face 0 column 2^13 (quarter) | 32768 | 233.27 (F0.r0.c8192) / 305.74 (F0.r16383.c8192) | 74.301 (F0.r0.c8192) / 105.700 (F0.r0.c8192) | 1.2618 (68447 .. 86363 m2) | 3.645 / 4.777 |
+| 24 corner sectors (3 per cube vertex) | 24 | 288.25 (F1.r0.c0) / 288.26 (F1.r0.c0) | 60.002 (F1.r0.c0) / 120.000 (F1.r0.c0) | 1.0000 (71959 .. 71959 m2) | 4.504 / 4.504 |
+
+Interior angle at the cube vertex itself (24 corner sectors): 120.0000 .. 120.0000 deg (prediction 120).
+
+## Result table
+
+| check | region | seed | metric | measured | threshold | pass | kind |
+|---|---|---|---|---|---|---|---|
+| a | R0 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 2.04736E-06 | < 1 mm | PASS | protocol |
+| a | R0 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0132124 | < 1 mm | PASS | protocol |
+| a | R0 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.65739E-06 | < 1 mm | PASS | protocol |
+| a | R0 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.015347 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 2.71366E-06 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0201349 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00189987 | < 1 mm | PASS | protocol |
+| a | R0 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0196415 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 2.88061E-06 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0197237 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 1.42604E-05 | < 1 mm | PASS | protocol |
+| a | R0 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0170695 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 2.92597E-06 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0206507 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00189806 | < 1 mm | PASS | protocol |
+| a | R0 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0189995 | < 1 mm | PASS | protocol |
+| a | R45 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.95875E-06 | < 1 mm | PASS | protocol |
+| a | R45 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0147236 | < 1 mm | PASS | protocol |
+| a | R45 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.81691E-06 | < 1 mm | PASS | protocol |
+| a | R45 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.01416 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00255492 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0144921 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00179668 | < 1 mm | PASS | protocol |
+| a | R45 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0141557 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00255456 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0145298 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00471108 | < 1 mm | PASS | protocol |
+| a | R45 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.014809 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00378115 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0151718 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00527875 | < 1 mm | PASS | protocol |
+| a | R45 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0139941 | < 1 mm | PASS | protocol |
+| a | R89 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 2.04736E-06 | < 1 mm | PASS | protocol |
+| a | R89 | all | 5 x 5 block around the anchor sector (40 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0155739 | < 1 mm | PASS | protocol |
+| a | R89 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | all | level-10 region border (12 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.65739E-06 | < 1 mm | PASS | protocol |
+| a | R89 | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.015347 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 3.36669E-06 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0191817 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 5.78073E-05 | < 1 mm | PASS | protocol |
+| a | R89 | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.017565 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 3.3184E-06 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0190193 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.000114487 | < 1 mm | PASS | protocol |
+| a | R89 | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0168611 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 3.48706E-06 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | 5 x 5 block around the anchor sector (40 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0196454 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 1.53192E-05 | < 1 mm | PASS | protocol |
+| a | R89 | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0180292 | < 1 mm | PASS | protocol |
+| a | RC | all | 5 x 5 block around the anchor sector (12 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | all | 5 x 5 block around the anchor sector (12 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | all | 5 x 5 block around the anchor sector (12 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.01483E-06 | < 1 mm | PASS | protocol |
+| a | RC | all | 5 x 5 block around the anchor sector (12 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0133798 | < 1 mm | PASS | protocol |
+| a | RC | all | level-10 region border (12 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | all | level-10 region border (12 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 9.60736E-07 | < 1 mm | PASS | protocol |
+| a | RC | all | level-10 region border (12 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0148501 | < 1 mm | PASS | protocol |
+| a | RC | 1 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 1 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 1 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00160611 | < 1 mm | PASS | protocol |
+| a | RC | 1 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0143895 | < 1 mm | PASS | protocol |
+| a | RC | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 1 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00352315 | < 1 mm | PASS | protocol |
+| a | RC | 1 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.013121 | < 1 mm | PASS | protocol |
+| a | RC | 42 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 42 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 42 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00690582 | < 1 mm | PASS | protocol |
+| a | RC | 42 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0143847 | < 1 mm | PASS | protocol |
+| a | RC | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 42 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00349829 | < 1 mm | PASS | protocol |
+| a | RC | 42 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.013648 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00262514 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | 5 x 5 block around the anchor sector (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0145241 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | level-10 region border (12 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.00349539 | < 1 mm | PASS | protocol |
+| a | RC | 2147483647 | level-10 region border (12 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0144445 | < 1 mm | PASS | protocol |
+| a | cube | all | across the 12 cube edges (144 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | all | across the 12 cube edges (144 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | all | across the 12 cube edges (144 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 1.31422E-06 | < 1 mm | PASS | protocol |
+| a | cube | all | across the 12 cube edges (144 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.0152374 | < 1 mm | PASS | protocol |
+| a | cube | all | 3 sectors at each of 8 cube vertices (24 pairs) (h = 0): max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | all | 3 sectors at each of 8 cube vertices (24 pairs) (h = 0): max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | all | 3 sectors at each of 8 cube vertices (24 pairs) (h = 0): max vertical mm; float local mesh back-transformed | 7.87001E-07 | < 1 mm | PASS | protocol |
+| a | cube | all | 3 sectors at each of 8 cube vertices (24 pairs) (h = 0): max horizontal mm; float local mesh back-transformed | 0.013809 | < 1 mm | PASS | protocol |
+| a | cube | 1 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 1 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 1 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 0.000118831 | < 1 mm | PASS | protocol |
+| a | cube | 1 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0166177 | < 1 mm | PASS | protocol |
+| a | cube | 1 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 1 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 1 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 8.32983E-07 | < 1 mm | PASS | protocol |
+| a | cube | 1 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0166177 | < 1 mm | PASS | protocol |
+| a | cube | 42 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 42 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 42 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 1.41089E-06 | < 1 mm | PASS | protocol |
+| a | cube | 42 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0162074 | < 1 mm | PASS | protocol |
+| a | cube | 42 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 42 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 42 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 8.89162E-07 | < 1 mm | PASS | protocol |
+| a | cube | 42 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.0162074 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | across the 12 cube edges (144 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 5.93774E-05 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | across the 12 cube edges (144 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.015944 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; double world | 0 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max vertical mm; float local mesh back-transformed | 1.04596E-06 | < 1 mm | PASS | protocol |
+| a | cube | 2147483647 | 3 sectors at each of 8 cube vertices (24 pairs) with terrain height: max horizontal mm; float local mesh back-transformed | 0.015944 | < 1 mm | PASS | protocol |
+| b | R0 | 1 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R0 | 1 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R0 | 1 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R0 | 1 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2202911 | report | PASS | diag |
+| b | R0 | 1 | diag: local rounded to float: max height difference mm | 0.431061 | report | PASS | diag |
+| b | R0 | 42 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R0 | 42 | x rebuilt as origin + local (double): differing results of 3e6 | 1 | report | PASS | protocol |
+| b | R0 | 42 | x rebuilt as origin + local (double): max difference in float ulp | 1 | <= 1 ulp | PASS | protocol |
+| b | R0 | 42 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2202773 | report | PASS | diag |
+| b | R0 | 42 | diag: local rounded to float: max height difference mm | 0.322342 | report | PASS | diag |
+| b | R0 | 2147483647 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R0 | 2147483647 | x rebuilt as origin + local (double): differing results of 3e6 | 1 | report | PASS | protocol |
+| b | R0 | 2147483647 | x rebuilt as origin + local (double): max difference in float ulp | 1 | <= 1 ulp | PASS | protocol |
+| b | R0 | 2147483647 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2285987 | report | PASS | diag |
+| b | R0 | 2147483647 | diag: local rounded to float: max height difference mm | 0.38147 | report | PASS | diag |
+| b | R45 | 1 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R45 | 1 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R45 | 1 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R45 | 1 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2450190 | report | PASS | diag |
+| b | R45 | 1 | diag: local rounded to float: max height difference mm | 0.465393 | report | PASS | diag |
+| b | R45 | 42 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R45 | 42 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R45 | 42 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R45 | 42 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2178537 | report | PASS | diag |
+| b | R45 | 42 | diag: local rounded to float: max height difference mm | 0.47493 | report | PASS | diag |
+| b | R45 | 2147483647 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R45 | 2147483647 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R45 | 2147483647 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R45 | 2147483647 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2033124 | report | PASS | diag |
+| b | R45 | 2147483647 | diag: local rounded to float: max height difference mm | 0.50354 | report | PASS | diag |
+| b | R89 | 1 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R89 | 1 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R89 | 1 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R89 | 1 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2257070 | report | PASS | diag |
+| b | R89 | 1 | diag: local rounded to float: max height difference mm | 0.338554 | report | PASS | diag |
+| b | R89 | 42 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R89 | 42 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R89 | 42 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R89 | 42 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2000460 | report | PASS | diag |
+| b | R89 | 42 | diag: local rounded to float: max height difference mm | 0.343323 | report | PASS | diag |
+| b | R89 | 2147483647 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | R89 | 2147483647 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | R89 | 2147483647 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | R89 | 2147483647 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2174156 | report | PASS | diag |
+| b | R89 | 2147483647 | diag: local rounded to float: max height difference mm | 0.439644 | report | PASS | diag |
+| b | RC | 1 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | RC | 1 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | RC | 1 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | RC | 1 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2372934 | report | PASS | diag |
+| b | RC | 1 | diag: local rounded to float: max height difference mm | 0.458717 | report | PASS | diag |
+| b | RC | 42 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | RC | 42 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | RC | 42 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | RC | 42 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2387272 | report | PASS | diag |
+| b | RC | 42 | diag: local rounded to float: max height difference mm | 0.400543 | report | PASS | diag |
+| b | RC | 2147483647 | same double x from origins A; B (256 m); C (100 km): differing float bits of 3e6 | 0 | = 0 | PASS | protocol |
+| b | RC | 2147483647 | x rebuilt as origin + local (double): differing results of 3e6 | 0 | report | PASS | protocol |
+| b | RC | 2147483647 | x rebuilt as origin + local (double): max difference in float ulp | 0 | <= 1 ulp | PASS | protocol |
+| b | RC | 2147483647 | diag: local rounded to float before the rebuild: differing results of 3e6 | 2275945 | report | PASS | diag |
+| b | RC | 2147483647 | diag: local rounded to float: max height difference mm | 0.417709 | report | PASS | diag |
+| c | R0 | all | max /per-step rotation - analytic/ rad (1 km loop around the region centre; 6283 steps) | 1.22E-019 | < 1e-9 | PASS | protocol |
+| c | R0 | all | max step rotation / median step rotation | 1.000000 | <= 2 | PASS | protocol |
+| c | R0 | all | closing holonomy 7.722906E-008 rad vs cap area/R^2 7.722908E-008: /difference/ rad | 1.26E-014 | < 1e-9 | PASS | protocol |
+| c | R0 | all | max frame orthonormality / up=radial error after the loop | 6.73E-013 | report < 1e-9 | PASS | protocol |
+| c | R45 | all | max /per-step rotation - analytic/ rad (1 km loop around the region centre; 6283 steps) | 2.19E-016 | < 1e-9 | PASS | protocol |
+| c | R45 | all | max step rotation / median step rotation | 1.000000 | <= 2 | PASS | protocol |
+| c | R45 | all | closing holonomy 7.722911E-008 rad vs cap area/R^2 7.722908E-008: /difference/ rad | 3.49E-014 | < 1e-9 | PASS | protocol |
+| c | R45 | all | max frame orthonormality / up=radial error after the loop | 7.64E-013 | report < 1e-9 | PASS | protocol |
+| c | R89 | all | max /per-step rotation - analytic/ rad (circle of latitude 89.99 deg (radius 1113 m); 6994 steps) | 7.78E-020 | < 1e-9 | PASS | protocol |
+| c | R89 | all | max step rotation / median step rotation | 1.000000 | <= 2 | PASS | protocol |
+| c | R89 | all | closing holonomy 9.569837E-008 rad vs cap area/R^2 9.569838E-008: /difference/ rad | 1.25E-014 | < 1e-9 | PASS | protocol |
+| c | R89 | all | max frame orthonormality / up=radial error after the loop | 2.19E-013 | report < 1e-9 | PASS | protocol |
+| c | RC | all | max /per-step rotation - analytic/ rad (1 km loop around the cube corner (1;1;1)/sqrt3; 6283 steps) | 2.29E-016 | < 1e-9 | PASS | protocol |
+| c | RC | all | max step rotation / median step rotation | 1.000000 | <= 2 | PASS | protocol |
+| c | RC | all | closing holonomy 7.722906E-008 rad vs cap area/R^2 7.722908E-008: /difference/ rad | 1.43E-014 | < 1e-9 | PASS | protocol |
+| c | RC | all | max frame orthonormality / up=radial error after the loop | 3.09E-013 | report < 1e-9 | PASS | protocol |
+| r1 | global | all | portal s (int64 1 cm) from both regions differs: count over portals (10000 arcs; 76282 border crossings; 12 of 12 cube edges crossed (min 493 crossings per edge); 0 unresolved) | 0 | = 0 | PASS | protocol |
+| r1 | global | all | portal position reconstructed by each region from its own face basis: max mismatch mm (planet frame) | 2.00281E-06 | < 1 | PASS | protocol |
+| r1 | global | all | diag: quantised portal vs the true intersection of the arc with the border; max mm (1 cm quantisation) | 4.99986 | report | PASS | diag |
+| r2 | global | all | nearest distance of any portal to a region vertex after the snap; m (3000 arcs near cube / region vertices; 13181 portals; 5048 in joint-snap groups (2521 on the shifted line; the rest moved along the border); 0 unresolved) | 256.0000 | >= 256 (255.999 for chord) | PASS | protocol |
+| r2 | global | all | road length change vs the true arc (polyline through the shifted portals); max % over eligible arcs only (both ends >= 1 km from the nearest shifted portal; 2992 eligible of 3000; 2992 below 0.5 %) | 0.4029 | < 0.5 | PASS | protocol |
+| r2 | global | all | diag: excluded arcs (an end < 1 km from a shifted portal): count of 3000; share 0.27 % | 8 | report | PASS | diag |
+| r2 | global | all | diag: max road length change among the excluded arcs; % | 0.5236 | report | PASS | diag |
+| r2 | global | all | diag: old metric; max road length change over all 3000 arcs; % (arcs >= 0.5 %: 1) | 0.5236 | report | PASS | diag |
+| r2 | global | all | single-portal snap shift (candidate B; Portal.Snap of the raw crossing); max m | 255.99 | <= 256 | PASS | protocol |
+| r2 | global | all | diag: candidate A (shifted great circle): max lateral offset of the shifted road line from the true arc; m | 256.05 | report | PASS | diag |
+| r2 | global | all | diag: candidate A: max slide of a crossing along its border; m | 7100.61 | report | PASS | diag |
+| r2 | global | all | portals off their border segment before the snap (raw s < -5 cm or > LengthCm + 5 cm); count | 0 | = 0 | PASS | protocol |
+| r2 | global | all | portal s mismatch between the two regions after the snap; count | 0 | = 0 | PASS | protocol |
+| r3 | global | all | heading vs border tangent; difference between the two regions; max rad (r1 set; 76282 portals) | 2.05E-013 | < 1e-9 | PASS | protocol |
+| r3 | global | all | same on the snapped r2 set (13181 portals; heading of the bent arc); max rad | 1.02E-013 | < 1e-9 | PASS | protocol |
+| r4 | global | all | self-intersections of the refined corridor (144 polylines in the 24 corner regions (3 per cube vertex) x 3 side pairs x 2 classes; <= 3347 points at 4 m; 0 rejected) | 0 | = 0 | PASS | protocol |
+| r4 | global | all | min horizontal radius motorway (m; circumradius of 4 m samples in the region plane) | 344.830 | >= 344.83 | PASS | protocol |
+| r4 | global | all | min horizontal radius primary (m; same) | 121.310 | >= 121.31 | PASS | protocol |
+| r4 | global | all | interior samples outside the region (maps back to another level-10 region) | 0 | = 0 | PASS | protocol |
+| r4 | global | all | end points not on the portal border (> 1 mm from the border plane) | 0 | = 0 | PASS | protocol |
+| r5 | global | all | time to build the whole-planet corridor graph; median of 3; single thread; s (49152 settlements; 87164 edges (5279 motorway); times 0.040 / 0.041 / 0.041 s) | 0.041 | < 1 | PASS | protocol |
+| r5 | global | all | retained memory of the graph (GC.GetTotalMemory delta); MB; arrays alone 1.87 MB | 1.87 | < 5 | PASS | protocol |
+| w1 | face-centre | 1 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | face-centre | 1 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00112196 | report | PASS | diag |
+| w2 | face-centre | 1 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | face-centre | 1 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0152317 | < 1 | PASS | protocol |
+| w3 | face-centre | 1 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | face-centre | 1 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.108511 | report | PASS | diag |
+| w3 | face-centre | 1 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.139068 | report | PASS | diag |
+| w3 | face-centre | 1 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0573297 | report | PASS | diag |
+| w3 | face-centre | 1 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 3.91824 | report | PASS | diag |
+| w3 | face-centre | 1 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.000707756 | report | PASS | diag |
+| w1 | face-centre | 42 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | face-centre | 42 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00144222 | report | PASS | diag |
+| w2 | face-centre | 42 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | face-centre | 42 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0152181 | < 1 | PASS | protocol |
+| w3 | face-centre | 42 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | face-centre | 42 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.14444 | report | PASS | diag |
+| w3 | face-centre | 42 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.137296 | report | PASS | diag |
+| w3 | face-centre | 42 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0551477 | report | PASS | diag |
+| w3 | face-centre | 42 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 3.28284 | report | PASS | diag |
+| w3 | face-centre | 42 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.000839188 | report | PASS | diag |
+| w1 | face-centre | 2147483647 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | face-centre | 2147483647 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00118416 | report | PASS | diag |
+| w2 | face-centre | 2147483647 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | face-centre | 2147483647 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0152525 | < 1 | PASS | protocol |
+| w3 | face-centre | 2147483647 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | face-centre | 2147483647 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.086305 | report | PASS | diag |
+| w3 | face-centre | 2147483647 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.0944868 | report | PASS | diag |
+| w3 | face-centre | 2147483647 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0611579 | report | PASS | diag |
+| w3 | face-centre | 2147483647 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 2.09325 | report | PASS | diag |
+| w3 | face-centre | 2147483647 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.000848912 | report | PASS | diag |
+| w4 | face-centre | all | footprint side lengths m in the tangent plane (row 0 / col 64 / row 64 / col 0) | 305.74 / 305.74 / 305.74 / 305.74 | report | PASS | diag |
+| w4 | face-centre | all | footprint max corner angle deviation from 90 deg | 0.000 | report | PASS | diag |
+| w4 | face-centre | all | footprint area / (256 m x 256 m) | 1.4264 | report | PASS | diag |
+| w4 | face-centre | all | WorldGen domain: base grid 23 x 23 at 16 m (interior +-160 m; RG-160 assumed 19 x 19 = +-128 m) | 23 | report | PASS | diag |
+| w4 | face-centre | all | vertices inside the 32 m taper band (of 4225); max band distance m | 1624 (38.4 %); 28.66 m | report | PASS | diag |
+| w1 | cube-edge-mid | 1 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-edge-mid | 1 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00201748 | report | PASS | diag |
+| w2 | cube-edge-mid | 1 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-edge-mid | 1 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0144752 | < 1 | PASS | protocol |
+| w3 | cube-edge-mid | 1 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-edge-mid | 1 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.0748999 | report | PASS | diag |
+| w3 | cube-edge-mid | 1 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.0852837 | report | PASS | diag |
+| w3 | cube-edge-mid | 1 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0401264 | report | PASS | diag |
+| w3 | cube-edge-mid | 1 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 2.0275 | report | PASS | diag |
+| w3 | cube-edge-mid | 1 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.00146217 | report | PASS | diag |
+| w1 | cube-edge-mid | 42 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-edge-mid | 42 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00148468 | report | PASS | diag |
+| w2 | cube-edge-mid | 42 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-edge-mid | 42 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0147224 | < 1 | PASS | protocol |
+| w3 | cube-edge-mid | 42 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-edge-mid | 42 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.158005 | report | PASS | diag |
+| w3 | cube-edge-mid | 42 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.14035 | report | PASS | diag |
+| w3 | cube-edge-mid | 42 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0585004 | report | PASS | diag |
+| w3 | cube-edge-mid | 42 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 3.45412 | report | PASS | diag |
+| w3 | cube-edge-mid | 42 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.000963806 | report | PASS | diag |
+| w1 | cube-edge-mid | 2147483647 | shared-edge planet base height max /diff/ m (4 pairs / 260 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-edge-mid | 2147483647 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00288826 | report | PASS | diag |
+| w2 | cube-edge-mid | 2147483647 | seam of the adapted mesh: max world gap mm; double positions (4 pairs / 260 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-edge-mid | 2147483647 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (4 pairs / 260 shared vertices) | 0.0146786 | < 1 | PASS | protocol |
+| w3 | cube-edge-mid | 2147483647 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-edge-mid | 2147483647 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.119698 | report | PASS | diag |
+| w3 | cube-edge-mid | 2147483647 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.138996 | report | PASS | diag |
+| w3 | cube-edge-mid | 2147483647 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0529182 | report | PASS | diag |
+| w3 | cube-edge-mid | 2147483647 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 2.98901 | report | PASS | diag |
+| w3 | cube-edge-mid | 2147483647 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.00174232 | report | PASS | diag |
+| w4 | cube-edge-mid | all | footprint side lengths m in the tangent plane (row 0 / col 64 / row 64 / col 0) | 305.74 / 216.19 / 305.74 / 216.20 | report | PASS | diag |
+| w4 | cube-edge-mid | all | footprint max corner angle deviation from 90 deg | 0.002 | report | PASS | diag |
+| w4 | cube-edge-mid | all | footprint area / (256 m x 256 m) | 1.0086 | report | PASS | diag |
+| w4 | cube-edge-mid | all | WorldGen domain: base grid 23 x 23 at 16 m (interior +-160 m; RG-160 assumed 19 x 19 = +-128 m) | 23 | report | PASS | diag |
+| w4 | cube-edge-mid | all | vertices inside the 32 m taper band (of 4225); max band distance m | 1930 (45.7 %); 30.40 m | report | PASS | diag |
+| w1 | cube-vertex | 1 | shared-edge planet base height max /diff/ m (5 pairs / 325 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-vertex | 1 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.000521628 | report | PASS | diag |
+| w2 | cube-vertex | 1 | seam of the adapted mesh: max world gap mm; double positions (5 pairs / 325 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-vertex | 1 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (5 pairs / 325 shared vertices) | 0.0143907 | < 1 | PASS | protocol |
+| w3 | cube-vertex | 1 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-vertex | 1 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.0676123 | report | PASS | diag |
+| w3 | cube-vertex | 1 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.0605582 | report | PASS | diag |
+| w3 | cube-vertex | 1 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0451261 | report | PASS | diag |
+| w3 | cube-vertex | 1 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 1.59275 | report | PASS | diag |
+| w3 | cube-vertex | 1 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.000419826 | report | PASS | diag |
+| w1 | cube-vertex | 42 | shared-edge planet base height max /diff/ m (5 pairs / 325 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-vertex | 42 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00184213 | report | PASS | diag |
+| w2 | cube-vertex | 42 | seam of the adapted mesh: max world gap mm; double positions (5 pairs / 325 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-vertex | 42 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (5 pairs / 325 shared vertices) | 0.0130706 | < 1 | PASS | protocol |
+| w3 | cube-vertex | 42 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-vertex | 42 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.146271 | report | PASS | diag |
+| w3 | cube-vertex | 42 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.165535 | report | PASS | diag |
+| w3 | cube-vertex | 42 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0470308 | report | PASS | diag |
+| w3 | cube-vertex | 42 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 4.02011 | report | PASS | diag |
+| w3 | cube-vertex | 42 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.00215316 | report | PASS | diag |
+| w1 | cube-vertex | 2147483647 | shared-edge planet base height max /diff/ m (5 pairs / 325 shared vertices; 0 not bit-identical) | 0 | = 0 (bit-identical) | PASS | protocol |
+| w1 | cube-vertex | 2147483647 | shared-edge grid-interpolated WorldGen base max /diff/ m (each side's own frame and 16 m grid; why the edge uses the planet base) | 0.00199967 | report | PASS | diag |
+| w2 | cube-vertex | 2147483647 | seam of the adapted mesh: max world gap mm; double positions (5 pairs / 325 shared vertices) | 0 | < 1 | PASS | protocol |
+| w2 | cube-vertex | 2147483647 | seam of the adapted mesh: max world gap mm; each side's float local mesh back through its own frame (5 pairs / 325 shared vertices) | 0.0131851 | < 1 | PASS | protocol |
+| w3 | cube-vertex | 2147483647 | max /WorldGen contribution/ on the quad edge m (taper x contribution on the 256 rim vertices) | 0 | = 0 | PASS | protocol |
+| w3 | cube-vertex | 2147483647 | taper band 32 m: max slope change by the taper /d(t c) - dc/ / ds (rise/run) | 0.110806 | report | PASS | diag |
+| w3 | cube-vertex | 2147483647 | taper band: max slope of the tapered contribution /d(t c)/ds/ (rise/run) | 0.0989985 | report | PASS | diag |
+| w3 | cube-vertex | 2147483647 | taper band: max slope of the untapered contribution /dc/ds/ (rise/run) | 0.0464724 | report | PASS | diag |
+| w3 | cube-vertex | 2147483647 | max /WorldGen contribution/ anywhere in the sector m (detail octaves 2-4 of relief 60 m; no roads in v1) | 2.7532 | report | PASS | diag |
+| w3 | cube-vertex | 2147483647 | 16 m Catmull-Rom grid vs exact planet base at the 4225 vertices: max /diff/ m | 0.0030597 | report | PASS | diag |
+| w4 | cube-vertex | all | footprint side lengths m in the tangent plane (row 0 / col 64 / row 64 / col 0) | 288.26 / 288.25 / 288.25 / 288.26 | report | PASS | diag |
+| w4 | cube-vertex | all | footprint max corner angle deviation from 90 deg | 30.000 | report | PASS | diag |
+| w4 | cube-vertex | all | footprint area / (256 m x 256 m) | 1.0980 | report | PASS | diag |
+| w4 | cube-vertex | all | WorldGen domain: base grid 31 x 31 at 16 m (interior +-224 m; RG-160 assumed 19 x 19 = +-128 m) | 31 | report | PASS | diag |
+| w4 | cube-vertex | all | vertices inside the 32 m taper band (of 4225); max band distance m | 2016 (47.7 %); 31.21 m | report | PASS | diag |
+| e3 | face-centre | all | region chart: 10 000 random point pairs in the region: max /chart distance - great-circle distance/ / great-circle distance (farthest point 6871 m from the chart origin) | 8.39693E-07 | <= 2e-6 | PASS | protocol |
+| e3 | face-centre | all | region chart: 1 000 random right angles (central differences +-1 m) mapped to the sphere: max deviation deg | 3.10807E-05 | <= 1e-4 | PASS | protocol |
+| e1 | face-centre | 1 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | face-centre | 1 | shared vertices on a road surface (within half width of a ground centreline) | 32 | report | PASS | diag |
+| e2 | face-centre | 1 | seam across region borders: max world gap mm; double positions (4 pairs; 1 across a region border; 2 regions (F0.L10.r512.c512 F0.L10.r512.c511) / 260 shared vertices; 0 not bit-identical) | 0 | < 1 | PASS | protocol |
+| e2 | face-centre | 1 | seam across region borders: max world gap mm; each side's float local mesh through its own frame (4 pairs; 1 across a region border; 2 regions (F0.L10.r512.c512 F0.L10.r512.c511) / 260 shared vertices; 0 not bit-identical) | 0.0162679 | < 1 | PASS | protocol |
+| e2 | face-centre | 1 | max /taper x WorldGen contribution/ m on the region-border vertices of the cross-region pairs | 0 | = 0 | PASS | protocol |
+| e2 | face-centre | 1 | ground road samples (4 m) inside the 32 m taper band (of 15529 inside the region polygon): they ramp to the planet base until portals carry a road height | 9 (0.06 %) | report | PASS | diag |
+| e2 | face-centre | all | share of the region area inside the taper band (chart polygon 95.721 km2 minus its 32 m inward offset) % | 1.3040 | <= 1.6 | PASS | protocol |
+| e4 | face-centre | 1 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 156.48->156.48 m; grade 8.280->8.280 %; local x1227: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x7: R 343.19->343.19 m; grade 5.670->5.670 %; primary x9: R 120.79->120.79 m; grade 9.392->9.392 %; secondary x1: R 100.03->100.03 m; grade 5.488->5.488 %) | 4.01918E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 1 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 3.79004E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 1 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 7.54388E-07 | <= 1e-5 | PASS | protocol |
+| e6 | face-centre | 1 | carve at the lattice vertices; quads split along the SHORT diagonal: max terrain above the road surface inside the footprint m (1075750 footprint points of the ground roads >= 92 m inside the region; lattice quad diagonals 6.76-6.76 m) | 3.8064 | report (baseline: 4 m grid) | PASS | diag |
+| e6 | face-centre | 1 | carve at the lattice vertices; quads split along the LONG diagonal: max terrain above the road surface m | 3.2439 | report | PASS | diag |
+| e6 | face-centre | 1 | baseline: carve on the planar 4 m chart grid (SampleTile spacing); diagonal (i;j)-(i+1;j+1) / the other: max terrain above the road surface m | 2.9702 / 3.2162 | report | PASS | diag |
+| e6 | face-centre | 1 | lattice SHORT diagonal minus the better 4 m baseline m (> 0 = worse than the baseline: a finding) | 0.8362 | report | PASS | diag |
+| e8 | face-centre | 1 | float emit inside one region (F0.r16392.c16384 / F0.r16392.c16385): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 30.5 um / 49 of 65 bit-identical; 600 m: 61.0 um / 35 of 65 bit-identical; 10000 m: 976.6 um / 33 of 65 bit-identical | report | PASS | diag |
+| e8 | face-centre | 1 | float emit across a region border (F0.r16400.c16384 / F0.r16400.c16383): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 30.5 um / 50 of 65 bit-identical; 600 m: 61.0 um / 55 of 65 bit-identical; 10000 m: 976.6 um / 41 of 65 bit-identical | report | PASS | diag |
+| e10 | face-centre | 1 | region world build (sequential; single thread): Generator.Run + TerrainModel; 9.8 km square; 1248 edges / 136.6 km of road; 5 settlements: s; managed MB retained | 1.106 s; 3.0 MB | report | PASS | diag |
+| e1 | face-centre | 42 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | face-centre | 42 | shared vertices on a road surface (within half width of a ground centreline) | 34 | report | PASS | diag |
+| e4 | face-centre | 42 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.22->155.22 m; grade 4.276->4.276 %; local x1142: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x11: R 343.97->343.97 m; grade 5.344->5.344 %; primary x10: R 120.48->120.48 m; grade 5.670->5.670 %; secondary x1: R 99.81->99.81 m; grade 7.839->7.839 %) | 7.83882E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 42 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 3.02151E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 42 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 7.30683E-07 | <= 1e-5 | PASS | protocol |
+| e10 | face-centre | 42 | region world build (9.8 km square; 1168 edges / 138.0 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 0.477 s | report | PASS | diag |
+| e1 | face-centre | 2147483647 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | face-centre | 2147483647 | shared vertices on a road surface (within half width of a ground centreline) | 37 | report | PASS | diag |
+| e4 | face-centre | 2147483647 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.39->155.39 m; grade 8.280->8.280 %; local x1328: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x9: R 343.99->343.99 m; grade 5.670->5.670 %; primary x10: R 120.49->120.49 m; grade 9.720->9.720 %; secondary x1: R 69.83->69.83 m; grade 6.431->6.431 %) | 4.18929E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 2147483647 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 4.76412E-07 | <= 1e-5 | PASS | protocol |
+| e4 | face-centre | 2147483647 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 5.64224E-07 | <= 1e-5 | PASS | protocol |
+| e10 | face-centre | 2147483647 | region world build (9.8 km square; 1352 edges / 148.5 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 2.508 s | report | PASS | diag |
+| e3 | cube-edge-mid | all | region chart: 10 000 random point pairs in the region: max /chart distance - great-circle distance/ / great-circle distance (farthest point 5965 m from the chart origin) | 6.77676E-07 | <= 2e-6 | PASS | protocol |
+| e3 | cube-edge-mid | all | region chart: 1 000 random right angles (central differences +-1 m) mapped to the sphere: max deviation deg | 2.25482E-05 | <= 1e-4 | PASS | protocol |
+| e1 | cube-edge-mid | 1 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-edge-mid | 1 | shared vertices on a road surface (within half width of a ground centreline) | 118 | report | PASS | diag |
+| e2 | cube-edge-mid | 1 | seam across region borders: max world gap mm; double positions (4 pairs; 1 across a region border; 2 regions (F0.L10.r512.c1023 F2.L10.r1023.c512) / 260 shared vertices; 0 not bit-identical) | 0 | < 1 | PASS | protocol |
+| e2 | cube-edge-mid | 1 | seam across region borders: max world gap mm; each side's float local mesh through its own frame (4 pairs; 1 across a region border; 2 regions (F0.L10.r512.c1023 F2.L10.r1023.c512) / 260 shared vertices; 0 not bit-identical) | 0.0146495 | < 1 | PASS | protocol |
+| e2 | cube-edge-mid | 1 | max /taper x WorldGen contribution/ m on the region-border vertices of the cross-region pairs | 0 | = 0 | PASS | protocol |
+| e2 | cube-edge-mid | 1 | ground road samples (4 m) inside the 32 m taper band (of 15417 inside the region polygon): they ramp to the planet base until portals carry a road height | 60 (0.39 %) | report | PASS | diag |
+| e2 | cube-edge-mid | all | share of the region area inside the taper band (chart polygon 67.737 km2 minus its 32 m inward offset) % | 1.5725 | <= 1.6 | PASS | protocol |
+| e4 | cube-edge-mid | 1 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.35->155.35 m; grade 6.560->6.560 %; local x1221: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x11: R 343.76->343.76 m; grade 5.670->5.670 %; primary x10: R 120.58->120.58 m; grade 7.844->7.844 %; secondary x1: R 99.42->99.42 m; grade 8.922->8.922 %) | 1.71648E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 1 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 6.49121E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 1 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 6.93628E-07 | <= 1e-5 | PASS | protocol |
+| e6 | cube-edge-mid | 1 | carve at the lattice vertices; quads split along the SHORT diagonal: max terrain above the road surface inside the footprint m (1056939 footprint points of the ground roads >= 92 m inside the region; lattice quad diagonals 5.85-5.86 m) | 2.0104 | report (baseline: 4 m grid) | PASS | diag |
+| e6 | cube-edge-mid | 1 | carve at the lattice vertices; quads split along the LONG diagonal: max terrain above the road surface m | 2.0210 | report | PASS | diag |
+| e6 | cube-edge-mid | 1 | baseline: carve on the planar 4 m chart grid (SampleTile spacing); diagonal (i;j)-(i+1;j+1) / the other: max terrain above the road surface m | 1.9445 / 1.9612 | report | PASS | diag |
+| e6 | cube-edge-mid | 1 | lattice SHORT diagonal minus the better 4 m baseline m (> 0 = worse than the baseline: a finding) | 0.0658 | report | PASS | diag |
+| e8 | cube-edge-mid | 1 | float emit inside one region (F0.r16389.c32736 / F0.r16389.c32737): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 15.7 um / 9 of 65 bit-identical; 600 m: 61.2 um / 25 of 65 bit-identical; 10000 m: 976.6 um / 29 of 65 bit-identical | report | PASS | diag |
+| e8 | cube-edge-mid | 1 | float emit across a region border (F0.r16400.c32767 / F2.r32767.c16400): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 30.8 um / 16 of 65 bit-identical; 600 m: 61.2 um / 23 of 65 bit-identical; 10000 m: 976.6 um / 18 of 65 bit-identical | report | PASS | diag |
+| e10 | cube-edge-mid | 1 | region world build (sequential; single thread): Generator.Run + TerrainModel; 9.8 km square; 1247 edges / 143.7 km of road; 5 settlements: s; managed MB retained | 0.401 s; 3.1 MB | report | PASS | diag |
+| e1 | cube-edge-mid | 42 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-edge-mid | 42 | shared vertices on a road surface (within half width of a ground centreline) | 37 | report | PASS | diag |
+| e4 | cube-edge-mid | 42 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.21->155.21 m; grade 5.248->5.248 %; local x1104: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x7: R 343.93->343.93 m; grade 5.670->5.670 %; primary x9: R 120.48->120.48 m; grade 6.315->6.315 %; secondary x1: R 69.94->69.94 m; grade 10.176->10.176 %) | 4.34567E-08 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 42 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 2.53524E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 42 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 6.81295E-07 | <= 1e-5 | PASS | protocol |
+| e10 | cube-edge-mid | 42 | region world build (9.8 km square; 1125 edges / 137.6 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 2.989 s | report | PASS | diag |
+| e1 | cube-edge-mid | 2147483647 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-edge-mid | 2147483647 | shared vertices on a road surface (within half width of a ground centreline) | 41 | report | PASS | diag |
+| e4 | cube-edge-mid | 2147483647 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.76->155.76 m; grade 6.891->6.891 %; local x1252: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x7: R 344.06->344.06 m; grade 5.670->5.670 %; primary x10: R 120.69->120.69 m; grade 9.720->9.720 %; secondary x1: R 99.71->99.71 m; grade 5.296->5.296 %) | 2.08039E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 2147483647 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 2.8168E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-edge-mid | 2147483647 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 7.2215E-07 | <= 1e-5 | PASS | protocol |
+| e10 | cube-edge-mid | 2147483647 | region world build (9.8 km square; 1274 edges / 143.7 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 1.052 s | report | PASS | diag |
+| e3 | cube-vertex | all | region chart: 10 000 random point pairs in the region: max /chart distance - great-circle distance/ / great-circle distance (farthest point 7943 m from the chart origin) | 1.15584E-06 | <= 2e-6 | PASS | protocol |
+| e3 | cube-vertex | all | region chart: 1 000 random right angles (central differences +-1 m) mapped to the sphere: max deviation deg | 3.22226E-05 | <= 1e-4 | PASS | protocol |
+| e1 | cube-vertex | 1 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-vertex | 1 | shared vertices on a road surface (within half width of a ground centreline) | 35 | report | PASS | diag |
+| e2 | cube-vertex | 1 | seam across region borders: max world gap mm; double positions (5 pairs; 3 across a region border; 3 regions (F0.L10.r1023.c1023 F2.L10.r1023.c1023 F4.L10.r1023.c1023) / 325 shared vertices; 0 not bit-identical) | 0 | < 1 | PASS | protocol |
+| e2 | cube-vertex | 1 | seam across region borders: max world gap mm; each side's float local mesh through its own frame (5 pairs; 3 across a region border; 3 regions (F0.L10.r1023.c1023 F2.L10.r1023.c1023 F4.L10.r1023.c1023) / 325 shared vertices; 0 not bit-identical) | 0.0134968 | < 1 | PASS | protocol |
+| e2 | cube-vertex | 1 | max /taper x WorldGen contribution/ m on the region-border vertices of the cross-region pairs | 0 | = 0 | PASS | protocol |
+| e2 | cube-vertex | 1 | ground road samples (4 m) inside the 32 m taper band (of 15169 inside the region polygon): they ramp to the planet base until portals carry a road height | 30 (0.20 %) | report | PASS | diag |
+| e2 | cube-vertex | all | share of the region area inside the taper band (chart polygon 73.686 km2 minus its 32 m inward offset) % | 1.5955 | <= 1.6 | PASS | protocol |
+| e4 | cube-vertex | 1 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.34->155.34 m; grade 6.198->6.198 %; local x1251: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x11: R 343.73->343.73 m; grade 5.670->5.670 %; primary x10: R 122.02->122.02 m; grade 7.868->7.868 %; secondary x1: R 80.17->80.17 m; grade 11.610->11.610 %) | 9.42015E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 1 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 1.23761E-06 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 1 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 9.39528E-07 | <= 1e-5 | PASS | protocol |
+| e6 | cube-vertex | 1 | carve at the lattice vertices; quads split along the SHORT diagonal: max terrain above the road surface inside the footprint m (1041625 footprint points of the ground roads >= 92 m inside the region; lattice quad diagonals 4.50-7.80 m) | 1.4873 | report (baseline: 4 m grid) | PASS | diag |
+| e6 | cube-vertex | 1 | carve at the lattice vertices; quads split along the LONG diagonal: max terrain above the road surface m | 1.5408 | report | PASS | diag |
+| e6 | cube-vertex | 1 | baseline: carve on the planar 4 m chart grid (SampleTile spacing); diagonal (i;j)-(i+1;j+1) / the other: max terrain above the road surface m | 1.4429 / 1.8984 | report | PASS | diag |
+| e6 | cube-vertex | 1 | lattice SHORT diagonal minus the better 4 m baseline m (> 0 = worse than the baseline: a finding) | 0.0444 | report | PASS | diag |
+| e8 | cube-vertex | 1 | float emit inside one region (F0.r32741.c32736 / F0.r32741.c32737): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 15.3 um / 21 of 65 bit-identical; 600 m: 61.1 um / 6 of 65 bit-identical; 10000 m: 976.6 um / 38 of 65 bit-identical | report | PASS | diag |
+| e8 | cube-vertex | 1 | float emit across a region border (F0.r32767.c32767 / F2.r32767.c32767): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 17.5 um / 7 of 65 bit-identical; 600 m: 61.6 um / 11 of 65 bit-identical; 10000 m: 976.6 um / 0 of 65 bit-identical | report | PASS | diag |
+| e10 | cube-vertex | 1 | region world build (sequential; single thread): Generator.Run + TerrainModel; 13.9 km square; 1277 edges / 156.2 km of road; 5 settlements: s; managed MB retained | 0.443 s; 3.3 MB | report | PASS | diag |
+| e1 | cube-vertex | 42 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 0.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-vertex | 42 | shared vertices on a road surface (within half width of a ground centreline) | 38 | report | PASS | diag |
+| e4 | cube-vertex | 42 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 156.88->156.88 m; grade 8.280->8.280 %; local x1233: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x9: R 344.07->344.07 m; grade 5.670->5.670 %; primary x13: R 117.66->117.66 m; grade 9.720->9.720 %; secondary x1: R 77.81->77.81 m; grade 6.052->6.052 %) | 1.04042E-06 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 42 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 5.20371E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 42 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 1.02239E-06 | <= 1e-5 | PASS | protocol |
+| e10 | cube-vertex | 42 | region world build (13.9 km square; 1260 edges / 149.3 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 12.848 s | report | PASS | diag |
+| e1 | cube-vertex | 2147483647 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | cube-vertex | 2147483647 | shared vertices on a road surface (within half width of a ground centreline) | 44 | report | PASS | diag |
+| e4 | cube-vertex | 2147483647 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.46->155.46 m; grade 8.280->8.280 %; local x1170: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x7: R 343.24->343.24 m; grade 5.670->5.670 %; primary x9: R 120.62->120.62 m; grade 9.720->9.720 %; secondary x1: R 182.38->182.38 m; grade 5.502->5.502 %) | 1.49543E-06 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 2147483647 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 3.33855E-07 | <= 1e-5 | PASS | protocol |
+| e4 | cube-vertex | 2147483647 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 1.09923E-06 | <= 1e-5 | PASS | protocol |
+| e10 | cube-vertex | 2147483647 | region world build (13.9 km square; 1191 edges / 148.1 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 5.718 s | report | PASS | diag |
+| e3 | region-corner-4 | all | region chart: 10 000 random point pairs in the region: max /chart distance - great-circle distance/ / great-circle distance (farthest point 6915 m from the chart origin) | 9.00732E-07 | <= 2e-6 | PASS | protocol |
+| e3 | region-corner-4 | all | region chart: 1 000 random right angles (central differences +-1 m) mapped to the sphere: max deviation deg | 3.02024E-05 | <= 1e-4 | PASS | protocol |
+| e1 | region-corner-4 | 1 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | region-corner-4 | 1 | shared vertices on a road surface (within half width of a ground centreline) | 40 | report | PASS | diag |
+| e2 | region-corner-4 | 1 | seam across region borders: max world gap mm; double positions (4 pairs; 4 across a region border; 4 regions (F0.L10.r256.c768 F0.L10.r256.c767 F0.L10.r255.c768 F0.L10.r255.c767) / 260 shared vertices; 0 not bit-identical) | 0 | < 1 | PASS | protocol |
+| e2 | region-corner-4 | 1 | seam across region borders: max world gap mm; each side's float local mesh through its own frame (4 pairs; 4 across a region border; 4 regions (F0.L10.r256.c768 F0.L10.r256.c767 F0.L10.r255.c768 F0.L10.r255.c767) / 260 shared vertices; 0 not bit-identical) | 0.0167601 | < 1 | PASS | protocol |
+| e2 | region-corner-4 | 1 | max /taper x WorldGen contribution/ m on the region-border vertices of the cross-region pairs | 0 | = 0 | PASS | protocol |
+| e2 | region-corner-4 | 1 | ground road samples (4 m) inside the 32 m taper band (of 15981 inside the region polygon): they ramp to the planet base until portals carry a road height | 11 (0.07 %) | report | PASS | diag |
+| e2 | region-corner-4 | all | share of the region area inside the taper band (chart polygon 84.404 km2 minus its 32 m inward offset) % | 1.3959 | <= 1.6 | PASS | protocol |
+| e4 | region-corner-4 | 1 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.36->155.36 m; grade 7.237->7.237 %; local x1221: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x11: R 343.48->343.48 m; grade 5.488->5.488 %; primary x10: R 120.59->120.59 m; grade 6.712->6.712 %; secondary x1: R 99.69->99.69 m; grade 5.115->5.115 %) | 5.20766E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 1 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 4.0571E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 1 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 6.29818E-07 | <= 1e-5 | PASS | protocol |
+| e6 | region-corner-4 | 1 | carve at the lattice vertices; quads split along the SHORT diagonal: max terrain above the road surface inside the footprint m (1109524 footprint points of the ground roads >= 92 m inside the region; lattice quad diagonals 5.89-6.83 m) | 2.7203 | report (baseline: 4 m grid) | PASS | diag |
+| e6 | region-corner-4 | 1 | carve at the lattice vertices; quads split along the LONG diagonal: max terrain above the road surface m | 2.7176 | report | PASS | diag |
+| e6 | region-corner-4 | 1 | baseline: carve on the planar 4 m chart grid (SampleTile spacing); diagonal (i;j)-(i+1;j+1) / the other: max terrain above the road surface m | 2.6205 / 2.8107 | report | PASS | diag |
+| e6 | region-corner-4 | 1 | lattice SHORT diagonal minus the better 4 m baseline m (> 0 = worse than the baseline: a finding) | 0.0998 | report | PASS | diag |
+| e8 | region-corner-4 | 1 | float emit inside one region (F0.r8199.c24576 / F0.r8199.c24577): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 15.4 um / 31 of 65 bit-identical; 600 m: 61.1 um / 13 of 65 bit-identical; 10000 m: 976.6 um / 0 of 65 bit-identical | report | PASS | diag |
+| e8 | region-corner-4 | 1 | float emit across a region border (F0.r8192.c24576 / F0.r8192.c24575): own float32 local mesh x float32 object matrix into a floating-origin frame at 0 / 600 m / 10 km from the seam: max gap of the shared vertices; bit-identical count | 0 m: 30.5 um / 19 of 65 bit-identical; 600 m: 61.1 um / 42 of 65 bit-identical; 10000 m: 976.6 um / 24 of 65 bit-identical | report | PASS | diag |
+| e10 | region-corner-4 | 1 | region world build (sequential; single thread): Generator.Run + TerrainModel; 10.6 km square; 1247 edges / 143.3 km of road; 5 settlements: s; managed MB retained | 0.296 s; 3.1 MB | report | PASS | diag |
+| e1 | region-corner-4 | 42 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | region-corner-4 | 42 | shared vertices on a road surface (within half width of a ground centreline) | 44 | report | PASS | diag |
+| e4 | region-corner-4 | 42 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.77->155.77 m; grade 5.262->5.262 %; local x1241: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x13: R 343.99->343.99 m; grade 4.877->4.877 %; primary x10: R 120.50->120.50 m; grade 8.965->8.965 %; secondary x1: R 100.03->100.03 m; grade 5.884->5.884 %) | 6.95287E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 42 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 2.10167E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 42 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 8.22933E-07 | <= 1e-5 | PASS | protocol |
+| e10 | region-corner-4 | 42 | region world build (10.6 km square; 1269 edges / 150.9 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 0.826 s | report | PASS | diag |
+| e1 | region-corner-4 | 2147483647 | shared vertices inside one region: differing height / position / chart bits (7 pairs (3 crossed by a ground road: motorway / local / primary) / 455 shared vertices; min taper 1.000) | 0 | = 0 | PASS | protocol |
+| e1 | region-corner-4 | 2147483647 | shared vertices on a road surface (within half width of a ground centreline) | 31 | report | PASS | diag |
+| e4 | region-corner-4 | 2147483647 | road edges mapped to the sphere: min horizontal radius per class (3-point; sphere = geodesic curvature): max relative deviation sphere vs chart (link x4: R 155.51->155.51 m; grade 8.280->8.280 %; local x1268: R 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00->179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.00 m; grade 14.850->14.850 %; motorway x13: R 343.23->343.23 m; grade 5.670->5.670 %; primary x9: R 120.50->120.50 m; grade 8.878->8.878 %; secondary x1: R 99.69->99.69 m; grade 7.094->7.094 %) | 2.6266E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 2147483647 | road edges mapped to the sphere: max grade per class (rise / chord at h 0): max relative deviation sphere vs chart | 3.59442E-07 | <= 1e-5 | PASS | protocol |
+| e4 | region-corner-4 | 2147483647 | road edges mapped to the sphere: road width (edge to edge across every 4 m segment): max relative deviation from the class width | 9.08238E-07 | <= 1e-5 | PASS | protocol |
+| e10 | region-corner-4 | 2147483647 | region world build (10.6 km square; 1295 edges / 144.6 km of road; 5 settlements): s; built in parallel with the other worlds (under load; an upper bound); memory not measured | 1.414 s | report | PASS | diag |
+| e10 | face-centre | 1 | sector build v2 of F0.r16392.c16384; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1613 / 1.1971 | report (< 3) | PASS | diag |
+| e10 | face-centre | 42 | sector build v2 of F0.r16392.c16384; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1574 / 1.2448 | report (< 3) | PASS | diag |
+| e10 | face-centre | 2147483647 | sector build v2 of F0.r16392.c16384; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1734 / 1.2314 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 1 | sector build v2 of F0.r16389.c32736; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1888 / 1.2291 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 42 | sector build v2 of F0.r16389.c32736; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1802 / 1.3684 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 2147483647 | sector build v2 of F0.r16389.c32736; this process only (1 run; after the parallel world builds): median / P95 ms | 1.1899 / 1.2328 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 1 | sector build v2 of F0.r32741.c32736; this process only (1 run; after the parallel world builds): median / P95 ms | 1.3253 / 1.4744 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 42 | sector build v2 of F0.r32736.c32743; this process only (1 run; after the parallel world builds): median / P95 ms | 1.2447 / 1.3608 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 2147483647 | sector build v2 of F0.r32739.c32736; this process only (1 run; after the parallel world builds): median / P95 ms | 1.2729 / 1.3227 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 1 | sector build v2 of F0.r8199.c24576; this process only (1 run; after the parallel world builds): median / P95 ms | 1.2364 / 1.2937 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 42 | sector build v2 of F0.r8199.c24576; this process only (1 run; after the parallel world builds): median / P95 ms | 1.2183 / 1.2663 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 2147483647 | sector build v2 of F0.r8199.c24576; this process only (1 run; after the parallel world builds): median / P95 ms | 1.2147 / 1.3178 | report (< 3) | PASS | diag |
+| e10 | face-centre | 1 | sector build v2 of F0.r16399.c16400; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7205 / 2.8405 | report (< 3) | PASS | diag |
+| e10 | face-centre | 42 | sector build v2 of F0.r16400.c16403; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7498 / 2.8920 | report (< 3) | PASS | diag |
+| e10 | face-centre | 2147483647 | sector build v2 of F0.r16401.c16399; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7695 / 2.9078 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 1 | sector build v2 of F0.r16398.c32751; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7544 / 2.8491 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 42 | sector build v2 of F0.r16398.c32750; this process only (1 run; after the parallel world builds): median / P95 ms | 2.9312 / 3.0276 | report (< 3) | PASS | diag |
+| e10 | cube-edge-mid | 2147483647 | sector build v2 of F0.r16400.c32753; this process only (1 run; after the parallel world builds): median / P95 ms | 2.6959 / 2.8167 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 1 | sector build v2 of F0.r32748.c32750; this process only (1 run; after the parallel world builds): median / P95 ms | 2.5813 / 2.7208 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 42 | sector build v2 of F0.r32749.c32749; this process only (1 run; after the parallel world builds): median / P95 ms | 2.4650 / 2.7646 | report (< 3) | PASS | diag |
+| e10 | cube-vertex | 2147483647 | sector build v2 of F0.r32752.c32755; this process only (1 run; after the parallel world builds): median / P95 ms | 2.5519 / 2.7059 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 1 | sector build v2 of F0.r8209.c24593; this process only (1 run; after the parallel world builds): median / P95 ms | 2.5802 / 2.7341 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 42 | sector build v2 of F0.r8205.c24595; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7044 / 2.7601 | report (< 3) | PASS | diag |
+| e10 | region-corner-4 | 2147483647 | sector build v2 of F0.r8210.c24595; this process only (1 run; after the parallel world builds): median / P95 ms | 2.7501 / 2.8645 | report (< 3) | PASS | diag |
+| d | R0 | 1 | median ms/sector (median of 3 runs medians: 0.2245 / 0.2303 / 0.2281; spread 2.5 %) | 0.2281 | <= 0.5 | PASS | protocol |
+| d | R0 | 1 | P95 ms/sector (median of 3 runs P95s: 0.7049 / 0.2787 / 0.2780) | 0.2787 | <= 3 | PASS | protocol |
+| d | R0 | 1 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.867 | < 2 | PASS | protocol |
+| d | R0 | 42 | median ms/sector (median of 3 runs medians: 0.2220 / 0.2207 / 0.2206; spread 0.6 %) | 0.2207 | <= 0.5 | PASS | protocol |
+| d | R0 | 42 | P95 ms/sector (median of 3 runs P95s: 0.2338 / 0.2337 / 0.2332) | 0.2337 | <= 3 | PASS | protocol |
+| d | R0 | 42 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.839 | < 2 | PASS | protocol |
+| d | R0 | 2147483647 | median ms/sector (median of 3 runs medians: 0.2185 / 0.2203 / 0.2199; spread 0.8 %) | 0.2199 | <= 0.5 | PASS | protocol |
+| d | R0 | 2147483647 | P95 ms/sector (median of 3 runs P95s: 0.2320 / 0.2298 / 0.2315) | 0.2315 | <= 3 | PASS | protocol |
+| d | R0 | 2147483647 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.836 | < 2 | PASS | protocol |
+| d | R45 | 1 | median ms/sector (median of 3 runs medians: 0.2235 / 0.2234 / 0.2226; spread 0.4 %) | 0.2234 | <= 0.5 | PASS | protocol |
+| d | R45 | 1 | P95 ms/sector (median of 3 runs P95s: 0.2378 / 0.2345 / 0.2356) | 0.2356 | <= 3 | PASS | protocol |
+| d | R45 | 1 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.849 | < 2 | PASS | protocol |
+| d | R45 | 42 | median ms/sector (median of 3 runs medians: 0.2236 / 0.2224 / 0.2231; spread 0.5 %) | 0.2231 | <= 0.5 | PASS | protocol |
+| d | R45 | 42 | P95 ms/sector (median of 3 runs P95s: 0.2365 / 0.2398 / 0.2363) | 0.2365 | <= 3 | PASS | protocol |
+| d | R45 | 42 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.848 | < 2 | PASS | protocol |
+| d | R45 | 2147483647 | median ms/sector (median of 3 runs medians: 0.2196 / 0.2227 / 0.2304; spread 4.8 %) | 0.2227 | <= 0.5 | PASS | protocol |
+| d | R45 | 2147483647 | P95 ms/sector (median of 3 runs P95s: 0.2346 / 0.2343 / 0.2539) | 0.2346 | <= 3 | PASS | protocol |
+| d | R45 | 2147483647 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.846 | < 2 | PASS | protocol |
+| d | R89 | 1 | median ms/sector (median of 3 runs medians: 0.2208 / 0.2187 / 0.2190; spread 1.0 %) | 0.2190 | <= 0.5 | PASS | protocol |
+| d | R89 | 1 | P95 ms/sector (median of 3 runs P95s: 0.2339 / 0.2296 / 0.2341) | 0.2339 | <= 3 | PASS | protocol |
+| d | R89 | 1 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.832 | < 2 | PASS | protocol |
+| d | R89 | 42 | median ms/sector (median of 3 runs medians: 0.2220 / 0.2203 / 0.2193; spread 1.2 %) | 0.2203 | <= 0.5 | PASS | protocol |
+| d | R89 | 42 | P95 ms/sector (median of 3 runs P95s: 0.2344 / 0.2327 / 0.2325) | 0.2327 | <= 3 | PASS | protocol |
+| d | R89 | 42 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.837 | < 2 | PASS | protocol |
+| d | R89 | 2147483647 | median ms/sector (median of 3 runs medians: 0.2234 / 0.2203 / 0.2229; spread 1.4 %) | 0.2229 | <= 0.5 | PASS | protocol |
+| d | R89 | 2147483647 | P95 ms/sector (median of 3 runs P95s: 0.2343 / 0.2320 / 0.2329) | 0.2329 | <= 3 | PASS | protocol |
+| d | R89 | 2147483647 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.847 | < 2 | PASS | protocol |
+| d | RC | 1 | median ms/sector (median of 3 runs medians: 0.2223 / 0.2186 / 0.2245; spread 2.7 %) | 0.2223 | <= 0.5 | PASS | protocol |
+| d | RC | 1 | P95 ms/sector (median of 3 runs P95s: 0.2367 / 0.2481 / 0.2391) | 0.2391 | <= 3 | PASS | protocol |
+| d | RC | 1 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.845 | < 2 | PASS | protocol |
+| d | RC | 42 | median ms/sector (median of 3 runs medians: 0.2228 / 0.2212 / 0.2251; spread 1.8 %) | 0.2228 | <= 0.5 | PASS | protocol |
+| d | RC | 42 | P95 ms/sector (median of 3 runs P95s: 0.2386 / 0.2351 / 0.2371) | 0.2371 | <= 3 | PASS | protocol |
+| d | RC | 42 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.847 | < 2 | PASS | protocol |
+| d | RC | 2147483647 | median ms/sector (median of 3 runs medians: 0.2259 / 0.2156 / 0.2251; spread 4.6 %) | 0.2251 | <= 0.5 | PASS | protocol |
+| d | RC | 2147483647 | P95 ms/sector (median of 3 runs P95s: 0.2367 / 0.2315 / 0.2398) | 0.2367 | <= 3 | PASS | protocol |
+| d | RC | 2147483647 | CPU share of one core at 900 km/h / 5 km (38 sectors/s x median) % | 0.855 | < 2 | PASS | protocol |
+| w5 | face-centre | 1 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8166 / 0.8198 / 0.8475) | 0.8198 | < 3 | PASS | protocol |
+| w5 | face-centre | 1 | adapter build P95 ms (median of 3 runs P95s: 0.8665 / 0.8679 / 0.9227) | 0.8679 | < 3 | PASS | protocol |
+| w5 | face-centre | 1 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0369 / 0.0014 / 0.7819 | report | PASS | diag |
+| w5 | face-centre | 42 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8248 / 0.8036 / 0.8343) | 0.8248 | < 3 | PASS | protocol |
+| w5 | face-centre | 42 | adapter build P95 ms (median of 3 runs P95s: 0.8698 / 0.8386 / 0.8563) | 0.8563 | < 3 | PASS | protocol |
+| w5 | face-centre | 42 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0373 / 0.0015 / 0.7858 | report | PASS | diag |
+| w5 | face-centre | 2147483647 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8359 / 0.8326 / 0.8460) | 0.8359 | < 3 | PASS | protocol |
+| w5 | face-centre | 2147483647 | adapter build P95 ms (median of 3 runs P95s: 0.8719 / 0.8495 / 0.8625) | 0.8625 | < 3 | PASS | protocol |
+| w5 | face-centre | 2147483647 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0372 / 0.0014 / 0.7967 | report | PASS | diag |
+| w5 | cube-edge-mid | 1 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8247 / 0.8330 / 0.8482) | 0.8330 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 1 | adapter build P95 ms (median of 3 runs P95s: 0.9687 / 0.8852 / 0.8896) | 0.8896 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 1 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0376 / 0.0014 / 0.7939 | report | PASS | diag |
+| w5 | cube-edge-mid | 42 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8329 / 0.8271 / 0.8164) | 0.8271 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 42 | adapter build P95 ms (median of 3 runs P95s: 0.8874 / 0.8454 / 1.7572) | 0.8874 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 42 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0376 / 0.0015 / 0.7878 | report | PASS | diag |
+| w5 | cube-edge-mid | 2147483647 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8059 / 0.8414 / 0.8045) | 0.8059 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 2147483647 | adapter build P95 ms (median of 3 runs P95s: 0.9389 / 0.8910 / 0.9085) | 0.9085 | < 3 | PASS | protocol |
+| w5 | cube-edge-mid | 2147483647 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0366 / 0.0015 / 0.7679 | report | PASS | diag |
+| w5 | cube-vertex | 1 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8734 / 0.8915 / 0.8807) | 0.8807 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 1 | adapter build P95 ms (median of 3 runs P95s: 0.9526 / 0.9341 / 0.9246) | 0.9341 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 1 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0676 / 0.0014 / 0.8116 | report | PASS | diag |
+| w5 | cube-vertex | 42 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8753 / 0.8955 / 0.9065) | 0.8955 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 42 | adapter build P95 ms (median of 3 runs P95s: 0.9075 / 0.9229 / 0.9365) | 0.9229 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 42 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0691 / 0.0014 / 0.8247 | report | PASS | diag |
+| w5 | cube-vertex | 2147483647 | adapter build of one sector (input + TerrainModel + 65 x 65 heights) median ms (median of 3 runs medians: 0.8991 / 0.8883 / 0.8533) | 0.8883 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 2147483647 | adapter build P95 ms (median of 3 runs P95s: 0.9297 / 0.9102 / 0.8843) | 0.9102 | < 3 | PASS | protocol |
+| w5 | cube-vertex | 2147483647 | parts median ms: SectorPlanetInput / TerrainModel construction / 65 x 65 heights (median of the run medians) | 0.0688 / 0.0014 / 0.8176 | report | PASS | diag |
+| e10 | face-centre | 1 | sector build v2.1 of the slowest sector of the region sweep (F0.r16397.c16402 / F0.r16397.c16397; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 2.4828 / 2.2959 / 2.3318) | 2.3318 | <= 2.0 | FAIL | protocol |
+| e10 | face-centre | 1 | sector build v2.1 of the slowest sector of the region sweep P95 ms (median of 3 runs P95s: 2.5752 / 2.4091 / 2.4185) | 2.4185 | < 3 | PASS | protocol |
+| e10 | face-centre | 1 | sector build v2.1 of the first road-crossing sector (F0.r16392.c16384; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 1.1849 / 1.1955 / 1.2115) | 1.1955 | <= 2.0 | PASS | protocol |
+| e10 | face-centre | 1 | sector build v2.1 of the first road-crossing sector P95 ms (median of 3 runs P95s: 1.3558 / 1.2557 / 1.2792) | 1.2792 | < 3 | PASS | protocol |
+| e10 | face-centre | 1 | index buffer with the shorter-diagonal split (8 192 triangles) median ms (median of the run medians) | 0.0230 | report | PASS | diag |
+| e10 | cube-edge-mid | 1 | sector build v2.1 of the slowest sector of the region sweep (F0.r16402.c32750 / F0.r16398.c32751; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 2.7673 / 2.8817 / 2.7610) | 2.7673 | <= 2.0 | FAIL | protocol |
+| e10 | cube-edge-mid | 1 | sector build v2.1 of the slowest sector of the region sweep P95 ms (median of 3 runs P95s: 2.9856 / 2.9283 / 2.9178) | 2.9283 | < 3 | PASS | protocol |
+| e10 | cube-edge-mid | 1 | sector build v2.1 of the first road-crossing sector (F0.r16389.c32736; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 1.2340 / 1.2272 / 1.2382) | 1.2340 | <= 2.0 | PASS | protocol |
+| e10 | cube-edge-mid | 1 | sector build v2.1 of the first road-crossing sector P95 ms (median of 3 runs P95s: 1.3292 / 1.3010 / 1.2571) | 1.3010 | < 3 | PASS | protocol |
+| e10 | cube-edge-mid | 1 | index buffer with the shorter-diagonal split (8 192 triangles) median ms (median of the run medians) | 0.0216 | report | PASS | diag |
+| e10 | cube-vertex | 1 | sector build v2.1 of the slowest sector of the region sweep (F0.r32748.c32750 / F0.r32754.c32750; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 2.6644 / 2.6031 / 2.3878) | 2.6031 | <= 2.0 | FAIL | protocol |
+| e10 | cube-vertex | 1 | sector build v2.1 of the slowest sector of the region sweep P95 ms (median of 3 runs P95s: 2.8457 / 2.7751 / 2.6088) | 2.7751 | < 3 | PASS | protocol |
+| e10 | cube-vertex | 1 | sector build v2.1 of the first road-crossing sector (F0.r32741.c32736; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 1.3509 / 1.3747 / 1.3422) | 1.3509 | <= 2.0 | PASS | protocol |
+| e10 | cube-vertex | 1 | sector build v2.1 of the first road-crossing sector P95 ms (median of 3 runs P95s: 1.5281 / 1.4971 / 1.4878) | 1.4971 | < 3 | PASS | protocol |
+| e10 | cube-vertex | 1 | index buffer with the shorter-diagonal split (8 192 triangles) median ms (median of the run medians) | 0.0195 | report | PASS | diag |
+| e10 | region-corner-4 | 1 | sector build v2.1 of the slowest sector of the region sweep (F0.r8209.c24593 / F0.r8205.c24592; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 2.7235 / 2.6946 / 2.7528) | 2.7235 | <= 2.0 | FAIL | protocol |
+| e10 | region-corner-4 | 1 | sector build v2.1 of the slowest sector of the region sweep P95 ms (median of 3 runs P95s: 2.8950 / 2.7966 / 2.8486) | 2.8486 | < 3 | PASS | protocol |
+| e10 | region-corner-4 | 1 | sector build v2.1 of the first road-crossing sector (F0.r8199.c24576; 65 x 65: lattice direction, region chart, planet base, batch Height query, taper) median ms (median of 3 runs medians: 1.2790 / 1.3141 / 1.2891) | 1.2891 | <= 2.0 | PASS | protocol |
+| e10 | region-corner-4 | 1 | sector build v2.1 of the first road-crossing sector P95 ms (median of 3 runs P95s: 1.4320 / 1.3588 / 1.3221) | 1.3588 | < 3 | PASS | protocol |
+| e10 | region-corner-4 | 1 | index buffer with the shorter-diagonal split (8 192 triangles) median ms (median of the run medians) | 0.0211 | report | PASS | diag |
+| e10 | face-centre | 1 | sweep of all 1024 sectors of the region, one pass per process, median of 1 processes: point query median / P95 / P99 / max ms | 1.277 / 4.339 / 5.631 / 6.645 | report | PASS | diag |
+| e10 | face-centre | 1 | sweep, batch query median / P95 / P99 / max ms; slowest sector per process: F0.r16397.c16402 2.520 | 1.081 / 2.177 / 4.436 / 6.566 | report | PASS | diag |
+| e10 | face-centre | 1 | sweep: sectors whose batch build differs from the point-query build (contribution, world y; sum over processes) | 0 | 0 | PASS | protocol |
+| e10 | cube-edge-mid | 1 | sweep of all 1024 sectors of the region, one pass per process, median of 1 processes: point query median / P95 / P99 / max ms | 1.333 / 4.521 / 5.766 / 6.622 | report | PASS | diag |
+| e10 | cube-edge-mid | 1 | sweep, batch query median / P95 / P99 / max ms; slowest sector per process: F0.r16402.c32750 2.795 | 1.070 / 2.256 / 2.581 / 2.769 | report | PASS | diag |
+| e10 | cube-edge-mid | 1 | sweep: sectors whose batch build differs from the point-query build (contribution, world y; sum over processes) | 0 | 0 | PASS | protocol |
+| e10 | cube-vertex | 1 | sweep of all 1024 sectors of the region, one pass per process, median of 1 processes: point query median / P95 / P99 / max ms | 1.216 / 4.463 / 5.372 / 6.298 | report | PASS | diag |
+| e10 | cube-vertex | 1 | sweep, batch query median / P95 / P99 / max ms; slowest sector per process: F0.r32748.c32750 2.652 | 1.064 / 2.234 / 2.412 / 2.770 | report | PASS | diag |
+| e10 | cube-vertex | 1 | sweep: sectors whose batch build differs from the point-query build (contribution, world y; sum over processes) | 0 | 0 | PASS | protocol |
+| e10 | region-corner-4 | 1 | sweep of all 1024 sectors of the region, one pass per process, median of 1 processes: point query median / P95 / P99 / max ms | 1.358 / 4.317 / 5.540 / 7.390 | report | PASS | diag |
+| e10 | region-corner-4 | 1 | sweep, batch query median / P95 / P99 / max ms; slowest sector per process: F0.r8209.c24593 2.702 | 1.073 / 2.232 / 2.508 / 3.658 | report | PASS | diag |
+| e10 | region-corner-4 | 1 | sweep: sectors whose batch build differs from the point-query build (contribution, world y; sum over processes) | 0 | 0 | PASS | protocol |
+| p1 | block A | 1 | regions: 9 (built 8; of which 1 without a city site = surface heights only; skipped as ocean 1); inner borders 12 | 9 | 9 | PASS | protocol |
+| p1 | block A | 1 | e1 inside the regions: shared vertices of sector pairs (centre + road-crossing pairs) with differing height / position / chart bits; sum over the 9 regions | 0 | = 0 | PASS | protocol |
+| p1 | block A | 1 | e3 chart metric: max relative distance error over the regions | 1.08239E-06 | <= 2e-6 | PASS | protocol |
+| p1 | block A | 1 | e3 chart metric: max right-angle deviation deg over the regions | 3.20796E-05 | <= 1e-4 | PASS | protocol |
+| p1 | block A | 1 | e4 road rules on the sphere (7 regions with roads): max relative deviation radius / grade / width | 9.39444E-07 | <= 1e-5 | PASS | protocol |
+| p1 | block A | 1 | e2 across all 12 inner region borders: 96 sector pairs; 6240 shared vertices: not bit-identical (world position) | 0 | = 0 | PASS | protocol |
+| p1 | block A | 1 | e2 across the inner borders: max world gap mm (double positions) | 0 | < 1 | PASS | protocol |
+| p1 | block A | 1 | e2 across the inner borders: max /taper x WorldGen contribution/ m on the border vertices | 0 | = 0 | PASS | protocol |
+| p1 | block A | 1 | e2 per inner border | A1-A2: 8 pairs; 32 border sectors; 0 not bit-identical | A1-A4: 8 pairs; 32 border sectors; 0 not bit-identical | A2-A3: 8 pairs; 32 border sectors; 0 not bit-identical | A2-A5: 8 pairs; 32 border sectors; 0 not bit-identical | A3-A6: 8 pairs; 32 border sectors; 0 not bit-identical | A4-A5: 8 pairs; 32 border sectors; 0 not bit-identical | A4-A7: 8 pairs; 32 border sectors; 0 not bit-identical | A5-A6: 8 pairs; 32 border sectors; 0 not bit-identical | A5-A8: 8 pairs; 32 border sectors; 0 not bit-identical | A6-A9: 8 pairs; 32 border sectors; 0 not bit-identical | A7-A8: 8 pairs; 32 border sectors; 0 not bit-identical | A8-A9: 8 pairs; 32 border sectors; 0 not bit-identical | report | PASS | diag |
+| p2 | block A | 1 | road vertices (4 m) on surface water (Ocean / Sea / Lake; 82432 vertices; 732 km of road) | 0 | = 0 | PASS | protocol |
+| p2 | block A | 1 | settlements (centre; 31) and houses (1471) on water | 0 / 0 | = 0 / 0 | PASS | protocol |
+| p2 | A1 F2.L10.r605.c682 | 1 | GenResult hash (RG-176; village-only world) | 60a50e336fa52d70 | report | PASS | diag |
+| p2 | A2 F2.L10.r605.c683 | 1 | GenResult hash (RG-176; city world) | 04ca4418f19e7ad2 | report | PASS | diag |
+| p2 | A3 F2.L10.r605.c684 | 1 | GenResult hash (RG-176; city world) | d08f94b002d83ca2 | report | PASS | diag |
+| p2 | A4 F2.L10.r606.c682 | 1 | GenResult hash (RG-176; no site) | 9fb7b08a1568a2aa | report | PASS | diag |
+| p2 | A5 F2.L10.r606.c683 | 1 | GenResult hash (RG-176; city world) | 03880d7ec4dd7496 | report | PASS | diag |
+| p2 | A6 F2.L10.r606.c684 | 1 | GenResult hash (RG-176; city world) | 7a288c8a6aae0188 | report | PASS | diag |
+| p2 | A7 F2.L10.r607.c682 | 1 | GenResult hash (RG-176; ocean) | a4010785782efc28 | report | PASS | diag |
+| p2 | A8 F2.L10.r607.c683 | 1 | GenResult hash (RG-176; village-only world) | 0dee3f3e5dfba88e | report | PASS | diag |
+| p2 | A9 F2.L10.r607.c684 | 1 | GenResult hash (RG-176; city world) | 46b17e5a60efbbfc | report | PASS | diag |
+| p2 | A1 F2.L10.r605.c682 | 1 | land 27 %; VILLAGE-ONLY world (no city; no motorway); road 5.6 km; 18 edges; 1 connected component(s); 2 settlements (2 villages); 82 houses | 5.6 km / 1 comp | report | PASS | diag |
+| p2 | A2 F2.L10.r605.c683 | 1 | land 100 %; road 143.8 km; 1203 edges; 1 connected component(s); 5 settlements (4 villages); 233 houses | 143.8 km / 1 comp | report | PASS | diag |
+| p2 | A3 F2.L10.r605.c684 | 1 | land 100 %; road 141.8 km; 1245 edges; 1 connected component(s); 5 settlements (4 villages); 224 houses | 141.8 km / 1 comp | report | PASS | diag |
+| p2 | A4 F2.L10.r606.c682 | 1 | land 0 %; no city site (no WorldGen world) | no site | report | PASS | diag |
+| p2 | A5 F2.L10.r606.c683 | 1 | land 74 %; road 148.1 km; 1224 edges; 1 connected component(s); 5 settlements (4 villages); 229 houses | 148.1 km / 1 comp | report | PASS | diag |
+| p2 | A6 F2.L10.r606.c684 | 1 | land 99 %; road 132.5 km; 1146 edges; 1 connected component(s); 5 settlements (4 villages); 237 houses | 132.5 km / 1 comp | report | PASS | diag |
+| p2 | A7 F2.L10.r607.c682 | 1 | region skipped as ocean (no WorldGen world; sectors = surface heights) | ocean | report | PASS | diag |
+| p2 | A8 F2.L10.r607.c683 | 1 | land 35 %; VILLAGE-ONLY world (no city; no motorway); road 21.3 km; 38 edges; 1 connected component(s); 4 settlements (4 villages); 227 houses | 21.3 km / 1 comp | report | PASS | diag |
+| p2 | A9 F2.L10.r607.c684 | 1 | land 100 %; road 138.5 km; 1227 edges; 1 connected component(s); 5 settlements (4 villages); 239 houses | 138.5 km / 1 comp | report | PASS | diag |
+| p2 | block A | 1 | RG-176 land regions (>= 25 % land) without a WorldGen world (NoSite) | none | target: none (report) | PASS | diag |
+| p2 | block A | 1 | regions with >= 30 % land and 0 km of road (explained: no dry city site within the region; the whole world is skipped) | none | report | PASS | diag |
+| p3 | block A | 1 | trees on water (0 trees) | 0 | = 0 | PASS | protocol |
+| p3 | block A | 1 | trees where the planet Forest == 0 | 0 | = 0 | PASS | protocol |
+| p3 | block A | 1 | regions with land >= 30 % and mean Forest >= 0.3 (0) that have trees > 0 | all | all (none without trees) | PASS | protocol |
+| p3 | A1 F2.L10.r605.c682 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A2 F2.L10.r605.c683 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A3 F2.L10.r605.c684 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A5 F2.L10.r606.c683 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A6 F2.L10.r606.c684 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A8 F2.L10.r607.c683 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | A9 F2.L10.r607.c684 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 0; 0 per km2; Forest 0.000 | report | PASS | diag |
+| p3 | block A | 1 | rank correlation (Spearman) of trees per km2 vs mean Forest over 6 regions with land >= 30 % (density must rise with Forest) | 0 | report | PASS | diag |
+| p3 | block A | 1 | tree candidate rejections by reason (first failing test; 0 trees kept) | mask/density 7123688; margin 0; water 0; lot 0; tree line 0; water line 0; hole 0; slope 0 | report | PASS | diag |
+| p1 | block B | 1 | regions: 9 (built 9; of which 0 without a city site = surface heights only; skipped as ocean 0); inner borders 12 | 9 | 9 | PASS | protocol |
+| p1 | block B | 1 | e1 inside the regions: shared vertices of sector pairs (centre + road-crossing pairs) with differing height / position / chart bits; sum over the 9 regions | 0 | = 0 | PASS | protocol |
+| p1 | block B | 1 | e3 chart metric: max relative distance error over the regions | 1.10594E-06 | <= 2e-6 | PASS | protocol |
+| p1 | block B | 1 | e3 chart metric: max right-angle deviation deg over the regions | 3.57483E-05 | <= 1e-4 | PASS | protocol |
+| p1 | block B | 1 | e4 road rules on the sphere (9 regions with roads): max relative deviation radius / grade / width | 1.26294E-06 | <= 1e-5 | PASS | protocol |
+| p1 | block B | 1 | e2 across all 12 inner region borders: 96 sector pairs; 6240 shared vertices: not bit-identical (world position) | 0 | = 0 | PASS | protocol |
+| p1 | block B | 1 | e2 across the inner borders: max world gap mm (double positions) | 0 | < 1 | PASS | protocol |
+| p1 | block B | 1 | e2 across the inner borders: max /taper x WorldGen contribution/ m on the border vertices | 0 | = 0 | PASS | protocol |
+| p1 | block B | 1 | e2 per inner border | B1-B2: 8 pairs; 32 border sectors; 0 not bit-identical | B1-B4: 8 pairs; 32 border sectors; 0 not bit-identical | B2-B3: 8 pairs; 32 border sectors; 0 not bit-identical | B2-B5: 8 pairs; 32 border sectors; 0 not bit-identical | B3-B6: 8 pairs; 32 border sectors; 0 not bit-identical | B4-B5: 8 pairs; 32 border sectors; 0 not bit-identical | B4-B7: 8 pairs; 32 border sectors; 0 not bit-identical | B5-B6: 8 pairs; 32 border sectors; 0 not bit-identical | B5-B8: 8 pairs; 32 border sectors; 0 not bit-identical | B6-B9: 8 pairs; 32 border sectors; 0 not bit-identical | B7-B8: 8 pairs; 32 border sectors; 0 not bit-identical | B8-B9: 8 pairs; 32 border sectors; 0 not bit-identical | report | PASS | diag |
+| p2 | block B | 1 | road vertices (4 m) on surface water (Ocean / Sea / Lake; 150159 vertices; 1330 km of road) | 0 | = 0 | PASS | protocol |
+| p2 | block B | 1 | settlements (centre; 45) and houses (598) on water | 0 / 0 | = 0 / 0 | PASS | protocol |
+| p2 | B1 F0.L10.r159.c1022 | 1 | GenResult hash (RG-176; city world) | 0474d52bc986d1bf | report | PASS | diag |
+| p2 | B2 F0.L10.r159.c1023 | 1 | GenResult hash (RG-176; city world) | 144580b1f6691890 | report | PASS | diag |
+| p2 | B3 F2.L10.r1023.c159 | 1 | GenResult hash (RG-176; city world) | 3ae037ba53444738 | report | PASS | diag |
+| p2 | B4 F0.L10.r160.c1022 | 1 | GenResult hash (RG-176; city world) | c83f3534720453de | report | PASS | diag |
+| p2 | B5 F0.L10.r160.c1023 | 1 | GenResult hash (RG-176; city world) | 05972acb03278290 | report | PASS | diag |
+| p2 | B6 F2.L10.r1023.c160 | 1 | GenResult hash (RG-176; city world) | d5a3e30b539b3421 | report | PASS | diag |
+| p2 | B7 F0.L10.r161.c1022 | 1 | GenResult hash (RG-176; city world) | 36751a72bc42a974 | report | PASS | diag |
+| p2 | B8 F0.L10.r161.c1023 | 1 | GenResult hash (RG-176; city world) | c98a9f6e6764c73f | report | PASS | diag |
+| p2 | B9 F2.L10.r1023.c161 | 1 | GenResult hash (RG-176; city world) | b4a146ee46cf2a48 | report | PASS | diag |
+| p2 | B1 F0.L10.r159.c1022 | 1 | land 100 %; road 147.3 km; 1304 edges; 1 connected component(s); 5 settlements (4 villages); 128 houses | 147.3 km / 1 comp | report | PASS | diag |
+| p2 | B2 F0.L10.r159.c1023 | 1 | land 100 %; road 152.6 km; 1237 edges; 1 connected component(s); 5 settlements (4 villages); 0 houses | 152.6 km / 1 comp | report | PASS | diag |
+| p2 | B3 F2.L10.r1023.c159 | 1 | land 100 %; road 148.3 km; 1249 edges; 1 connected component(s); 5 settlements (4 villages); 113 houses | 148.3 km / 1 comp | report | PASS | diag |
+| p2 | B4 F0.L10.r160.c1022 | 1 | land 100 %; road 140.3 km; 1224 edges; 1 connected component(s); 5 settlements (4 villages); 9 houses | 140.3 km / 1 comp | report | PASS | diag |
+| p2 | B5 F0.L10.r160.c1023 | 1 | land 100 %; road 158.5 km; 1282 edges; 1 connected component(s); 5 settlements (4 villages); 104 houses | 158.5 km / 1 comp | report | PASS | diag |
+| p2 | B6 F2.L10.r1023.c160 | 1 | land 100 %; road 144.2 km; 1279 edges; 1 connected component(s); 5 settlements (4 villages); 92 houses | 144.2 km / 1 comp | report | PASS | diag |
+| p2 | B7 F0.L10.r161.c1022 | 1 | land 100 %; road 150.2 km; 1227 edges; 1 connected component(s); 5 settlements (4 villages); 49 houses | 150.2 km / 1 comp | report | PASS | diag |
+| p2 | B8 F0.L10.r161.c1023 | 1 | land 100 %; road 149.5 km; 1207 edges; 1 connected component(s); 5 settlements (4 villages); 63 houses | 149.5 km / 1 comp | report | PASS | diag |
+| p2 | B9 F2.L10.r1023.c161 | 1 | land 100 %; road 139.1 km; 1197 edges; 1 connected component(s); 5 settlements (4 villages); 40 houses | 139.1 km / 1 comp | report | PASS | diag |
+| p2 | block B | 1 | RG-176 land regions (>= 25 % land) without a WorldGen world (NoSite) | none | target: none (report) | PASS | diag |
+| p2 | block B | 1 | regions with >= 30 % land and 0 km of road (explained: no dry city site within the region; the whole world is skipped) | none | report | PASS | diag |
+| p3 | block B | 1 | trees on water (941364 trees) | 0 | = 0 | PASS | protocol |
+| p3 | block B | 1 | trees where the planet Forest == 0 | 0 | = 0 | PASS | protocol |
+| p3 | block B | 1 | regions with land >= 30 % and mean Forest >= 0.3 (9) that have trees > 0 | all | all (none without trees) | PASS | protocol |
+| p3 | B1 F0.L10.r159.c1022 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 115421; 1605 per km2; Forest 0.793 | report | PASS | diag |
+| p3 | B2 F0.L10.r159.c1023 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 86238; 1200 per km2; Forest 0.590 | report | PASS | diag |
+| p3 | B3 F2.L10.r1023.c159 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 147764; 2057 per km2; Forest 0.933 | report | PASS | diag |
+| p3 | B4 F0.L10.r160.c1022 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 107023; 1489 per km2; Forest 0.587 | report | PASS | diag |
+| p3 | B5 F0.L10.r160.c1023 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 116872; 1627 per km2; Forest 0.581 | report | PASS | diag |
+| p3 | B6 F2.L10.r1023.c160 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 110275; 1535 per km2; Forest 0.887 | report | PASS | diag |
+| p3 | B7 F0.L10.r161.c1022 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 77120; 1073 per km2; Forest 0.434 | report | PASS | diag |
+| p3 | B8 F0.L10.r161.c1023 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 75209; 1047 per km2; Forest 0.444 | report | PASS | diag |
+| p3 | B9 F2.L10.r1023.c161 | 1 | trees; trees per km2 of land vs mean planet Forest of the land samples | 105442; 1468 per km2; Forest 0.654 | report | PASS | diag |
+| p3 | block B | 1 | rank correlation (Spearman) of trees per km2 vs mean Forest over 9 regions with land >= 30 % (density must rise with Forest) | 0.666667 | report | PASS | diag |
+| p3 | block B | 1 | tree candidate rejections by reason (first failing test; 941364 trees kept) | mask/density 6579519; margin 17723; water 0; lot 0; tree line 0; water line 0; hole 0; slope 25 | report | PASS | diag |
+| p4 | 40 coast regions | 1 | coastline length / straight chord (marching squares on the chart grid; 32 m; arcs >= 1 km end to end; regions with an open arc: 31 of 40): median ratio | 1.428 | >= 1.3 | PASS | protocol |
+| p4 | 40 coast regions | 1 | ratio min / P25 / P75 / max; median coastline length per region km | 1.099 / 1.192 / 1.742 / 5.787; 10.6 km | report | PASS | diag |
+| p7 | all | 1 | retained managed memory per built region (GC.GetTotalMemory(true) delta; 3 regions built one after the other): median / max MiB | 3.1 / 3.1 | <= 32 | PASS | protocol |
+| p7 | all | 1 | region build time (BuildSurface; single thread; 3 regions): median s | 0.25 | report | PASS | diag |
+| p7 | all | 1 | region build time max s (sequential regions; the parallel ones max 2.7 s under load are an upper bound) | 2.31 | <= 60 | PASS | protocol |
+| p5 | blocks A + B | 1 | sector build v3 (surface base + carve) over all 17408 sectors of the 17 built regions, one pass, single thread: median ms | 1.309 | <= 2.0 | PASS | protocol |
+| p5 | blocks A + B | 1 | same sweep: P95 ms | 2.358 | <= 3.0 | PASS | protocol |
+| p5 | blocks A + B | 1 | same sweep: P99 / max ms | 2.833 / 3.939 | report | PASS | diag |
+| p5 | blocks A + B | 1 | worst sector of the sweep (8 slowest of process 1 re-timed 11 x in each process): median of 3 processes (3.318 / 4.981 / 5.019) ms; target, a FAIL is reported not tuned | 4.981 | <= 3.5 | FAIL | protocol |
+| p5 | A1 F2.L10.r605.c682 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19391.c21854 | 1.183 / 1.484 / 1.687 / 2.040 | report | PASS | diag |
+| p5 | A2 F2.L10.r605.c683 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19376.c21867 | 1.509 / 2.561 / 3.004 / 3.293 | report | PASS | diag |
+| p5 | A3 F2.L10.r605.c684 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19376.c21904 | 1.336 / 2.551 / 2.870 / 3.262 | report | PASS | diag |
+| p5 | A4 F2.L10.r606.c682 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19402.c21827 | 0.790 / 0.822 / 0.909 / 1.211 | report | PASS | diag |
+| p5 | A5 F2.L10.r606.c683 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19408.c21868 | 1.498 / 2.644 / 2.999 / 3.574 | report | PASS | diag |
+| p5 | A6 F2.L10.r606.c684 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19408.c21900 | 1.452 / 2.417 / 2.853 / 3.289 | report | PASS | diag |
+| p5 | A8 F2.L10.r607.c683 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19426.c21872 | 1.205 / 1.688 / 1.853 / 2.926 | report | PASS | diag |
+| p5 | A9 F2.L10.r607.c684 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r19442.c21906 | 1.490 / 2.568 / 3.127 / 3.801 | report | PASS | diag |
+| p5 | B1 F0.L10.r159.c1022 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5102.c32724 | 1.300 / 2.564 / 2.845 / 3.067 | report | PASS | diag |
+| p5 | B2 F0.L10.r159.c1023 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5106.c32754 | 1.305 / 2.534 / 2.823 / 3.278 | report | PASS | diag |
+| p5 | B3 F2.L10.r1023.c159 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r32754.c5103 | 1.303 / 2.477 / 2.689 / 2.963 | report | PASS | diag |
+| p5 | B4 F0.L10.r160.c1022 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5131.c32723 | 1.307 / 2.481 / 2.811 / 3.013 | report | PASS | diag |
+| p5 | B5 F0.L10.r160.c1023 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5131.c32754 | 1.300 / 2.405 / 2.725 / 3.603 | report | PASS | diag |
+| p5 | B6 F2.L10.r1023.c160 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r32755.c5138 | 1.288 / 2.411 / 2.658 / 2.845 | report | PASS | diag |
+| p5 | B7 F0.L10.r161.c1022 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5169.c32717 | 1.282 / 2.400 / 2.693 / 2.962 | report | PASS | diag |
+| p5 | B8 F0.L10.r161.c1023 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F0.r5165.c32752 | 1.294 / 2.309 / 2.667 / 3.939 | report | PASS | diag |
+| p5 | B9 F2.L10.r1023.c161 | 1 | sweep of 1024 sectors: median / P95 / P99 / max ms; slowest F2.r32751.c5168 | 1.289 / 2.411 / 2.702 / 3.083 | report | PASS | diag |
+| p1 | images | 1 | top views (surface kind, tree density, roads, settlements, region borders), sha256 | p_blockA_top.png 29a65f49ed8c1b2191331d889f175d7bfdd5df560bf7c86fe74bf9bcb5d2d67e ; p_blockB_top.png 33d594ec679f911aa95f8124091eff2ee2de1642ebbbf95f7b4a36820c472c13 | report | PASS | diag |
+| p8 | all | all | wall time of the whole run-experiment.ps1 (build, checks, cost, ecost, block, pworst) s | 182 | <= 450 | PASS | protocol |
+| e10 | all | all | experiment processes (RG-167 notebook budget): peak working set MB; managed heap MB at the end; wall s (checks only) | block 210 MB peak; 83 MB managed; 37 s / checks 238 MB peak; 73 MB managed; 93 s / cost1 34 MB peak; 5 MB managed / cost2 34 MB peak; 4 MB managed / cost3 34 MB peak; 4 MB managed / ecost1 92 MB peak; 16 MB managed / ecost2 92 MB peak; 19 MB managed / ecost3 94 MB peak; 18 MB managed | report | PASS | diag |
+
+Seed `all` = the metric does not depend on the seed (geometry only). Same table as CSV: `what-if-planet-experiment.csv`.

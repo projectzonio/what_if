@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WhatIf.Planet\WhatIf.Planet.csproj" />
+    <ProjectReference Include="..\..\src\WhatIf.Planet.Surface\WhatIf.Planet.Surface.csproj" />
+  </ItemGroup>
+</Project>

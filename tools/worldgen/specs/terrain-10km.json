@@ -1,0 +1,16 @@
+{
+  "seed": 1,
+  "size_km": 10,
+  "city": { "x": 0, "z": 0, "radius_m": 1400 },
+  "villages": 4,
+  "village_spacing_km": { "min": 3, "max": 8 },
+  "motorway": { "entry_x": -5000, "entry_z": -2200, "exit_x": 5000, "exit_z": 1600 },
+  "allow_provisional": [],
+  "terrain": {
+    "relief_m": 60,
+    "base_wavelength_m": 1400,
+    "octaves": 5,
+    "mountain": { "x0": -3300, "z0": -5000, "x1": -2700, "z1": 5000, "width_m": 2400, "relief_m": 350 },
+    "settlement_flat_margin_m": 300
+  }
+}

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- RG-110 (W3, ADR-030..032): deterministic road-graph generator on flat terrain + validators + road-dataset v1 export.
+       netstandard2.1, no package or project references, no Unity types. World coordinates in double metres, x east, z north, y up.
+       Own SplitMix64 RNG (System.Random differs across runtimes). C# language level stays at the netstandard2.1 default (8.0). -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>WhatIf.WorldGen</AssemblyName>
+    <RootNamespace>WhatIf.WorldGen</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+    <InformationalVersion>1.0.0</InformationalVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="WhatIf.WorldGen.Tests" />
+  </ItemGroup>
+</Project>
