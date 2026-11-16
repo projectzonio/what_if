@@ -71,9 +71,9 @@ Consequences include:
 - Inaccurate camera movement.
 - Problems with animation and particle systems.
 
-Unity HDRP already addresses some rendering precision problems through camera-relative rendering. It translates rendering coordinates relative to the camera, but this does not solve the underlying simulation coordinate problem.&#x20;
+Unity HDRP already addresses some rendering precision problems through camera-relative rendering. It translates rendering coordinates relative to the camera, but this does not solve the underlying simulation coordinate problem.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+*(zdroj: github.com)*
 
 GitHub
 
@@ -230,14 +230,6 @@ A single mesh LOD hierarchy is not sufficient for the complete problem.
 
 I recommend separating planetary surface rendering from local gameplay environment rendering.
 
-[Astronaut Photo ART002-E-23319](https://images.openai.com/static-rsc-4/uaX3k1qgyAH9SZyrA4t2g_uHxNKR-VlkW6bPc34EoeJ-igECiFw_ZPMPs1TMtmlm4H-FhIt9H7wZ-TqX-YbJehq6T0K4wbT8ng50rrTw_jFUeELosvKN0teZCLjcBTKVdNVzdb6wI9QWwRCyihSyzXmjTvcm8rnAA4X7wAwnKTk?purpose=inline)
-
-[GitHub - mathis-s/PlanetaryTerrain: Unity Asset for spherical terrain with dynamic quadtree-based LOD](https://images.openai.com/static-rsc-4/AEfQIxxr_edhkmzr_aGb8ph-84BtlKACUYfyX0eKFRNArH4hhK1Vk9tDW_tgKjKZ2AxaVaolZT4kclym7EQDn0SU5JLOSz8-k7Mh5eLiC0DKzf9nUKd9QJFTxy_JYThjb5i-VEoDNieLiT24OWpR3zzdxE53Pl4cwDoEe08MBBU?purpose=inline)
-
-[High-Resolution Imagery with Planet Satellite Tasking | Planet](https://images.openai.com/static-rsc-4/KwscyAGla2nyRtPP_6d3CroALw5VoaakGUAiDegPmvlUVJHmXDaDjk6QuekXW8sf-1wVg4w39-HDXmJY2Xx5zz-rW6IgaU690Xgkb8JQ6eyKoLH-hTbQjG86d3UmGGVNsHMUglOJUNJo_gkDMJCkxkP4r1KmfwzVLkAf-O2nLq4?purpose=inline)
-
-9
-
 ### 3.2 Cube-sphere terrain
 
 A cube-sphere maps six cube faces onto a sphere.
@@ -298,14 +290,6 @@ Tier B — Gameplay terrain
 - Collision proxies.
 - Gameplay objects.
 - Destruction and modification.
-
-[Behind the Scenes – Planet LOD | Patreon](https://images.openai.com/static-rsc-4/bmykznN3A2wva7Gvd0KsmQW0YZwg3xYLcVcurTQDIbAwyJIzdnePY2FoXfVAM6MWh_Y2RtfVHZxzGhsSMaYRKvOjJTEtR1heHOeRCc5PNPhGaGsxm85K9kyGO_wD6GT_QLBeYhPS7ic0FBeL_cYtZpIppLBBFyntKWacW6-Vaig?purpose=inline)
-
-[Tessellated Terrain Rendering with Dynamic LOD - victorbush](https://images.openai.com/static-rsc-4/UvxxsU1-qJPqIrXwqr5hwwa2fOY77_AaSUpTitvzdReVW8TsR5JjXk-ubyFgy7tQlRFFkFyBfXMlaFO2XE6abrD6OcdX7NcRD4NXf_EXwc4VPRmm8CQv-xe__YPSUlnX3feHMTmGssfmfvSaRG_z9zvex8cnKHCYleetmdiDqGk?purpose=inline)
-
-[TerrainRenderingInFarCry5](https://images.openai.com/static-rsc-4/OnLaodx1sN7vEtYsM3kluLyZQxc10bfie-cYJmdIq5BDu7dctamQlnO_9wIk9Plq9y4I4ISI7xMFOYeTQwjwALu3pCuF-OSUgnsg9wY7XxZyKv5rkaFD9mRPv8WtrMLNZlt93Sh-TmXwj6-Qw-kbdvIIAomKPJAthPm95i9GVRw?purpose=inline)
-
-12
 
 These representations must share a consistent underlying world coordinate system.
 
@@ -380,9 +364,9 @@ Use background workers for decoding and preparation, and budget the main-thread/
 | Custom planetary shaders | Required for specialized planet rendering                                                |
 | Unity Terrain            | Useful for local gameplay regions, not sufficient as the global planetary representation |
 
-HDRP camera-relative rendering is documented in Unity's Graphics repository.&#x20;
+HDRP camera-relative rendering is documented in Unity's Graphics repository.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+*(zdroj: github.com)*
 
 GitHub
 
@@ -416,13 +400,9 @@ For a physically based appearance, the renderer needs:
 - Camera altitude.
 - Atmospheric composition.
 
-HDRP's Physically Based Sky already provides a useful baseline for spherical planetary atmosphere, including exponentially decreasing atmospheric density and ozone-layer modelling.&#x20;
+HDRP's Physically Based Sky already provides a useful baseline for spherical planetary atmosphere, including exponentially decreasing atmospheric density and ozone-layer modelling.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+*(zdroj: GitHub +1)*
 
 Clouds
 
@@ -435,9 +415,9 @@ Separate cloud representations into:
 | Local flight   | Volumetric cloud volumes                    |
 | Ground view    | Local cloud shadows and atmospheric effects |
 
-HDRP supports cloud layers and volumetric clouds, including camera traversal through cloud volumes.&#x20;
+HDRP supports cloud layers and volumetric clouds, including camera traversal through cloud volumes.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+*(zdroj: github.com)*
 
 GitHub
 
@@ -449,13 +429,9 @@ This is an important integration limitation.
 
 HDRP's native water system offers ocean, sea, lake, pool and river surfaces, underwater rendering, foam, caustics and deformation.
 
-However, Unity documents that its water implementation does not support spherical or vertical water bodies.&#x20;
+However, Unity documents that its water implementation does not support spherical or vertical water bodies.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+*(zdroj: GitHub +1)*
 
 Therefore, the global ocean must use a custom planetary water representation.
 
@@ -580,9 +556,9 @@ This is arguably the most important part of Worker 07.
 
 Unity Netcode for Entities is a useful reference implementation of prediction, rollback, ghost replication and snapshot systems.
 
-Its prediction architecture runs the same simulation on the client and server, using fixed timesteps and rollback.&#x20;
+Its prediction architecture runs the same simulation on the client and server, using fixed timesteps and rollback.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity.cn\&sz=32)
+*(zdroj: docs.unity.cn)*
 
 0.51.1-preview\.21+1
 
@@ -614,9 +590,9 @@ Recommendation: Custom cross-language networking protocol.
 
 I recommend investigating QUIC as the primary transport candidate.
 
-QUIC datagrams provide unreliable application datagrams within a QUIC connection, using the connection's congestion controller. They are not a replacement for reliable streams, and the receiver may drop datagrams.&#x20;
+QUIC datagrams provide unreliable application datagrams within a QUIC connection, using the connection's congestion controller. They are not a replacement for reliable streams, and the receiver may drop datagrams.
 
-[image](https://www.google.com/s2/favicons?domain=https://www.rfc-editor.org\&sz=32)
+*(zdroj: www.rfc-editor.org)*
 
 rfc-editor.org
 
@@ -628,13 +604,9 @@ This gives us a useful division:
 - Unreliable datagrams: snapshots, frequent input and transient state updates.
 - Separate asset delivery: HTTP-based or dedicated content distribution.
 
-Unity Transport is also a valid alternative for a UDP-based client transport, but it should not be confused with a complete cross-language networking solution.&#x20;
+Unity Transport is also a valid alternative for a UDP-based client transport, but it should not be confused with a complete cross-language networking solution.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+*(zdroj: GitHub +1)*
 
 ### 5.3 Recommended network topology
 
@@ -709,13 +681,9 @@ For entities with sufficiently smooth motion and velocity data, Hermite interpol
 
 The client maintains a snapshot buffer and adapts its interpolation delay to network jitter and packet loss.
 
-This is an established approach for non-deterministic networked physics.&#x20;
+This is an established approach for non-deterministic networked physics.
 
-[image](https://www.google.com/s2/favicons?domain=https://www.gafferongames.com\&sz=32)
-
-Gaffer On Games+1
-
-
+*(zdroj: Gaffer On Games +1)*
 
 ### 5.6 Client prediction and reconciliation
 
@@ -745,13 +713,9 @@ The simulation state should be corrected to the authoritative result. A separate
 
 Do not gradually blend an incorrect authoritative physics state into a new state and then use that blended value as the basis for further physics calculations.
 
-This distinction is also emphasized in Gaffer On Games' state synchronization discussion.&#x20;
+This distinction is also emphasized in Gaffer On Games' state synchronization discussion.
 
-[image](https://www.google.com/s2/favicons?domain=https://gafferongames.com\&sz=32)
-
-Gaffer On Games+1
-
-
+*(zdroj: Gaffer On Games +1)*
 
 ### 5.7 What should be predicted?
 
@@ -822,13 +786,9 @@ I recommend combining:
 
 A player entering a strategic overview should receive a different relevancy set from a player driving a car.
 
-Unity's Netcode for Entities documents an explicit relevancy mechanism and importance-based snapshot prioritization. These are useful references, even though the actual implementation should reside in our cross-language networking architecture.&#x20;
+Unity's Netcode for Entities documents an explicit relevancy mechanism and importance-based snapshot prioritization. These are useful references, even though the actual implementation should reside in our cross-language networking architecture.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity.cn\&sz=32)
-
-1.5.0-exp.2+1
-
-
+*(zdroj: 1.5.0-exp.2 +1)*
 
 ### 6.3 Hierarchical spatial relevance
 
@@ -1002,13 +962,9 @@ The client has:
 
 The client must estimate server time and maintain a stable relationship between these timelines.
 
-Unity's networking documentation describes the distinction between prediction ticks and interpolation ticks and adjusts interpolation delay using RTT, jitter and packet arrival behavior.&#x20;
+Unity's networking documentation describes the distinction between prediction ticks and interpolation ticks and adjusts interpolation delay using RTT, jitter and packet arrival behavior.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity.cn\&sz=32)
-
-1.1.0-exp.1+1
-
-
+*(zdroj: 1.1.0-exp.1 +1)*
 
 ### 8.1 Proposed time model
 
@@ -1067,9 +1023,9 @@ This is especially important for the What-If Simulation Platform.
 
 Unity's fixed timestep is appropriate for fixed-rate local presentation and prediction loops, but it should not control the authoritative simulation clock.
 
-Unity documents that its physics advances in fixed time steps, and that heavy frames can trigger multiple physics updates.&#x20;
+Unity documents that its physics advances in fixed time steps, and that heavy frames can trigger multiple physics updates.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity3d.com\&sz=32)
+*(zdroj: docs.unity3d.com)*
 
 マニュアル: Understand physics performance issues+1
 
@@ -1083,37 +1039,25 @@ All perspectives should be different presentations of the same persistent world.
 
 They should not have independent entity models.
 
-[DayZ - Screenshots der Standalone-Version](https://images.openai.com/static-rsc-4/ll_4a_5Ue3NxpcSt2yWgdacYjWgAMrvJ5uCC3b-KGoYGI5MPX_kHGwU1hDJEJZJYN2RCCwEVlL-ju44EpgEE9E327YaMGTmGZynwjfuWFSi5ce7JfIqwXr6jDQaEycZueco9qo5KcRC-bEdwCVbC39-KqjBqqjqCdFnZPxClN2k?purpose=inline)
-
 First person
 
 Local camera, head movement, interaction, weapon/tool presentation and high-frequency local feedback.
-
-[Bad Way on Steam](https://images.openai.com/static-rsc-4/lABdyRZwFrw6VEOyskWuTYoCLucREqCtXieQb3fuMu40RvmBcRlVoAWpMS_MupEDi98gGzk76h3Cd8QnLfEfBxQ73UFEiIiJXiSKf_r0SmTwCP3T4zeyfrIGKXSCJHTKAYOaaWdF0dhi7jLlyyyH41m5RdPScJ_5m0nZm65WlGg?purpose=inline)
 
 Third person
 
 Character animation, camera collision, movement prediction and contextual interactions.
 
-[Screenshot of Forza Horizon 4 (Windows, 2018) - MobyGames](https://images.openai.com/static-rsc-4/KtGdgaIyyKwGfAL9jBwzvvfIy1aTJxafUuWaa06mcIPEH-RoQf4sqCoTIDlQhCfuNGIgZOebfmeYqzLUn14AntT5CqYcCo48lkBcWqqonotacDGK72cwUP2mkG2E1ZRT4FehMk0q1hi3Jk5saIbL7mtKrIZ28xKwruE2dwmegtg?purpose=inline)
-
 Vehicle camera
 
 Cockpit, chase camera, dashboard, vehicle telemetry and camera-relative presentation.
-
-[Fenix Simulations Releases A320 V2 Block 1 - FSElite](https://images.openai.com/static-rsc-4/tVSXJJTkJ_IADuYPeyi3mQ7qBJ160mvHqjghA0CuXvzRpzZwazj26Uljm2k99pQrxX-ws-untRo2W5uB4p5m1OmI77qAeOeVNyUfetEQibg4FzBK3OCNV6Jee9HR5-RtQCrVZWlDcHq0p11c5DvBvGqsVNu5TukTwhqjYpBj41M?purpose=inline)
 
 Aircraft
 
 Cockpit instruments, flight displays, external cameras and atmospheric transitions.
 
-[Reentry - A Space Flight Simulator - Reentry has been updated to version 0.65 - TSS for Gemini - Steam News](https://images.openai.com/static-rsc-4/nSNyQwvDrDKLx55qr448yCWaMBqkfMneNAdKUsjEMVLP-_kgbgsSts18NYGh0aYA_xThAz-gmBt4UgOklh-VDEe2bxHt5DlZic9hvap9FhY5c8bx7MvLX0JTNCFGRS8FbqdOrGPGBdHoNruOKrAyMWQ5QiZPvw7gjjzKVP7nYLQ?purpose=inline)
-
 Spacecraft
 
 Orbital navigation, attitude indicators, relative reference frames and orbital visualization.
-
-[v1.65 Early Access Update - GalCiv IV: Supernova » Forum Post by redskittlesonly](https://images.openai.com/static-rsc-4/FTxr3o8TDbV5booZ196DNqsxpKCAe3PETy4R4NwdJ6fBC6YKobaImkzd0mswYA2nh72_mR2W3IcVGc-Vh0DVRlu_hw6JI_vtIk6P6JHCy1hAtD8EFVZppW5w1wodr3VngNRv-Bva5Eb7r8MgSXUyL6vIa6D613t_KblMQ1c6IyM?purpose=inline)
 
 Strategic overview
 
@@ -1553,9 +1497,9 @@ Therefore AOI and relevance-based scheduling are fundamental architectural requi
 
 ### 12.5 Network packet size
 
-QUIC datagrams cannot be fragmented at the QUIC DATAGRAM frame level. Their usable size is constrained by negotiated transport parameters and path MTU.&#x20;
+QUIC datagrams cannot be fragmented at the QUIC DATAGRAM frame level. Their usable size is constrained by negotiated transport parameters and path MTU.
 
-[image](https://www.google.com/s2/favicons?domain=https://quicwg.org\&sz=32)
+*(zdroj: quicwg.org)*
 
 QUIC
 
@@ -1699,9 +1643,9 @@ Measure separately:
 
 Use actual standalone builds, not only Unity Editor profiling.
 
-Unity's GPU Usage Profiler can be used to measure GPU workloads in Play Mode and builds, subject to its documented platform limitations.&#x20;
+Unity's GPU Usage Profiler can be used to measure GPU workloads in Play Mode and builds, subject to its documented platform limitations.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity3d.com\&sz=32)
+*(zdroj: docs.unity3d.com)*
 
 Unity Manual
 
@@ -1811,21 +1755,21 @@ These are the most useful sources for the subsequent implementation architecture
 
 | Subject                               | Reference                                                                                                                                                                                                                                |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| HDRP camera-relative rendering        | [Unity Graphics — Camera-relative rendering](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/Camera-Relative-Rendering.md?plain=1\&utm_source=chatgpt.com) |
-| HDRP planetary atmosphere             | [Physically Based Sky](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/physically-based-sky-volume-override-reference.md?utm_source=chatgpt.com)           |
-| HDRP clouds and environmental effects | [HDRP features](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/HDRP-Features.md?plain=1\&utm_source=chatgpt.com)                                          |
-| HDRP ocean limitations                | [Water capabilities](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/water-capabilities-of-the-water-system.md?utm_source=chatgpt.com)                     |
-| Unity prediction                      | [Netcode prediction](https://docs.unity.cn/Packages/com.unity.netcode%401.1/manual/prediction.html?utm_source=chatgpt.com)                                                                                                               |
-| Unity interpolation                   | [Netcode interpolation](https://docs.unity.cn/Packages/com.unity.netcode%401.5/manual/interpolation.html?utm_source=chatgpt.com)                                                                                                         |
-| Unity time synchronization            | [Network time synchronization](https://docs.unity.cn/Packages/com.unity.netcode%401.1/manual/time-synchronization.html?utm_source=chatgpt.com)                                                                                           |
-| Unity entity relevancy                | [Ghost relevancy](https://docs.unity.cn/Packages/com.unity.netcode%401.5/manual/optimizations.html?utm_source=chatgpt.com)                                                                                                               |
-| Unity Transport                       | [Unity Transport](https://github.com/Unity-Technologies/com.unity.multiplayer.docs/blob/main/transport/about.md?plain=1\&utm_source=chatgpt.com)                                                                                         |
-| Networked physics                     | [Gaffer — Snapshot Interpolation](https://www.gafferongames.com/post/snapshot_interpolation/?utm_source=chatgpt.com)                                                                                                                     |
-| State synchronization                 | [Gaffer — State Synchronization](https://gafferongames.com/post/state_synchronization/?utm_source=chatgpt.com)                                                                                                                           |
-| Snapshot compression                  | [Gaffer — Snapshot Compression](https://new.gafferongames.com/post/snapshot_compression/?utm_source=chatgpt.com)                                                                                                                         |
-| QUIC                                  | [RFC 9000](https://www.rfc-editor.org/rfc/rfc9000.html?utm_source=chatgpt.com)                                                                                                                                                           |
-| QUIC datagrams                        | [RFC 9221](https://www.rfc-editor.org/rfc/rfc9221.html?utm_source=chatgpt.com)                                                                                                                                                           |
-| Unity physics timing                  | [Unity physics performance](https://docs.unity3d.com/jp/current/Manual/physics-performance-issues.html?utm_source=chatgpt.com)                                                                                                           |
+| HDRP camera-relative rendering        | [Unity Graphics — Camera-relative rendering](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/Camera-Relative-Rendering.md?plain=1\) |
+| HDRP planetary atmosphere             | [Physically Based Sky](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/physically-based-sky-volume-override-reference.md)           |
+| HDRP clouds and environmental effects | [HDRP features](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/HDRP-Features.md?plain=1\)                                          |
+| HDRP ocean limitations                | [Water capabilities](https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.high-definition/Documentation~/water-capabilities-of-the-water-system.md)                     |
+| Unity prediction                      | [Netcode prediction](https://docs.unity.cn/Packages/com.unity.netcode%401.1/manual/prediction.html)                                                                                                               |
+| Unity interpolation                   | [Netcode interpolation](https://docs.unity.cn/Packages/com.unity.netcode%401.5/manual/interpolation.html)                                                                                                         |
+| Unity time synchronization            | [Network time synchronization](https://docs.unity.cn/Packages/com.unity.netcode%401.1/manual/time-synchronization.html)                                                                                           |
+| Unity entity relevancy                | [Ghost relevancy](https://docs.unity.cn/Packages/com.unity.netcode%401.5/manual/optimizations.html)                                                                                                               |
+| Unity Transport                       | [Unity Transport](https://github.com/Unity-Technologies/com.unity.multiplayer.docs/blob/main/transport/about.md?plain=1\)                                                                                         |
+| Networked physics                     | [Gaffer — Snapshot Interpolation](https://www.gafferongames.com/post/snapshot_interpolation/)                                                                                                                     |
+| State synchronization                 | [Gaffer — State Synchronization](https://gafferongames.com/post/state_synchronization/)                                                                                                                           |
+| Snapshot compression                  | [Gaffer — Snapshot Compression](https://new.gafferongames.com/post/snapshot_compression/)                                                                                                                         |
+| QUIC                                  | [RFC 9000](https://www.rfc-editor.org/rfc/rfc9000.html)                                                                                                                                                           |
+| QUIC datagrams                        | [RFC 9221](https://www.rfc-editor.org/rfc/rfc9221.html)                                                                                                                                                           |
+| Unity physics timing                  | [Unity physics performance](https://docs.unity3d.com/jp/current/Manual/physics-performance-issues.html)                                                                                                           |
 
 # 19. Final architectural conclusions
 

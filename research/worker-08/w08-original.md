@@ -158,7 +158,7 @@ Doporučuji kombinovat:
 4. Dynamický model proudění.
 Referenční profil U.S. Standard Atmosphere 1976 sahá až do 1000 km, ale běžná interaktivní atmosférická simulace bude potřebovat jiné modely pro jednotlivé výškové režimy. 
 
-ntrs.nasa.gov+1
+*(zdroj: ntrs.nasa.gov +1)*
 
 3.3 Aerodynamika
 Každé fyzické těleso musí dostávat vlastnosti okolního vzduchu.
@@ -376,7 +376,7 @@ Reálná data
 - Součástí je i Type Identifier Grid, který popisuje původ podkladových dat.
 Zdroj: GEBCO_2026 technical specification. 
 
-GEBCO+1
+*(zdroj: GEBCO +1)*
 
 Rozlišení 15 arcseconds odpovídá přibližně:
 - 463 m severojižně.
@@ -846,7 +846,7 @@ NOAA GFS
 
 ERA5 poskytuje hodinová povrchová pole s rozlišením 0,25° a samostatná vlnová data s rozlišením 0,5°. Jde o reanalýzu kombinující model a pozorování, nikoliv o surové naměřené hodnoty v každém bodě planety. 
 
-cds.climate.copernicus.eu+1
+*(zdroj: cds.climate.copernicus.eu +1)*
 
 Důležitá architektonická poznámka:
 
@@ -1189,15 +1189,15 @@ Climate energy	NASA Earth energy budget
 
 MITgcm dokumentace obsahuje matematické rovnice, numerické metody a testovací experimenty pro oceánskou i atmosférickou dynamiku. Je vhodným zdrojem pro vytvoření validační sady. 
 
-mitgcm.org+1
+*(zdroj: mitgcm.org +1)*
 
 Pro vlnové modelování je důležitým referenčním systémem NOAA WAVEWATCH III, který řeší spektrální rovnici zachování akční hustoty v prostoru, frekvenci a směru. 
 
-weather.gov+1
+*(zdroj: weather.gov +1)*
 
 Pro příliv je TPXO vhodný i jako numerická validační reference, protože obsahuje harmonické konstanty hladiny a transportů. 
 
-tpxo.net+1
+*(zdroj: tpxo.net +1)*
 
 
 12. Risk register

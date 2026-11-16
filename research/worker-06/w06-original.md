@@ -114,13 +114,9 @@ This allows the same factory to participate in:
 
 The capabilities are not gameplay-specific copies of the factory.
 
-Established engineering approach: ECS (Entity Component System). Bevy ECS provides a particularly relevant Rust reference: entities hold components, systems operate on component queries, and system access metadata enables parallel execution.&#x20;
+Established engineering approach: ECS (Entity Component System). Bevy ECS provides a particularly relevant Rust reference: entities hold components, systems operate on component queries, and system access metadata enables parallel execution.
 
-[image](https://www.google.com/s2/favicons?domain=https://bevy.org\&sz=32)
-
-bevy.org+1
-
-
+*(zdroj: bevy.org +1)*
 
 Limitation: ECS alone does not solve persistence, network authority, transactions, historical state or deterministic execution. Those require separate architectural contracts.
 
@@ -139,13 +135,9 @@ Its important architectural ideas include:
 - Asynchronous multi-stage actions.
 - Server/client execution and prediction.
 
-These concepts are applicable beyond RPGs.&#x20;
+These concepts are applicable beyond RPGs.
 
-[image](https://www.google.com/s2/favicons?domain=https://dev.epicgames.com\&sz=32)
-
-Epic Developer Community+2
-
-
+*(zdroj: Epic Developer Community +2)*
 
 I propose a universal `Interaction / Ability` subsystem.
 
@@ -621,13 +613,9 @@ This gives us:
 - What-if branches.
 - Reproducible mutation sequences.
 
-AWS and Microsoft document event sourcing's benefits as well as its significant costs: schema evolution, idempotency, replay, optimistic concurrency and projection consistency. It should therefore be applied selectively to authoritative mutations, not indiscriminately to every continuously changing physical value.&#x20;
+AWS and Microsoft document event sourcing's benefits as well as its significant costs: schema evolution, idempotency, replay, optimistic concurrency and projection consistency. It should therefore be applied selectively to authoritative mutations, not indiscriminately to every continuously changing physical value.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.aws.amazon.com\&sz=32)
-
-AWS Prescriptive Guidance+2
-
-
+*(zdroj: AWS Prescriptive Guidance +2)*
 
 Important distinction: Vehicle position changing at every physics tick does not necessarily need a permanent event in the world mutation history. Continuous simulation state should have its own snapshot/checkpoint and replay strategy.
 
@@ -666,13 +654,9 @@ The first user's edit is then submitted against revision 120.
 
 If the changes overlap, the server rejects the stale operation or returns a conflict requiring reconciliation.
 
-OpenStreetMap offers a useful real-world reference: versioned objects, optimistic locking, changesets and conflict responses. It also demonstrates why a changeset and an atomic transaction are not automatically the same thing.&#x20;
+OpenStreetMap offers a useful real-world reference: versioned objects, optimistic locking, changesets and conflict responses. It also demonstrates why a changeset and an atomic transaction are not automatically the same thing.
 
-[image](https://www.google.com/s2/favicons?domain=https://wiki.openstreetmap.org\&sz=32)
-
-OpenStreetMap Wiki+1
-
-
+*(zdroj: OpenStreetMap Wiki +1)*
 
 I recommend two separate collaboration mechanisms:
 
@@ -691,13 +675,9 @@ B. Collaborative editor workspace
 - Intermediate changes.
 - Non-authoritative previews.
 
-CRDT technology such as Yjs is worth evaluating for the second category. Its shared data structures automatically merge concurrent operations without ordinary merge conflicts.&#x20;
+CRDT technology such as Yjs is worth evaluating for the second category. Its shared data structures automatically merge concurrent operations without ordinary merge conflicts.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.yjs.dev\&sz=32)
-
-Yjs Docs+1
-
-
+*(zdroj: Yjs Docs +1)*
 
 I would not use CRDT merging as the authority mechanism for physical world changes. Two independently accepted edits cannot automatically guarantee that a building fits, that materials exist or that the resulting geometry is valid.
 
@@ -959,17 +939,13 @@ Different gameplay systems need different replication strategies.
 | Distant planetary state | Low-frequency aggregated updates    |
 | Editor workspace        | Collaborative draft synchronization |
 
-Open 3D Engine provides useful references for server-authoritative multiplayer, component-based replication, RPCs, prediction, reconciliation and delta synchronization.&#x20;
+Open 3D Engine provides useful references for server-authoritative multiplayer, component-based replication, RPCs, prediction, reconciliation and delta synchronization.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.o3de.org\&sz=32)
+*(zdroj: docs.o3de.org +2)*
 
-docs.o3de.org+2
+Unity Netcode documentation also illustrates how fixed simulation ticks, snapshots, prediction and interpolation can be separated.
 
-
-
-Unity Netcode documentation also illustrates how fixed simulation ticks, snapshots, prediction and interpolation can be separated.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://docs.unity.cn\&sz=32)
+*(zdroj: docs.unity.cn)*
 
 0.51.1-preview\.21+2
 
@@ -983,13 +959,9 @@ There is an important architectural trap here.
 
 A fully deterministic lockstep model is attractive for RTS and strategy games.
 
-Factorio documents how deterministic lockstep works: clients execute the same simulation from synchronized inputs, and any difference can produce desynchronization.&#x20;
+Factorio documents how deterministic lockstep works: clients execute the same simulation from synchronized inputs, and any difference can produce desynchronization.
 
-[image](https://www.google.com/s2/favicons?domain=https://wiki.factorio.com\&sz=32)
-
-Factorio Wiki+1
-
-
+*(zdroj: Factorio Wiki +1)*
 
 However, our universe contains:
 
@@ -1257,13 +1229,9 @@ Some data is better represented as:
 
 ECS should be a runtime execution mechanism, not the mandatory storage format for the entire universe.
 
-Bevy's official documentation specifically identifies system access analysis and parallel execution as strengths, but also notes that default parallel scheduling is not inherently deterministic.&#x20;
+Bevy's official documentation specifically identifies system access analysis and parallel execution as strengths, but also notes that default parallel scheduling is not inherently deterministic.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.rs\&sz=32)
-
-Rust+2
-
-
+*(zdroj: Rust +2)*
 
 ### 10. API and data contracts
 
@@ -1751,16 +1719,16 @@ The following are the most useful technical references identified during this in
 
 | Technology / research                                                                                                                                          | Architectural relevance                      |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| [Bevy ECS documentation](https://docs.rs/bevy/latest/bevy/ecs/?utm_source=chatgpt.com)                                                                         | Rust ECS and parallel execution              |
-| [Unreal Gameplay Ability System](https://dev.epicgames.com/documentation/en-us/unreal-engine/gameplay-ability-system-for-unreal-engine?utm_source=chatgpt.com) | Modular gameplay abilities                   |
-| [O3DE Multiplayer](https://docs.o3de.org/docs/user-guide/networking/multiplayer/overview/?utm_source=chatgpt.com)                                              | Server authority and replication             |
-| [Microsoft Event Sourcing](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing?utm_source=chatgpt.com)                                | History, replay and concurrency              |
-| [AWS Event Sourcing](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/event-sourcing-pattern.html?utm_source=chatgpt.com)        | Event architecture and trade-offs            |
-| [OpenStreetMap API](https://wiki.openstreetmap.org/wiki/OSM_Protocol_Version_0.6?utm_source=chatgpt.com)                                                       | Versioning, changesets and editing conflicts |
-| [Yjs documentation](https://docs.yjs.dev/?utm_source=chatgpt.com)                                                                                              | Collaborative editing and CRDT               |
-| [Factorio determinism](https://wiki.factorio.com/Desynchronization?utm_source=chatgpt.com)                                                                     | Deterministic lockstep limitations           |
-| [Unity prediction architecture](https://docs.unity.cn/Packages/com.unity.netcode%401.3/manual/prediction-high-level-explanation.html?utm_source=chatgpt.com)   | Fixed ticks and client reconciliation        |
-| [FMI standard](https://fmi-standard.org/docs/main/?utm_source=chatgpt.com)                                                                                     | Coupled simulation systems and scheduling    |
+| [Bevy ECS documentation](https://docs.rs/bevy/latest/bevy/ecs/)                                                                         | Rust ECS and parallel execution              |
+| [Unreal Gameplay Ability System](https://dev.epicgames.com/documentation/en-us/unreal-engine/gameplay-ability-system-for-unreal-engine) | Modular gameplay abilities                   |
+| [O3DE Multiplayer](https://docs.o3de.org/docs/user-guide/networking/multiplayer/overview/)                                              | Server authority and replication             |
+| [Microsoft Event Sourcing](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing)                                | History, replay and concurrency              |
+| [AWS Event Sourcing](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/event-sourcing-pattern.html)        | Event architecture and trade-offs            |
+| [OpenStreetMap API](https://wiki.openstreetmap.org/wiki/OSM_Protocol_Version_0.6)                                                       | Versioning, changesets and editing conflicts |
+| [Yjs documentation](https://docs.yjs.dev/)                                                                                              | Collaborative editing and CRDT               |
+| [Factorio determinism](https://wiki.factorio.com/Desynchronization)                                                                     | Deterministic lockstep limitations           |
+| [Unity prediction architecture](https://docs.unity.cn/Packages/com.unity.netcode%401.3/manual/prediction-high-level-explanation.html)   | Fixed ticks and client reconciliation        |
+| [FMI standard](https://fmi-standard.org/docs/main/)                                                                                     | Coupled simulation systems and scheduling    |
 
 # Final architectural recommendation
 

@@ -434,7 +434,7 @@ Collisionless gravitational systems and approximate large-scale evolution.
 
 This approach is supported by established numerical astronomy software. REBOUND provides WHFast, IAS15 and hybrid methods such as MERCURIUS, while its documentation describes their different intended applications. 
 
-rebound.hanno-rein.de+2
+*(zdroj: rebound.hanno-rein.de +2)*
 
 Important recommendation: Design the integrator as a replaceable subsystem. Never bind a celestial entity permanently to a particular numerical integration algorithm.
 
@@ -525,7 +525,7 @@ Use:
 - Optional high-fidelity galaxy evolution as a separate simulation mode.
 The Python package galpy is particularly useful as a scientific reference. It supports gravitational potentials, orbit integration, distribution functions, action-angle calculations and multipole expansions. 
 
-galpy v1.12.2.dev0 documentation+1
+*(zdroj: galpy v1.12.2.dev0 documentation +1)*
 
 
 
@@ -615,7 +615,7 @@ This is important because a visually convincing black hole can otherwise be phys
 
 NASA's black-hole visualization documentation explicitly distinguishes simplified optical visualizations from full general-relativistic ray tracing. 
 
-Black Hole with Accretion Disk Visualization+1
+*(zdroj: Black Hole with Accretion Disk Visualization +1)*
 
 
 
@@ -670,7 +670,7 @@ Scientific	GR + GRMHD	High-fidelity astrophysical simulation
 
 The Einstein Toolkit demonstrates production scientific approaches involving numerical relativity, adaptive mesh refinement, black-hole evolution and GRMHD. 
 
-einsteintoolkit.org+1
+*(zdroj: einsteintoolkit.org +1)*
 
 E. Tidal disruption
 A star passing sufficiently close to a black hole can experience tidal forces strong enough to disrupt it.
@@ -757,7 +757,7 @@ For Solar System ephemerides, TDB is particularly important.
 
 JPL's DE440/DE441 ephemerides use TDB and provide polynomial representations of planetary and lunar positions and velocities. DE441 also covers a substantially longer historical interval than DE440. 
 
-ssd.jpl.nasa.gov+1
+*(zdroj: ssd.jpl.nasa.gov +1)*
 
 Recommendation: Use a continuous internal simulation timeline with explicit astronomical time conversion services.
 
@@ -893,7 +893,7 @@ The Rust runtime retains the authoritative global state.
 E. Reference-frame inspiration
 NASA's SPICE system is an excellent architectural reference because it treats reference frames and transformations as explicit data-driven subsystems. It supports inertial, planetary and galactic reference frames. 
 
-naif.jpl.nasa.gov+1
+*(zdroj: naif.jpl.nasa.gov +1)*
 
 
 

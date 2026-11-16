@@ -167,9 +167,9 @@ Recommended conventions:
 | Spacecraft body  | Configurable right-handed body frame |
 | Astronomical     | Inertial reference frame             |
 
-The ISO vehicle convention is already used by Project Chrono's vehicle subsystem architecture.&#x20;
+The ISO vehicle convention is already used by Project Chrono's vehicle subsystem architecture.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
+*(zdroj: api.projectchrono.org)*
 
 api.projectchrono.org
 
@@ -199,13 +199,9 @@ For a rotating frame:
 
 The velocity transformation is especially important. Simply rotating the velocity vector produces an incorrect inertial velocity for an object attached to a rotating planet.
 
-NASA/JPL SPICE explicitly supports six-dimensional state transformations, including the derivative of the rotation matrix for rotating frames.&#x20;
+NASA/JPL SPICE explicitly supports six-dimensional state transformations, including the derivative of the rotation matrix for rotating frames.
 
-[image](https://www.google.com/s2/favicons?domain=https://naif.jpl.nasa.gov\&sz=32)
-
-naif.jpl.nasa.gov+1
-
-
+*(zdroj: naif.jpl.nasa.gov +1)*
 
 Recommendation: Worker 02 should own all frame transformations. Worker 03 must consume already-transformed physical state and must never independently implement planetary rotation corrections.
 
@@ -270,7 +266,25 @@ All four represent the same vehicle type and use the same physical environment.
 
 ## 3.3 Proposed execution pipeline
 
-\#chatgpt-mermaid-\_r_7ks\_{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;fill:rgb(26, 28, 31);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-\_r_7ks\_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-\_r_7ks\_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-\_r_7ks\_ .error-icon{fill:rgba(255, 255, 255, 0.96);}#chatgpt-mermaid-\_r_7ks\_ .error-text{fill:rgb(26, 28, 31);stroke:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-\_r_7ks\_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-\_r_7ks\_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-\_r_7ks\_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-\_r_7ks\_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-\_r_7ks\_ .marker{fill:rgba(26, 28, 31, 0.494);stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-\_r_7ks\_ .marker.cross{stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-\_r_7ks\_ svg{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;}#chatgpt-mermaid-\_r_7ks\_ p{margin:0;}#chatgpt-mermaid-\_r_7ks\_ .label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .cluster-label text{fill:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .cluster-label span{color:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-\_r_7ks\_ .label text,#chatgpt-mermaid-\_r_7ks\_ span{fill:rgb(26, 28, 31);color:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .node rect,#chatgpt-mermaid-\_r_7ks\_ .node circle,#chatgpt-mermaid-\_r_7ks\_ .node ellipse,#chatgpt-mermaid-\_r_7ks\_ .node polygon,#chatgpt-mermaid-\_r_7ks\_ .node path{fill:rgb(224, 237, 254);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .rough-node .label text,#chatgpt-mermaid-\_r_7ks\_ .node .label text,#chatgpt-mermaid-\_r_7ks\_ .image-shape .label,#chatgpt-mermaid-\_r_7ks\_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-\_r_7ks\_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .rough-node .label,#chatgpt-mermaid-\_r_7ks\_ .node .label,#chatgpt-mermaid-\_r_7ks\_ .image-shape .label,#chatgpt-mermaid-\_r_7ks\_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-\_r_7ks\_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-\_r_7ks\_ .root .anchor path{fill:rgba(26, 28, 31, 0.494)!important;stroke-width:0;stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-\_r_7ks\_ .arrowheadPath{fill:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-\_r_7ks\_ .edgePath .path{stroke:rgba(26, 28, 31, 0.494);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .flowchart-link{stroke:rgba(26, 28, 31, 0.494);fill:none;}#chatgpt-mermaid-\_r_7ks\_ .edgeLabel{background-color:rgb(255, 255, 255);text-align:center;}#chatgpt-mermaid-\_r_7ks\_ .edgeLabel p{background-color:rgb(255, 255, 255);}#chatgpt-mermaid-\_r_7ks\_ .edgeLabel rect{opacity:0.5;background-color:rgb(255, 255, 255);fill:rgb(255, 255, 255);}#chatgpt-mermaid-\_r_7ks\_ .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#chatgpt-mermaid-\_r_7ks\_ .cluster rect{fill:rgba(255, 255, 255, 0.96);stroke:rgba(26, 28, 31, 0.08);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .cluster text{fill:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ .cluster span{color:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:12px;background:rgba(255, 255, 255, 0.96);border:1px solid rgba(26, 28, 31, 0.08);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-\_r_7ks\_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(26, 28, 31);}#chatgpt-mermaid-\_r_7ks\_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-\_r_7ks\_ .icon-shape,#chatgpt-mermaid-\_r_7ks\_ .image-shape{background-color:rgb(255, 255, 255);text-align:center;}#chatgpt-mermaid-\_r_7ks\_ .icon-shape p,#chatgpt-mermaid-\_r_7ks\_ .image-shape p{background-color:rgb(255, 255, 255);padding:2px;}#chatgpt-mermaid-\_r_7ks\_ .icon-shape .label rect,#chatgpt-mermaid-\_r_7ks\_ .image-shape .label rect{opacity:0.5;background-color:rgb(255, 255, 255);fill:rgb(255, 255, 255);}#chatgpt-mermaid-\_r_7ks\_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-\_r_7ks\_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-\_r_7ks\_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node rect,#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].cluster rect,#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-\_r_7ks\_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-\_r_7ks\_-gradient);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-\_r_7ks\_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-\_r_7ks\_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-\_r_7ks\_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-\_r_7ks\_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-\_r_7ks\_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(0, 79, 153);}#chatgpt-mermaid-\_r_7ks\_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(0, 79, 153);}#chatgpt-mermaid-\_r_7ks\_ .node tspan[font-weight="normal"],#chatgpt-mermaid-\_r_7ks\_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-\_r_7ks\_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .node rect,#chatgpt-mermaid-\_r_7ks\_ .node circle,#chatgpt-mermaid-\_r_7ks\_ .node ellipse,#chatgpt-mermaid-\_r_7ks\_ .node polygon,#chatgpt-mermaid-\_r_7ks\_ .node path{fill:rgb(229, 243, 255);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-\_r_7ks\_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-\_r_7ks\_ .mermaid-decision .label-container{fill:rgb(245, 250, 255);stroke:rgb(206, 219, 229);stroke-dasharray:2,2;}#chatgpt-mermaid-\_r_7ks\_ .edgePaths .flowchart-link{stroke:rgba(26, 28, 31, 0.494);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-\_r_7ks\_ .marker{fill:rgba(26, 28, 31, 0.494);stroke:rgba(26, 28, 31, 0.494);}#chatgpt-mermaid-\_r_7ks\_ :root{--mermaid-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}Simulation tickRead entity stateAcquire environmentalsnapshotRead contacts and constraintsUpdate control systemsEvaluate specialized entitymodelsAccumulate forces and torquesUniversal Physics RuntimeIntegrate physical stateResolve collisions andconstraintsUpdate mass and internalstatesEmit events and telemetryNext tick
+> **Poznámka správce repa (2026-11-16):** diagram se při kopírování z ChatGPT rozpadl na CSS a holé popisky. Zrekonstruováno z popisků uzlů (pořadí zachováno, tok je lineární smyčka).
+
+```mermaid
+flowchart TD
+    A[Simulation tick] --> B[Read entity state]
+    B --> C[Acquire environmental snapshot]
+    C --> D[Read contacts and constraints]
+    D --> E[Update control systems]
+    E --> F[Evaluate specialized entity models]
+    F --> G[Accumulate forces and torques]
+    G --> H
+    subgraph RT[Universal Physics Runtime]
+        H[Integrate physical state] --> I[Resolve collisions and constraints]
+    end
+    I --> J[Update mass and internal states]
+    J --> K[Emit events and telemetry]
+    K --> L[Next tick]
+    L -.-> A
+```
 
 A critical detail is that entity models should not directly modify the authoritative rigid-body state.
 
@@ -316,13 +330,9 @@ Disadvantages:
 
 Recommendation: Support both. Do not force every entity model into one coupling method.
 
-Project Chrono demonstrates modular vehicle subsystems and a synchronization/advance interface designed for coupling independent models.&#x20;
+Project Chrono demonstrates modular vehicle subsystems and a synchronization/advance interface designed for coupling independent models.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
-
-api.projectchrono.org+1
-
-
+*(zdroj: api.projectchrono.org +1)*
 
 # 4. Environmental integration contract
 
@@ -434,25 +444,13 @@ The atmosphere supplies density and wind. The entity supplies its aerodynamic co
 
 This makes the same aircraft model usable on Earth, Mars or another world without modifying its physical equations.
 
-NASA's standard atmosphere documentation provides a production reference for atmospheric density, pressure, temperature and sound speed profiles. It also demonstrates why atmospheric properties must be altitude-dependent rather than fixed constants.&#x20;
+NASA's standard atmosphere documentation provides a production reference for atmospheric density, pressure, temperature and sound speed profiles. It also demonstrates why atmospheric properties must be altitude-dependent rather than fixed constants.
 
-[image](https://www.google.com/s2/favicons?domain=https://ntrs.nasa.gov\&sz=32)
-
-ntrs.nasa.gov+1
-
-
+*(zdroj: ntrs.nasa.gov +1)*
 
 # 5. Specialized entity systems
 
 ## A. Character physics
-
-[New Heights: Realistic Climbing and Bouldering on Steam](https://images.openai.com/static-rsc-4/HetmOQlM8wWbqC9tbeg8G6hR0xIQSFR1jK4AjbBonuooD4MYqsj-BsPt-wd87r3Do0hAzmYlraWJ4067wOWLxPTCjjx21x_oizmLSNaVVwuY6sbfP-iB8NUFamUXremHLKxhG-lRVjhBXypvtQCRHOP_Xd_1LaP9H-Aevnsof0E?purpose=inline)
-
-[Slow/Speed Character Movement On Slopes UE5 - Character & Animation - Epic Developer Community Forums](https://images.openai.com/static-rsc-4/zED3XZUME_CwFB0PsshsGWSc27fPMdcV5eZqqc2bDr9GGY_EikQUMiSi3clwBRgm7B29thYceTGF3xBht4B234-Sg4KbRgXPw3h_fWtgfORf8CknVWpXOW9qXYHuGT51E07u4LAHt-AhaZptKkIrYhcK9pRgoG-1s6qNgjTzJbo?purpose=inline)
-
-[Fluid Flux - Unreal Engine Asset](https://images.openai.com/static-rsc-4/JVdi3-Z_ycPCwXOFMRJChxjOmiywUFGtu339VwoI2oyeUg4SJ9yf_SkdpGcLtTF2AXHu9XyRx37X7ZFJugaW0OXlEagEdZnZtagVZXAgS-YR1ziliRfYFVty92r5tyvbktXLCENtCs3ASh1jkeJyo31SIj7BEhMKfn9g5whbLvY?purpose=inline)
-
-8
 
 ### A1. Required capabilities
 
@@ -482,13 +480,9 @@ This is not a compromise in physical consistency. It is a separation of differen
 
 A player character usually needs reliable navigation and predictable movement. A ragdoll needs actual articulated dynamics.
 
-Jolt documents this distinction explicitly: its virtual character controller is query-driven and can interact with rigid bodies through impulses, while a simulated character is a rigid body configured for constrained motion. It also documents the limitations of virtual character interaction and update ordering.&#x20;
+Jolt documents this distinction explicitly: its virtual character controller is query-driven and can interact with rigid bodies through impulses, while a simulated character is a rigid body configured for constrained motion. It also documents the limitations of virtual character interaction and update ordering.
 
-[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
-
-GitHub+1
-
-
+*(zdroj: GitHub +1)*
 
 ### A3. Walking and running
 
@@ -523,13 +517,9 @@ For a surface with normal \\(\mathbf n\\), the slope angle relative to local up 
 
 The controller can distinguish walkable slopes from slopes requiring sliding or climbing behavior.
 
-Rapier's character controller documents practical solutions for autostepping, slope detection and snap-to-ground. These are useful implementation references, although the final implementation should follow Worker 02's runtime interface.&#x20;
+Rapier's character controller documents practical solutions for autostepping, slope detection and snap-to-ground. These are useful implementation references, although the final implementation should follow Worker 02's runtime interface.
 
-[image](https://www.google.com/s2/favicons?domain=https://rapier.rs\&sz=32)
-
-Rapier+1
-
-
+*(zdroj: Rapier +1)*
 
 ### A4. Jumping and falling
 
@@ -601,14 +591,6 @@ Recommended implementation tier: Capsule-based kinematic controller first, artic
 
 ## B. Vehicle physics
 
-[2024 Porsche 911 GT3 RS's Electronics Are a Track-Day Game Changer](https://images.openai.com/static-rsc-4/18evPpkCchKuSwAHaEQYxtKiMDiyqKETca07U9fNTUumojVvy_6tcnZcWGd8cgyKrA-znYsVtXRmtg6KXI5lroYGOQzJhFmcsLaXasMH2O0rvA0yDfQclN43-2fASFEAJ5l7Lc3-PGKq2vU-qGwdK8s2Jx4meaT1ggX0aSCpy-c?purpose=inline)
-
-[CDTire – Scalable Tire Model -  Fraunhofer ITWM](https://images.openai.com/static-rsc-4/hjgQ34i4pGir1dSTDryFiEb5hCfy28Xb5sFyIV4g7v7PfsdoO0wCUgj60Nna1M_tHsVa-hQ2Fx-Hm2sr8DwN5NVPpkw6Wbj70tfz1wJ5zew9nu1kZCEprby5R_cv8HYvcMqL6CpI7lBCaBeOwVn0FNWFBB3sCMcOjfM6SrVxULc?purpose=inline)
-
-[Pure Rock Crawling — Download](https://images.openai.com/static-rsc-4/mN8r9vf6JBSTZyN4fPmuuWzrneNYccj2wUS8VDszOhyy182JGiDUsUBLzRnubjo-kFNs9af-WteyT_5Nm7g10eX4ZlOTxC0NXLmO3R5HLOkw7DZyKSA9Dx_jf4M0cnRS0k6U3T6_i2Q6MEXj5_f7duXkLhmIUFqPOQG9bDy2DkQ?purpose=inline)
-
-9
-
 This is one of the largest subsystems.
 
 It should be designed as an independent collection of mechanical models rather than a single vehicle update function.
@@ -645,13 +627,9 @@ Drag, lift, downforce
 
 Universal Physics Runtime
 
-This modular architecture is supported by Project Chrono's established vehicle subsystem design. Chrono separates suspension, steering, driveline, wheels, brakes, terrain and driver systems.&#x20;
+This modular architecture is supported by Project Chrono's established vehicle subsystem design. Chrono separates suspension, steering, driveline, wheels, brakes, terrain and driver systems.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
-
-api.projectchrono.org+1
-
-
+*(zdroj: api.projectchrono.org +1)*
 
 ### B2. Tire models
 
@@ -691,13 +669,9 @@ The parameters describe the nonlinear relationship between slip and tire force.
 
 The model is semi-empirical and requires appropriate tire parameter sets.
 
-Chrono supports Pacejka 89, Pacejka 2002, TMeasy, Fiala and finite-element tire models. Its documentation also describes transient tire slip states and validation against experimental vehicle measurements.&#x20;
+Chrono supports Pacejka 89, Pacejka 2002, TMeasy, Fiala and finite-element tire models. Its documentation also describes transient tire slip states and validation against experimental vehicle measurements.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
-
-api.projectchrono.org+2
-
-
+*(zdroj: api.projectchrono.org +2)*
 
 #### Combined friction
 
@@ -840,13 +814,9 @@ An important architectural dependency:
 
 A semi-empirical handling tire can work with terrain height, normal and friction information. However, it cannot automatically reproduce soil deformation, tire sinkage and granular resistance.
 
-Project Chrono explicitly distinguishes handling tires from rigid and FEA tires for deformable terrain.&#x20;
+Project Chrono explicitly distinguishes handling tires from rigid and FEA tires for deformable terrain.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
-
-api.projectchrono.org+1
-
-
+*(zdroj: api.projectchrono.org +1)*
 
 Therefore, the terrain system must expose enough information to distinguish:
 
@@ -868,7 +838,7 @@ The vehicle system must select an appropriate contact model.
 
 Recommended
 
-&#x20;Three levels:
+Three levels:
 
 
 
@@ -879,14 +849,6 @@ Recommended
 | L3    | Detailed mechanical and deformable models | Specialized simulations |
 
 ## C. Aircraft physics
-
-[How Bernoulli's principle and Newton's law create lift in aircraft | Ayushman Srivastav posted on the topic | LinkedIn](https://images.openai.com/static-rsc-4/Qnd1qwiiyzCRmqsnJE_JcTIEA7FjKT72-2cMkaNF0GQ5CQN4kapKHq4C3zZOy-h_UcnZRuwHSbDuScWXued2DLkTO63ti5ZRiOXyeCPdlQ_kxY3pfAUnHztmWHHJBfG6RbngqLSqGonFbGTjclK1-UV1ICV0xtVkHAZJRSjLLjU?purpose=inline)
-
-[Mech DAMP Blog](https://images.openai.com/static-rsc-4/_4uwmEGu4_kPYYOvTFr5mC76K9uWJ8CGht-R2RBD56-fkXS35AGVrYMcsWID-Fyi-Lb0EQlr_WgOsc8uo6Gr--5PQBIXyLrOC9J7xkRfhZi0Z5nzWPf9ALsc1EoGeX748Xsc6n8kgpieXE6l0i8TZbvpGzEIQ7noYD4jpkrnltE?purpose=inline)
-
-[\[Release\] B777-200ER | PMDG - Aircraft - Microsoft Flight Simulator Forums](https://images.openai.com/static-rsc-4/q6sY6whR1ZKKtWAu2nqvHbxFjmZW_3fbLIlP3hLWmlGjQ-M792uuq2vhD10DLobAzpwxtZWoPkKZ4h0FEZ3DFE41eQ9Bi8SLAECXdhAnMThBUvmreP8Z4FMuSGMm-WPJd1aK5F8VkAysHwdGcWckeJJIkXRKy_dGydDvxLz89C0?purpose=inline)
-
-10
 
 ### C1. Core model
 
@@ -909,13 +871,9 @@ Where:
 - \\(S\\): reference wing area.
 - \\(C_L,C_D\\): aerodynamic coefficients.
 
-These are established aerodynamic relationships. NASA Glenn documents both equations and emphasizes that aerodynamic coefficients depend on geometry, flow conditions and angle of attack.&#x20;
+These are established aerodynamic relationships. NASA Glenn documents both equations and emphasizes that aerodynamic coefficients depend on geometry, flow conditions and angle of attack.
 
-[image](https://www.google.com/s2/favicons?domain=https://www1.grc.nasa.gov\&sz=32)
-
-NASA+1
-
-
+*(zdroj: NASA +1)*
 
 ### C2. Aerodynamic surfaces
 
@@ -1027,14 +985,6 @@ Recommendation: Six-DOF rigid body plus aerodynamic coefficient tables, dynamic 
 
 ## D. Drone and multirotor physics
 
-[Identification of a Multicopter — Copter  documentation](https://images.openai.com/static-rsc-4/vpnR6v9_Ff8fnFDqr4za2zvmtq3RrD5DldLKQjflMuSE_WX8Rj7QspEsiJYYhKn46gsuG1TE_ObbVNrEZmdMyTl46vnDXaSRka2NsspinanqmNZUfIw4GdHMqeCbfI-V8q6SHaOoRp7QKAViT1qTwuZiNET61WdCRN1CILTtD7A?purpose=inline)
-
-[How shape-changing drones maintain flight stability | GlobalSpec](https://images.openai.com/static-rsc-4/JEDGoNG_NWCLA3uvVZvT7kELyZ75sA6W3QhhYDlmlM5nhRYFOG1pC2VqrZYXWuOFkT9tbujkzq1djTFuk2iRyniTy_VBopkZyeipSzdGOI285SznpmoJcLYxMml7Z3JGVRAfNj0YpQEF4hPnyEXeceMjJ2ewvZfPCCGJ-xl-fC4?purpose=inline)
-
-[Programming drones with Raspberry Pi on board easily - Hackster.io](https://images.openai.com/static-rsc-4/_LD7juuelVwVh_ooYeyPodxBvmAwgpYz2XhiJ3rPRrvbr1ldd4h-I00spowgE-ZhiPJSoDzsSmia_OYuyNqRjqIBiuoVWGdPHwsWnvLII1ecv2uL6W1J0aYeX_TtStUezEeV28U_XAufgU7Qis4pIoQ-oNNotVGah2687NGQV7s?purpose=inline)
-
-8
-
 A drone is not simply an aircraft with a different shape.
 
 The main difference is how it generates and controls aerodynamic forces.
@@ -1094,13 +1044,9 @@ Motor control allocation
 
 Physical rotor and motor dynamics
 
-PX4 documents the cascaded controller, quaternion-based attitude control, PID loops and actuator saturation handling.&#x20;
+PX4 documents the cascaded controller, quaternion-based attitude control, PID loops and actuator saturation handling.
 
-[image](https://www.google.com/s2/favicons?domain=https://docs.px4.io\&sz=32)
-
-PX4 Guide (main)+1
-
-
+*(zdroj: PX4 Guide (main) +1)*
 
 Important architectural distinction: The flight controller is not the physical drone.
 
@@ -1149,14 +1095,6 @@ Recommendation: Shared aircraft aerodynamic foundations, with a specialized mult
 
 ## E. Rocket physics
 
-[Juno: New Origins  | ESA Ariane 4 (44LP)](https://images.openai.com/static-rsc-4/gx17K2c2xN8QlT11P4g6fGYCBLMKFgXbs2u_MnUcC8mM6kxaasQ_XmSGCmMQ4u8JSpMcJmidNYsgXTGFsJB_5gPS-AbN5x75QEtjJVJWMqa6EDMgB1H82AW_90NVMIjpkGyO9tjWEDVNvf9Ntsyjv8Hv8_dGKu7QjY9lDTIIzIo?purpose=inline)
-
-[Spaceflight Simulator 2 on Steam](https://images.openai.com/static-rsc-4/UH94WtsmKff1nQZd48VpintzInnbAVkJ-4FAP25t5nRSzSGUxtkpyRRvzq0r-moCQzPvvvzLkWMQlfX-Ey9WD0x4Cpq9UyGll2vAGpe6GJ1A3cXen91UcKIyVWMRI7FpkQthw0MjmIYlCbx0ce2ynlTq8iQTIcUlQ-Qe__wHLIk?purpose=inline)
-
-[Rocket Engines – Introduction to Aerospace Flight Vehicles](https://images.openai.com/static-rsc-4/oxrhrlQPNDF81CR5nQNEDA126juwjDYx9CJV0TOeUqq18fQa7KlsULzDdVNu2XqZNdECIh9svwaOprwx_n-wH7Onu1vdDASpNhfUWeFE6D2BOTNWyxb4HBwnBgvNYq8LrXuFdAk77LSkXEo5i7_GhxmeomllHKIH8FylbvGHVQE?purpose=inline)
-
-12
-
 Rocket physics introduces an important new requirement:
 
 The physical entity's mass and inertia change during simulation.
@@ -1183,13 +1121,9 @@ Ideal rocket equation:
 
 \\[ \Delta v=I\_{sp}g_0 \ln\left(\frac{m_0}{m_f}\right) \\]
 
-NASA documents the thrust equation, mass flow and specific impulse relationships.&#x20;
+NASA documents the thrust equation, mass flow and specific impulse relationships.
 
-[image](https://www.google.com/s2/favicons?domain=https://www1.grc.nasa.gov\&sz=32)
-
-NASA+1
-
-
+*(zdroj: NASA +1)*
 
 The ideal rocket equation is a theoretical performance limit. It does not include gravity losses, aerodynamic drag, steering losses or other trajectory effects.
 
@@ -1273,14 +1207,6 @@ Recommendation: Variable-mass six-DOF rigid body, engine performance models, dis
 
 ## F. Spacecraft physics
 
-[Satellite Orbit Simulator – Satellite Orbit Simulator – A Tool for Learning Orbital Mechanics and Space Mission Design](https://images.openai.com/static-rsc-4/ZfWt7hhi0xcOw3p4kjkkDzOhgVjGAVRpaC-nfhxHUPtX9y99exyE2Ur9BL1LiqCa6u3cIBwOVfETCdKvqijklPwAMYZ-mMIGjFlxu66jHNcRD6eVN1PM5IWGYob6g1adTWRdJ3GW5X_JyZVIP52sUCze21c6gtZC9wSO1bLuMYg?purpose=inline)
-
-[Research Projects | Center for AEroSpace Autonomy Research (CAESAR)](https://images.openai.com/static-rsc-4/RkUWt-HOMyZFrUl9PquHDvUtRRYq13zEeq-E0FsXndyDlRSi41ul9llHDoqDbLebpNptWHHzJ2AzO-HJnycK9U8kneZWB-Y5PUWdXSA_0Dm9yZE5ROWNnLt1iOymRquGmA9nfdHMyxzjqsgscbeMq8bHMLcdq7r7nJKOJ3W0KGA?purpose=inline)
-
-[Overclock My Satellite - IEEE Spectrum](https://images.openai.com/static-rsc-4/CNwErL6mTXK-hdod6UXZKOYpRQi5IYZR6ibWXfyrHSdUdsNRgxSf9O1KEoeYyo6trEDyMmLOUMW9F8HLa2RKO880BVpw0M-sEIInzqYVOjOjpAvvYm42V87nzcPlgcO6tlsTlwVdXodQaK4rWDg6xEzopeu0qu3B00BcV8Hjzu0?purpose=inline)
-
-8
-
 This subsystem connects planetary physics to astronomical simulation.
 
 ### F1. Orbital mechanics
@@ -1301,13 +1227,9 @@ Three propagation approaches should be supported.
 | Semi-analytical       | Long-duration orbital propagation             |
 | Numerical integration | Maneuvers, perturbations and close encounters |
 
-Orekit provides a useful established reference: its numerical propagator separates force models from integration, allowing specialized forces to contribute accelerations without owning the numerical integration process.&#x20;
+Orekit provides a useful established reference: its numerical propagator separates force models from integration, allowing specialized forces to contribute accelerations without owning the numerical integration process.
 
-[image](https://www.google.com/s2/favicons?domain=https://test.orekit.org\&sz=32)
-
-Orekit+1
-
-
+*(zdroj: Orekit +1)*
 
 ### F2. Multi-body gravitational environments
 
@@ -1325,13 +1247,9 @@ For more complex astronomical systems, gravity evaluation may require hierarchic
 
 The environment service should own the gravitational sources and ephemerides.
 
-JPL SPICE provides reference implementations for planetary ephemerides, state vectors and coordinate transformations.&#x20;
+JPL SPICE provides reference implementations for planetary ephemerides, state vectors and coordinate transformations.
 
-[image](https://www.google.com/s2/favicons?domain=https://naif.jpl.nasa.gov\&sz=32)
-
-naif.jpl.nasa.gov+2
-
-
+*(zdroj: naif.jpl.nasa.gov +2)*
 
 ### F3. Attitude dynamics
 
@@ -1363,9 +1281,9 @@ Wheel saturation is essential.
 
 Once a wheel reaches its momentum capacity, it cannot continue providing the same control authority.
 
-NASA's SmallSat technical reference documents this behavior and the need for momentum desaturation through external actuators.&#x20;
+NASA's SmallSat technical reference documents this behavior and the need for momentum desaturation through external actuators.
 
-[image](https://www.google.com/s2/favicons?domain=https://www.nasa.gov\&sz=32)
+*(zdroj: www.nasa.gov)*
 
 NASA
 
@@ -1387,9 +1305,9 @@ They should be modeled as physical actuators with:
 
 The location of the thruster matters because a thrust vector not passing through the center of mass produces torque.
 
-NASA describes the dual translational and rotational role of spacecraft thrusters, including their interaction with reaction-wheel systems.&#x20;
+NASA describes the dual translational and rotational role of spacecraft thrusters, including their interaction with reaction-wheel systems.
 
-[image](https://www.google.com/s2/favicons?domain=https://www.nasa.gov\&sz=32)
+*(zdroj: www.nasa.gov)*
 
 NASA
 
@@ -1423,9 +1341,9 @@ A docking sequence should have explicit phases:
 
 Clohessy-Wiltshire/Hill equations provide an established approximation for relative motion in the vicinity of a target in a circular orbit.
 
-NASA rendezvous documentation provides an example of their use. They should not be treated as a universal orbital model for arbitrary trajectories.&#x20;
+NASA rendezvous documentation provides an example of their use. They should not be treated as a universal orbital model for arbitrary trajectories.
 
-[image](https://www.google.com/s2/favicons?domain=https://ntrs.nasa.gov\&sz=32)
+*(zdroj: ntrs.nasa.gov)*
 
 Paper_RDV_ISSFD_2007.doc
 
@@ -1552,13 +1470,9 @@ The drone controller's internal frequency can be higher than the world tick. Its
 
 For spacecraft, adaptive integration is more appropriate than forcing orbital mechanics into a 60 Hz global loop.
 
-Orekit demonstrates adaptive integration with configurable minimum and maximum step sizes and error tolerances.&#x20;
+Orekit demonstrates adaptive integration with configurable minimum and maximum step sizes and error tolerances.
 
-[image](https://www.google.com/s2/favicons?domain=https://test.orekit.org\&sz=32)
-
-Orekit+1
-
-
+*(zdroj: Orekit +1)*
 
 ## 6.4 Determinism
 
@@ -2121,13 +2035,9 @@ Important validation cases:
 - Vehicle handling against experimental data.
 - Energy accounting through the drivetrain.
 
-Project Chrono's tire validation documentation provides a useful reference methodology using measured vehicle data.&#x20;
+Project Chrono's tire validation documentation provides a useful reference methodology using measured vehicle data.
 
-[image](https://www.google.com/s2/favicons?domain=https://api.projectchrono.org\&sz=32)
-
-api.projectchrono.org+1
-
-
+*(zdroj: api.projectchrono.org +1)*
 
 ## 11.3 Aircraft validation
 
@@ -2230,10 +2140,6 @@ These tests are especially important because the project vision requires all ent
 
 Scenario 1 – Planetary environment consistency
 
-[【サイト紹介】ドローン空撮スポットサイト「Flyers」について紹介！！ | セキド無人航空機安全運用協議会](https://images.openai.com/static-rsc-4/vMvUOsbusOk4jjCVIIiv4z-3NWe0HCb4uQcCyu9KQvz0WfSsjt67OCdnXgz1T45YDGmf4JgAdrag3E59qYstGTdYEmnY3C0Y2608QJfh-H6kJ82MuqzceSOWlytLhr5FKT7O9t3m1izqkBjf25_i-YfGf5EpJXKPKNdcf0N3PXc?purpose=inline)
-
-[susc.jp](https://susc.jp/membership/sekidogroup/ngj/blog/detail/id%3D5753?utm_source=chatgpt.com)
-
 - Character walks on terrain.
 - Vehicle drives over the same terrain.
 - Drone flies above the vehicle.
@@ -2242,10 +2148,6 @@ Scenario 1 – Planetary environment consistency
 All entities must receive consistent environmental samples at corresponding positions and epochs.
 
 Scenario 2 – Rocket and spacecraft transition
-
-[Planet Labs launches Pelican Gen 2 technology satellite | Grafa](https://images.openai.com/static-rsc-4/-MYs59N1WuMiNZ0eDCL_xGJO3xl7QjvFAvBSK-YZk-JrfIJS4MMRt5ks_wacjtdphvPYAhoY9gR01L6H28OoeXXgah95aiGRZJaLl6sKfUim_KeH59br-xUOZy3xLD3c7shAXIrKpL0OWFr6VV5z79mb8MwetxncjylxjZpfMpc?purpose=inline)
-
-[grafa.com](https://grafa.com/en/news/united-states/planet-labs-pelican-11-gen-2-satellite-launch?utm_source=chatgpt.com)
 
 - Rocket launches.
 - Propellant is consumed.
@@ -2257,10 +2159,6 @@ Scenario 2 – Rocket and spacecraft transition
 Physical identity, momentum and mass properties must remain consistent through every transition.
 
 Scenario 3 – Multi-body interaction
-
-[Secure World Foundation: Outer Space Security Conference 2025](https://images.openai.com/static-rsc-4/D-iwPwssd9VxqhDxO0JhaEkGs0BxAS8dZwXTbYnDqepKfSj_JrxRGCj6hKhD_mUhf5muG5Ay1aPxe-Ew3A9_qkjYS_54ny6XxPO1O-d8HbzctOOdGrfMwAIFbwiLh7VobwCrCzArTB7fQy8-2_1e6eCALol-Ddw-zW31S6ca_r0?purpose=inline)
-
-[swfound.org](https://www.swfound.org/events/outer-space-security-conference-2025?utm_source=chatgpt.com)
 
 - Two spacecraft approach.
 - Relative navigation is performed.
@@ -2473,57 +2371,57 @@ The following sources were selected because they provide established engineering
 
 | Source                                                                                                                                         | Research relevance                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [Project Chrono – Vehicle Overview](https://api.projectchrono.org/vehicle_overview.html?utm_source=chatgpt.com)                                | Modular vehicle architecture, suspension, steering and drivetrain |
-| [Project Chrono – Tire Models](https://api.projectchrono.org/development/wheeled_tire.html?utm_source=chatgpt.com)                             | Pacejka, Fiala, TMeasy and FEA tire models                        |
-| [NVIDIA PhysX – Vehicle SDK](https://nvidiagameworks.github.io/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html?utm_source=chatgpt.com) | Sprung masses, suspension raycasts and tire forces                |
+| [Project Chrono – Vehicle Overview](https://api.projectchrono.org/vehicle_overview.html)                                | Modular vehicle architecture, suspension, steering and drivetrain |
+| [Project Chrono – Tire Models](https://api.projectchrono.org/development/wheeled_tire.html)                             | Pacejka, Fiala, TMeasy and FEA tire models                        |
+| [NVIDIA PhysX – Vehicle SDK](https://nvidiagameworks.github.io/PhysX/4.1/documentation/physxguide/Manual/Vehicles.html) | Sprung masses, suspension raycasts and tire forces                |
 
-Repository: [Project Chrono GitHub](https://github.com/projectchrono/chrono?utm_source=chatgpt.com).
+Repository: [Project Chrono GitHub](https://github.com/projectchrono/chrono).
 
 ## 15.2 Character physics
 
 | Source                                                                                                                       | Research relevance                                   |
 | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [Rapier – Character Controller](https://rapier.rs/docs/user_guides/rust/character_controller/?utm_source=chatgpt.com)        | Kinematic movement, autostepping and ground snapping |
-| [Jolt – Physics Architecture](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/Architecture.md?utm_source=chatgpt.com) | Dynamic and virtual character approaches             |
+| [Rapier – Character Controller](https://rapier.rs/docs/user_guides/rust/character_controller/)        | Kinematic movement, autostepping and ground snapping |
+| [Jolt – Physics Architecture](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/Architecture.md) | Dynamic and virtual character approaches             |
 
 Repositories:
 
-- [Rapier](https://github.com/dimforge/rapier?utm_source=chatgpt.com)
-- [Jolt Physics](https://github.com/jrouwe/JoltPhysics?utm_source=chatgpt.com)
+- [Rapier](https://github.com/dimforge/rapier)
+- [Jolt Physics](https://github.com/jrouwe/JoltPhysics)
 
 ## 15.3 Aircraft and drones
 
 | Source                                                                                                                          | Research relevance                             |
 | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [NASA – Lift Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/lift-equation/?utm_source=chatgpt.com)          | Aerodynamic lift                               |
-| [NASA – Drag Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/?utm_source=chatgpt.com)          | Aerodynamic drag                               |
-| [PX4 – Controller Diagrams](https://docs.px4.io/main/en/flight_stack/controller_diagrams?utm_source=chatgpt.com)                | Multirotor and fixed-wing control architecture |
-| [PX4 – Multicopter PID Tuning](https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter_basic?utm_source=chatgpt.com) | Controller tuning and stability                |
+| [NASA – Lift Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/lift-equation/)          | Aerodynamic lift                               |
+| [NASA – Drag Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/)          | Aerodynamic drag                               |
+| [PX4 – Controller Diagrams](https://docs.px4.io/main/en/flight_stack/controller_diagrams)                | Multirotor and fixed-wing control architecture |
+| [PX4 – Multicopter PID Tuning](https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter_basic) | Controller tuning and stability                |
 
-Repository: [PX4 Autopilot](https://github.com/PX4/PX4-Autopilot?utm_source=chatgpt.com).
+Repository: [PX4 Autopilot](https://github.com/PX4/PX4-Autopilot).
 
 ## 15.4 Rockets and atmosphere
 
 | Source                                                                                                                           | Research relevance                    |
 | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| [NASA – Specific Impulse](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/specific-impulse/?utm_source=chatgpt.com)     | Rocket thrust and propulsion          |
-| [NASA – Thrust Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/thrust-force/?utm_source=chatgpt.com)          | Momentum flow and nozzle pressure     |
-| [U.S. Standard Atmosphere 1976](https://ntrs.nasa.gov/archive/nasa%20/casi.ntrs.nasa.gov/19770009539.pdf?utm_source=chatgpt.com) | Atmospheric properties up to 1,000 km |
+| [NASA – Specific Impulse](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/specific-impulse/)     | Rocket thrust and propulsion          |
+| [NASA – Thrust Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/thrust-force/)          | Momentum flow and nozzle pressure     |
+| [U.S. Standard Atmosphere 1976](https://ntrs.nasa.gov/archive/nasa%20/casi.ntrs.nasa.gov/19770009539.pdf) | Atmospheric properties up to 1,000 km |
 
 ## 15.5 Spacecraft
 
 | Source                                                                                                                                                        | Research relevance                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [Orekit – Propagation Architecture](https://test.orekit.org/site-orekit-development/architecture/propagation.html?utm_source=chatgpt.com)                     | Numerical and semi-analytical orbital propagation |
-| [JPL NAIF – Reference Frames](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/frames.html?utm_source=chatgpt.com)                                       | Coordinate transformations                        |
-| [JPL SPICE – State Vectors](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkezr_c.html?utm_source=chatgpt.com)                                    | Ephemerides and state-vector calculations         |
-| [NASA – Spacecraft Guidance, Navigation and Control](https://www.nasa.gov/smallsat-institute/sst-soa/guidance-navigation-and-control/?utm_source=chatgpt.com) | Reaction wheels, thrusters and attitude control   |
-| [NASA – Rendezvous Algorithms](https://ntrs.nasa.gov/api/citations/20080012645/downloads/20080012645.pdf?utm_source=chatgpt.com)                              | Relative orbital motion and docking               |
+| [Orekit – Propagation Architecture](https://test.orekit.org/site-orekit-development/architecture/propagation.html)                     | Numerical and semi-analytical orbital propagation |
+| [JPL NAIF – Reference Frames](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/frames.html)                                       | Coordinate transformations                        |
+| [JPL SPICE – State Vectors](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkezr_c.html)                                    | Ephemerides and state-vector calculations         |
+| [NASA – Spacecraft Guidance, Navigation and Control](https://www.nasa.gov/smallsat-institute/sst-soa/guidance-navigation-and-control/) | Reaction wheels, thrusters and attitude control   |
+| [NASA – Rendezvous Algorithms](https://ntrs.nasa.gov/api/citations/20080012645/downloads/20080012645.pdf)                              | Relative orbital motion and docking               |
 
 Repositories:
 
-- [Orekit](https://github.com/CS-SI/Orekit?utm_source=chatgpt.com)
-- [SpiceyPy](https://github.com/AndrewAnnex/SpiceyPy?utm_source=chatgpt.com)
+- [Orekit](https://github.com/CS-SI/Orekit)
+- [SpiceyPy](https://github.com/AndrewAnnex/SpiceyPy)
 
 These are research and reference implementations, not mandatory runtime dependencies.
 

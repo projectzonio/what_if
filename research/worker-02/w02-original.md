@@ -118,7 +118,7 @@ The frame system should support:
 - Local origin rebasing.
 NASA JPL's SPICE system is an important reference for this architecture. It explicitly separates reference frames, frame centers, coordinate systems and time-dependent transformations. JPL uses ICRF and TDB as fundamental reference conventions for its solar-system ephemerides. 
 
-ssd.jpl.nasa.gov+2
+*(zdroj: ssd.jpl.nasa.gov +2)*
 
 Recommended numerical representation:
 - Global position: hierarchical sector coordinates plus f64 local offsets.
@@ -128,7 +128,7 @@ Recommended numerical representation:
 - Astronomical time: integer simulation time with an explicit conversion to scientific time scales.
 There is a particularly interesting production reference here: Avian supports f64 world-space coordinates while retaining f32 broadphase structures and solver data. Its documentation explains that this reduces the cost of double precision, but broadphase bounds become increasingly conservative at large distances. At approximately \(10^7\) units, f32 coordinate quantization reaches roughly one unit. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 This reinforces an important architectural conclusion:
 
@@ -152,7 +152,7 @@ A client rendering at 144 FPS must not cause a different physical simulation fro
 
 The established accumulator model described by Glenn Fiedler and used in production engines such as PhysX provides the appropriate foundation. 
 
-Gaffer On Games+1
+*(zdroj: Gaffer On Games +1)*
 
 Proposed initial timing configuration
 Parameter	Initial value
@@ -199,7 +199,7 @@ This method updates velocity before position. It has significantly better stabil
 
 MuJoCo explicitly identifies semi-implicit Euler as a standard physics-simulation method and does not implement explicit Euler as a supported integrator. 
 
-MuJoCo Documentation+1
+*(zdroj: MuJoCo Documentation +1)*
 
 Verlet / Velocity Verlet
 A second-order integration method particularly useful for conservative systems.
@@ -226,7 +226,7 @@ It is also not symplectic, which makes it less attractive as a universal long-du
 
 MuJoCo documents both RK4 and its limitations when compared with implicit single-step integration for velocity-dependent forces. 
 
-MuJoCo Documentation+1
+*(zdroj: MuJoCo Documentation +1)*
 
 Adaptive high-order integration
 For astronomical dynamics, REBOUND provides particularly relevant examples:
@@ -235,7 +235,7 @@ For astronomical dynamics, REBOUND provides particularly relevant examples:
 - TRACE: hybrid integration switching methods around close encounters.
 WHFast requires an appropriate fixed timestep and is not suitable for arbitrary close encounters. IAS15 handles such encounters with adaptive steps. 
 
-REBOUND+2
+*(zdroj: REBOUND +2)*
 
 3.3 Recommended integrator allocation
 Simulation subsystem	Preferred method
@@ -319,7 +319,7 @@ The center of mass must not be assumed to coincide with the visual object's orig
 
 Rapier explicitly separates mass, angular inertia and center of mass in its rigid-body model. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 4.3 Force and impulse model
 The universal force interface must distinguish continuous forces from instantaneous impulses.
@@ -407,7 +407,7 @@ Limitations:
 - Different physical behaviors require different constraint formulations.
 An interesting implementation reference is Avian: its current architecture uses impulse-based contact solving while supporting XPBD for joints. 
 
-Rust+2
+*(zdroj: Rust +2)*
 
 
 Recommendation
@@ -446,7 +446,7 @@ Collision response, friction, restitution and position correction
 
 This two-stage broadphase/narrowphase architecture is used by Rapier and Avian. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 5.2 Broadphase algorithms
 The broadphase must reduce the number of expensive geometric intersection tests.
@@ -488,7 +488,7 @@ When objects penetrate, EPA (Expanding Polytope Algorithm) can calculate penetra
 
 Parry, the collision library used by Rapier and Avian, provides these algorithms and specialized shape dispatch. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 Important limitations:
 - GJK and EPA are iterative.
@@ -516,7 +516,7 @@ Generate constraints for objects expected to collide before they physically over
 
 Rapier and Avian support CCD approaches, including swept collision detection and speculative contacts. 
 
-Rapier+2
+*(zdroj: Rapier +2)*
 
 Recommendation:
 - Static objects: ordinary discrete collision.
@@ -624,7 +624,7 @@ The two modes should be able to exchange state.
 
 Rapier's character controller is a useful reference: it calculates corrected movement against the environment, but does not automatically apply that movement to the body. Its built-in controller handles translation rather than rotation. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 6.3 Aircraft physics
 
@@ -663,7 +663,7 @@ D=C_DqA
 
 NASA's aerodynamic documentation establishes these equations and explains the dependence on air density, velocity, geometry and aerodynamic coefficients. 
 
-NASA+2
+*(zdroj: NASA +2)*
 
 The aircraft module must receive atmospheric properties from the environment subsystem.
 
@@ -701,7 +701,7 @@ The runtime must support:
 - Atmospheric pressure effects.
 NASA explicitly explains why the standard constant-mass form of Newton's second law cannot simply be applied to a rocket without accounting for expelled mass and momentum. 
 
-NASA+1
+*(zdroj: NASA +1)*
 
 6.5 Spacecraft and orbital mechanics
 
@@ -736,7 +736,7 @@ The orbital subsystem should support both analytical gravitational fields and nu
 
 REBOUND is a particularly useful scientific reference because it demonstrates multiple orbital integrators and hybrid approaches for handling close encounters. 
 
-rebound.hanno-rein.de+2
+*(zdroj: rebound.hanno-rein.de +2)*
 
 6.6 Common interface
 Every specialized module should implement a shared conceptual contract:
@@ -841,7 +841,7 @@ Instead:
 - The scheduler determines execution dependencies.
 The Bevy ECS is worth evaluating independently of the Bevy rendering engine. It can be used as a standalone Rust crate and supports parallel system scheduling. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 However, Planetary Engine should not become dependent on the complete Bevy application architecture merely to obtain ECS functionality.
 8.2 Recommended ownership model
@@ -1136,7 +1136,7 @@ Independent islands can be processed concurrently. Bodies connected through new 
 
 This is an established strategy in PhysX and other production physics engines. 
 
-PhysX SDK Documentation+1
+*(zdroj: PhysX SDK Documentation +1)*
 
 9.3 Rust execution
 Recommended candidate:
@@ -1168,7 +1168,7 @@ Therefore, the runtime must control:
 - State commit order.
 Rapier provides an interesting reference here: its enhanced-determinism mode supports parallel solving with results independent of the Rayon thread count, subject to its documented conditions. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 9.4 SIMD
 SIMD is useful for:
@@ -1181,7 +1181,7 @@ The architecture should support SIMD without making it a mandatory dependency of
 
 Important consideration: Rust's portable SIMD API is still marked nightly-only in the current standard library documentation. Therefore, the runtime should not depend on its stabilization for its initial architecture. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 Recommended strategy:
 1. Scalar implementation as reference.
@@ -1205,7 +1205,7 @@ GPU execution also introduces memory transfer and synchronization costs.
 
 PhysX demonstrates that GPU rigid-body simulation is feasible, but its documentation also identifies CPU/GPU feature compatibility limitations. 
 
-PhysX SDK Documentation+1
+*(zdroj: PhysX SDK Documentation +1)*
 
 My recommendation:
 - CPU remains the authoritative physics executor initially.
@@ -1225,7 +1225,7 @@ D3	Different platforms and processors, bit-identical results
 
 Rapier documents that its default behavior is locally deterministic, while cross-platform determinism requires additional configuration and restrictions. Its enhanced-determinism mode cannot be combined with its 8-lane SIMD configuration. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 IEEE 754 compliance alone is not enough for an entire simulation to become deterministic.
 
@@ -1305,7 +1305,7 @@ It needs to preserve:
 - Reference-frame state.
 Rapier's serialization implementation is a useful reference because its snapshots include the broadphase, narrowphase, contact state, islands and other internal structures. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 Important limitation: Rapier explicitly warns that its internal snapshots are not stable across different library builds and configurations.
 

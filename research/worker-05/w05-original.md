@@ -185,7 +185,7 @@ Výjimkou mohou být prezentační a predikční informace, které server násle
 
 Tento princip odpovídá server-authoritative modelu používanému například v Nakama. Jeho dokumentace výslovně popisuje serverové zpracování vstupů, pevný tick rate a držení autoritativního stavu na jednom hostitelském uzlu dané instance. 
 
-Heroic Labs Documentation+1
+*(zdroj: Heroic Labs Documentation +1)*
 
 2.3 Proč nedělat jeden globální simulační thread
 Jedna globální smyčka je jednoduchá, ale pro Planetary Engine představuje významné omezení.
@@ -239,7 +239,7 @@ Tokio poskytuje:
 - Asynchronous task management.
 Jeho multithreaded scheduler standardně používá worker thread pro každé dostupné CPU jádro. Důležité je ale rozlišovat asynchronní I/O scheduler od fyzikálního scheduleru. Tokio samo o sobě nezaručuje deterministické pořadí simulačních operací. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 Doporučená interní struktura Rust procesu
 Simulation Process
@@ -353,7 +353,7 @@ Primární technické zdroje:
 - S2 Geometry – Cell hierarchy.
 H3 používá hierarchickou hexagonální síť vytvořenou projekcí přes icosahedron. S2 používá šest stěn krychle projektovaných na jednotkovou sféru a rekurzivně je rozděluje na čtyři části. 
 
-GitHub+1
+*(zdroj: GitHub +1)*
 
 Doporučené řešení: hybridní prostorová hierarchie
 Doporučená varianta
@@ -646,7 +646,7 @@ Nevýhody:
 - Nutnost řešit ztracené a opožděné pakety.
 Glenn Fiedler podrobně rozebírá snapshot interpolation a kompresi síťových fyzikálních stavů. 
 
-Gaffer On Games+1
+*(zdroj: Gaffer On Games +1)*
 
 Client prediction
 Pro lokálně ovládaného hráče:
@@ -718,7 +718,7 @@ QUIC je zvláště zajímavý kvůli kombinaci spolehlivých streamů a nezávis
 
 RFC 9000 definuje QUIC jako multiplexovaný zabezpečený transport nad UDP. RFC 9221 přidává unreliable datagrams bez transportních retransmisí. 
 
-rfc-editor.org+1
+*(zdroj: rfc-editor.org +1)*
 
 Doporučení
 Preferovaná varianta
@@ -972,7 +972,7 @@ Agones řeší:
 - Autoscaling.
 Podporuje strategii Packed pro koncentrování serverů na menší počet uzlů a Distributed pro rozprostření serverů mezi uzly. 
 
-Agones+1
+*(zdroj: Agones +1)*
 
 Pro Planetary Engine bych ale nepoužíval model, kdy každá regionální buňka automaticky znamená jeden GameServer.
 
@@ -1516,7 +1516,7 @@ MMO a authoritative server
 3. Nakama – Authoritative multiplayer architecture.
 Konkrétní příklad L2J regionálního ownership a known-list mechanismu lze vidět v L2Object source. Je tam vidět registrace objektu do WorldRegion, globálního world registru a známého seznamu objektů. To je užitečný architektonický vzor, nikoliv návrh distribuovaného ownershipu. 
 
-GitHub+1
+*(zdroj: GitHub +1)*
 
 Poznámka: tento výzkum zatím představuje reverse engineering architektonických principů L2J, nikoliv kompletní audit všech tříd a thread poolů konkrétní verze L2J Mobius. Ten by měl být samostatným navazujícím úkolem.
 Rust a Node.js

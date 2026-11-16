@@ -306,7 +306,7 @@ Controlled threads
 
 Rayon nabízí work-stealing scheduler a paralelní iterátory. Je vhodný pro CPU-bound výpočty, kde lze práci rozdělit na nezávislé části. 
 
-Rust+1
+*(zdroj: Rust +1)*
 
 Tokio doporučuji pro I/O a síťové úlohy, nikoliv jako náhradu fyzikálního scheduleru.
 
@@ -580,7 +580,7 @@ Jde o návrhové rozsahy, nikoliv naměřené optimální hodnoty.
 
 Gaffer On Games popisuje prioritní akumulaci, díky které jsou důležité objekty aktualizovány častěji a objekty, které se do packetu nevejdou, neztratí svoji prioritu. Součástí řešení je jitter buffer a řízení síťového bandwidth budgetu. 
 
-Gaffer On Games+1
+*(zdroj: Gaffer On Games +1)*
 
 6.4 Orientační síťová kapacita
 Pro předběžný model definujeme:
@@ -674,7 +674,7 @@ Samotný počet hráčů není dobrým load-balancing metrikem.
 
 Pro orchestrace game serverů je relevantní Agones. Jeho dokumentace rozlišuje packed a distributed scheduling a podporuje autoscaling fleet. Je to užitečný infrastrukturní vzor, nikoliv řešení migrace živých fyzikálních regionů. 
 
-Agones+1
+*(zdroj: Agones +1)*
 
 
 8. Simulation fidelity a fyzikální konzistence
@@ -688,7 +688,7 @@ Network consistency	Shoda autoritativního a klientského stavu
 
 Například Rapier dokumentuje lokální determinismus při stejném počátečním stavu, verzi knihovny, kompilátoru a pořadí operací. Cross-platform determinismus má další podmínky včetně fixed timestep a kontroly matematických funkcí. 
 
-Rapier+1
+*(zdroj: Rapier +1)*
 
 To je důležité upozornění:
 

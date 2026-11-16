@@ -137,7 +137,7 @@ These are complementary systems, not competing alternatives.
 
 NASA's SPICE architecture is particularly relevant: it explicitly distinguishes inertial, body-fixed, spacecraft, fixed-offset and dynamic frames, and provides transformations between them. 
 
-naif.jpl.nasa.gov+1
+*(zdroj: naif.jpl.nasa.gov +1)*
 
 2.3 Recommended reference-frame hierarchy
 
@@ -216,7 +216,7 @@ S_B=X_{AB}(t)S_A
 
 NASA SPICE implements this distinction through pxform for position and sxform for Cartesian state vectors. Its rotating-frame transformation contains the derivative of the rotation matrix. 
 
-naif.jpl.nasa.gov+1
+*(zdroj: naif.jpl.nasa.gov +1)*
 
 This has direct consequences:
 - A stationary vehicle on Earth's surface has zero velocity in ECEF.
@@ -281,7 +281,7 @@ WGS 84
 
 For other planetary bodies, use body-specific shape and orientation parameters sourced from planetary constants and orientation models. NAIF PCK explicitly supports physical and cartographic parameters for planets, moons, comets and asteroids. 
 
-naif.jpl.nasa.gov+1
+*(zdroj: naif.jpl.nasa.gov +1)*
 
 Additional requirement: the system must explicitly distinguish:
 - Planetocentric latitude: angle measured from the body's center.
@@ -327,7 +327,7 @@ Double precision is adequate for many planetary and astronomical calculations, b
 
 PhysX documents scene-origin shifting as a solution to large-world precision problems, while also warning that shifting scene state has computational and integration costs. 
 
-PhysX SDK Documentation+1
+*(zdroj: PhysX SDK Documentation +1)*
 
 Floating origin must never modify authoritative world coordinates.
 
@@ -352,7 +352,7 @@ Do not use UTC as the internal physics clock because leap seconds make it unsuit
 
 The IERS maintains Earth-orientation data, reference-frame conventions and time-scale resources. JPL DE ephemerides use TDB for their dynamical time coordinate. 
 
-IERS+2
+*(zdroj: IERS +2)*
 
 
 3. Planetary geometry and terrain architecture
@@ -481,7 +481,7 @@ The projection should be defined once in the geometry specification and shared b
 
 A useful production reference is Google's S2 Geometry. Its implementation subdivides six cube faces into quadrilateral spherical cells, supports 30 subdivision levels and uses a 64-bit cell identifier. Its nonlinear face mapping helps produce more uniform cell sizes. 
 
-S2Geometry+1
+*(zdroj: S2Geometry +1)*
 
 I recommend investigating whether S2's mapping can serve as the common surface-addressing basis rather than independently inventing a second global cube projection.
 
@@ -543,7 +543,7 @@ Parent and child representations must derive from the same versioned terrain sou
 
 The 2:1 constraint is a proposed engineering policy, not a requirement imposed by the OGC standard. Research on quadtree terrain crack removal demonstrates why neighbor LOD differences and boundary topology need explicit treatment. 
 
-scitepress.org+1
+*(zdroj: scitepress.org +1)*
 
 For deterministic procedural generation, a tile must be a function of:
 \[
@@ -592,7 +592,7 @@ H3 deserves particular attention for economy, population, weather aggregation an
 
 However, H3's hierarchical containment is exact in its index structure but only approximate geometrically between parent and child cells. It also contains twelve pentagonal cells at each resolution. Consequently, it should not be treated as a universal physical terrain mesh. 
 
-H3+1
+*(zdroj: H3 +1)*
 
 3.7 Rendering technology versus world geometry
 A useful production reference is OGC 3D Tiles.
@@ -601,7 +601,7 @@ It provides hierarchical structures for streaming massive 3D content, including 
 
 Its important limitation is that it defines how content is organized and delivered, not the physical semantics of the simulation. 
 
-Streaming Massive 3D Geospatial Data+1
+*(zdroj: Streaming Massive 3D Geospatial Data +1)*
 
 It is therefore a good reference for the client streaming layer, not the authoritative world model.
 
@@ -692,7 +692,7 @@ For a solar-system simulation, gravitational contributions from multiple bodies 
 
 For Earth, EGM2008 provides geopotential coefficients for spherical harmonic expansion and a geoid referenced to WGS 84. 
 
-Earth Gravitational Model+1
+*(zdroj: Earth Gravitational Model +1)*
 
 The architecture should therefore distinguish:
 - Gravitational acceleration.
@@ -739,7 +739,7 @@ The model must account for the fact that atmosphere is a three-dimensional, time
 
 For Earth, the U.S. Standard Atmosphere 1976 provides a validated baseline model with layered temperature, pressure and density profiles. Its sea-level reference values include 1.225 kg/m³ density, 101325 Pa pressure and 288.15 K temperature. 
 
-ntrs.nasa.gov+1
+*(zdroj: ntrs.nasa.gov +1)*
 
 However, this is not a weather simulator.
 
@@ -1454,7 +1454,7 @@ Large-distance coordinates	No unacceptable precision loss
 
 Reference comparisons should use GeographicLib and NASA SPICE where applicable. 
 
-geographiclib.sourceforge.io+1
+*(zdroj: geographiclib.sourceforge.io +1)*
 
 Proposed acceptance criteria:
 - Terrestrial coordinate round-trip error: at most 1 mm for supported normal operating ranges.
@@ -1569,7 +1569,7 @@ If the project eventually requires cosmological expansion, relativistic effects 
 
 JPL's DE440/DE441 ephemerides are useful references for the solar-system portion. They use fitted Chebyshev polynomials for planetary positions and velocities and define their dynamical time coordinate in TDB. 
 
-ssd.jpl.nasa.gov+2
+*(zdroj: ssd.jpl.nasa.gov +2)*
 
 11.3 Physics and environment
 Still unresolved:
