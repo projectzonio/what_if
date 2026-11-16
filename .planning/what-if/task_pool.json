@@ -85,7 +85,14 @@
       "preferred_agent": "claude",
       "preferred_model": "sonnet",
       "write_scope": "integration/SOURCE_TRACE.md",
-      "risks": "Dokumenty jsou dlouhé (10–100 kB); číst grepem po sekcích, ne celé."
+      "risks": "Dokumenty jsou dlouhé (10–100 kB); číst grepem po sekcích, ne celé.",
+      "dispatch": {
+        "job_id": "20261116T215755957488Z_WI-001",
+        "agent": "claude",
+        "model": "sonnet",
+        "status": "pending",
+        "created_at": "2026-11-16T21:57:55Z"
+      }
     },
     {
       "id": "WI-002",

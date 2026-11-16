@@ -1,0 +1,11 @@
+{
+  "id": "20261116T215755957488Z_WI-001",
+  "status": "pending",
+  "agent": "claude",
+  "kind": "task",
+  "task": "WI-001",
+  "title": "Stopa zdrojů odzadu: final_for_orchestrator -> GPT-01..08 -> W01–W09 -> W10 (tabulka PE/INT/C/NC)",
+  "created_at": "2026-11-16T21:57:55Z",
+  "timeout_minutes": 120,
+  "model": "sonnet"
+}
