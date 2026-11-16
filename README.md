@@ -55,3 +55,7 @@ agent_pool/ wiki/         pool a znalostní vrstva (druhý mozek)
 - Rozpory mezi W01–W09 vznikly paralelní prací naslepo. Nejde o chybu autora.
 - Diagramy se píší jako ```` ```mermaid ```` bloky, GitHub je vykreslí.
 - Nový výzkum: zadání do `audit/`, výstup do `research/worker-0N/w0N-supplement-NN.md`, nové rozpory do `audit/CONFLICTS.md`.
+
+## Asset Library
+
+The CC0-only content catalog and acquisition workflow are maintained separately from simulation architecture in [`asset-library/`](asset-library/README.md). The accepted registry is intentionally empty until individual assets pass the license-evidence and technical-validation gates. Orchestrator entry point: [`asset-library/orchestration/ORCHESTRATOR_HANDOFF.md`](asset-library/orchestration/ORCHESTRATOR_HANDOFF.md).
