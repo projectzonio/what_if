@@ -74,3 +74,38 @@ Access date: **2026-11-19**. Version-specific documentation is preferred over ge
 - Add aircraft-specific references for airfoil profiles, panel topology and animation pivots once aircraft class/style is fixed.
 - Build a reference matrix and first three fictional OEM brand bibles for the vehicle catalogue.
 - Obtain a qualified legal review of final vehicle designs intended for commercial publication; verify design registers and marks for any Amber cases.
+
+
+## Grass rendering and persistent destruction sources
+
+| ID | Source | Evidence scope |
+|---|---|---|
+| SRC-NVIDIA-GPUGEMS3-CRYSIS-VEGETATION | https://developer.nvidia.com/gpugems/gpugems3/part-iii-rendering/chapter-16-vegetation-procedural-animation-and-shading-crysis | First-party Crytek chapter by Tiago Sousa: Crysis vegetation animation, shading, grass fill-rate, vertex attributes, procedural breaking and distant sprites |
+| SRC-CRYENGINE-GRASS-MERGED | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/24285889 | Official CRYENGINE merged-mesh grass, batching and interactions |
+| SRC-CRYENGINE-GRASS-PATCH | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/24285885 | Official grass patches documentation |
+| SRC-CRYENGINE-GRASS-SHADER | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/24285891 | Official vegetation shader modes and grass material path |
+| SRC-CRYENGINE-VEGETATION-PERF | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/24285894 | Official vegetation performance recommendations |
+| SRC-CRYENGINE-BENDING | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/24285898 | Official vegetation bending, wind and interaction |
+| SRC-CRYSIS3-GRASS-INTERVIEW | https://www.pcgamer.com/crysis-3s-grass-tech-is-so-good-itll-make-you-want-to-lie-down-in-it/ | Developer interview on Crysis 3 grass; reported claims, not a shader specification |
+| SRC-UNITY-GPU-INSTANCING | https://docs.unity3d.com/Manual/GPUInstancing.html | Unity GPU instancing behavior and constraints |
+| SRC-UNITY-TERRAIN-GRASS | https://docs.unity3d.com/Manual/terrain-Grass.html | Unity terrain grass authoring/rendering behavior; verify selected render pipeline/version |
+| SRC-CRYENGINE-PHYSICAL-BREAKAGE | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/25549969 | Official physical breakage overview: joints, Boolean, procedural triangulation and cloth slicing |
+| SRC-CRYENGINE-BOOLEAN-DESTRUCTIBLES | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/25549972 | Official Boolean destructibles workflow and asset constraints |
+| SRC-CRYENGINE-BREAKABLE-TREES | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/25549975 | Official breakable tree asset workflow and Boolean tree damage |
+| SRC-CRYENGINE-BREAKABLE-OBJECTS | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/25549978 | Official breakable object and structural-part behavior |
+| SRC-CRYENGINE-PHYSICS | https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/25549961 | Official CRYENGINE physics overview |
+
+## Evidence boundaries for grass and destruction
+
+- GPU Gems 3 documents the Crysis vegetation implementation; do not label every described technique as Crysis 3 internals.
+- Crysis 3 grass details from PC Gamer are reported developer statements, not a complete public renderer specification.
+- Current CRYENGINE 5 docs demonstrate documented engine-family features, not proof that the original Crysis 1 build used every later implementation detail.
+- No verified source in this research establishes a Crysis 3 grass requirement of 20–40 Gtexel/s. Gtexel/s is a throughput unit, not a direct measure of visible grass texels or image quality.
+- Unity docs establish API capabilities and constraints; profile the exact Planetary Engine render pipeline and target GPU.
+- Proposed PE LOD architecture, data layout, destruction persistence and benchmark fixtures are recommendations, not measured engine results.
+
+## Next research gaps
+
+- Build fixed grass benchmark cells; profile overdraw, GPU/CPU time, VRAM, power and coverage on target hardware.
+- Prototype Blender grass species/clusters and import into the actual Unity render pipeline.
+- Prototype a Boolean-cuttable tree and modular building with structural graph; benchmark damage, physics and save/load costs.
