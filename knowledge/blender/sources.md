@@ -2,12 +2,12 @@
 id: KB-BLENDER-005
 type: source-registry
 domain: blender
-tags: [sources, citations, blender-manual, research, addons]
+tags: [sources, citations, blender-manual, research, addons, vehicle-design, intellectual-property]
 ---
 
 # Source registry
 
-Access date: **2026-11-19**. Version-specific documentation is preferred over generic tutorials. Re-check add-on status and license when adopting.
+Access date: **2026-11-19**. Version-specific documentation is preferred over generic tutorials. Re-check add-on status and license when adopting. Legal sources are jurisdiction- and date-sensitive.
 
 ## Blender official documentation and API
 
@@ -41,11 +41,30 @@ Access date: **2026-11-19**. Version-specific documentation is preferred over ge
 | SRC-PAPER-CARDENAS-2023 | Cardenas et al., “Modeling of the 3D Tree Skeleton Using Real-World Data: A Survey,” IEEE TVCG 29(12), 4920–4935, DOI https://doi.org/10.1109/TVCG.2022.3193018 | Procedural reconstruction, geometry-based extraction and image-based modeling |
 | SRC-PAPER-XIE-2016 | Xie et al., “Tree Modeling with Real Tree-Parts Examples,” IEEE TVCG, https://graphics.uni-konstanz.de/publikationen/Xie2016TreeModelingReal/index.html | Scanned real-tree parts guide branching geometry |
 
-## Interpretation
+## Vehicle design, IP and GTA case study
+
+| ID | Source | Evidence scope |
+|---|---|---|
+| SRC-LAW-CZ-COPYRIGHT-121-2000 | https://www.e-sbirka.cz/sb/2000/121 | Czech Copyright Act No. 121/2000 Coll.; originality and subject matter (§ 2) |
+| SRC-LAW-CZ-DESIGN-207-2000 | https://www.e-sbirka.cz/sb/2000/207 | Czech Act No. 207/2000 Coll. on the Protection of Industrial Designs |
+| SRC-EU-DESIGN-2026-715 | https://eur-lex.europa.eu/eli/reg/2026/715/oj/eng | Current codified EU design regulation; applicable from 1 July 2026 |
+| SRC-EU-TRADEMARK-2017-1001 | https://eur-lex.europa.eu/eli/reg/2017/1001/oj/eng | EU trade mark regulation; includes shape exclusions and 3D marks |
+| SRC-CJEU-BROMPTON-C833-18 | https://curia.europa.eu/juris/liste.jsf?num=C-833/18 | CJEU copyright originality and technical constraints in product design |
+| SRC-US-WALMART-SAMARA | https://tile.loc.gov/storage-services/service/ll/usrep/usrep529/usrep529205/usrep529205.pdf | US Supreme Court: product design trade dress requires secondary meaning |
+| SRC-US-TRAFFIX | https://tile.loc.gov/storage-services/service/ll/usrep/usrep532/usrep532023/usrep532023.pdf | US Supreme Court: functionality limits trade dress protection |
+| SRC-TAKETWO-GTA-BRANDS-2022 | https://www.videogameschronicle.com/news/take-two-explains-why-grand-theft-auto-doesnt-include-more-real-world-brands/ | 2022 interview/report on Rockstar's creative preference for fictional brands |
+| SRC-FRANK-STEPHENSON-GTA-2021 | https://www.topgear.com/car-news/modified/mclaren-p1-designer-has-created-grand-theft-auto-v-car | 2021 designer commentary/demonstration; multi-source mashup as reported by Top Gear, not a Rockstar internal document |
+| SRC-DRIVE-GTA-VEHICLES-2020 | https://www.drive.com.au/ | General automotive secondary coverage; replace with a specific article before relying on a vehicle mapping |
+| SRC-GTA-WIKI-VEHICLES | https://gta.fandom.com/wiki/Vehicles | Fan-maintained catalogue and inferred real-world inspirations; secondary evidence only |
+
+## Interpretation and evidence quality
 
 - Blender manual/API pages establish software behavior, not visual quality of generated trees.
 - Extension listings establish advertised features and declared compatibility, not quality for Planetary Engine.
 - Papers establish methods and research context; they do not imply a Blender add-on implements the paper exactly.
+- Statutes and court judgments are primary legal sources. Legal conclusions depend on facts, jurisdiction, dates and the specific rights asserted.
+- VGC and Top Gear are secondary reporting. They support the reported statements and commentary, not a claim that Rockstar's full internal legal/design process is known.
+- Fan vehicle mappings are interpretive and must never be treated as authoritative legal clearance.
 - Recommendations are engineering synthesis and require validation with test assets.
 
 ## Next research gaps
@@ -54,3 +73,5 @@ Access date: **2026-11-19**. Version-specific documentation is preferred over ge
 - Compare curve-sweep, local voxel fusion and unified branching surfaces on the same species profile.
 - Test foliage alpha, tangent-space normals and LOD transitions in the current Unity renderer.
 - Add aircraft-specific references for airfoil profiles, panel topology and animation pivots once aircraft class/style is fixed.
+- Build a reference matrix and first three fictional OEM brand bibles for the vehicle catalogue.
+- Obtain a qualified legal review of final vehicle designs intended for commercial publication; verify design registers and marks for any Amber cases.
