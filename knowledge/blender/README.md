@@ -56,3 +56,11 @@ The Sapling Tree Gen extension listing was updated for Blender 5.2+ on 2026-11-0
 Legal notes are research guidance, not legal advice. Current EU design references use Regulation (EU) 2026/715 (applicable from 1 July 2026), alongside relevant EU trade mark law, Czech statutes and case law. Review actual territories, dates and rights before commercial publication.
 
 Blender is an authoring and asset-baking tool, not simulation authority. Exported assets are visual representations consumed by Unity; physical dimensions, collision proxies, identity and runtime ownership remain defined by Planetary Engine contracts.
+
+
+## Grass and destruction research
+
+- [Grass rendering and vegetation](grass-rendering-and-vegetation.md) — Crysis/CryEngine grass techniques, GPU instancing, overdraw, wind, LOD and benchmark plan.
+- [Destructible world assets](destructible-world-assets.md) — Blender fracture authoring and persistent runtime destruction of trees and buildings.
+
+Production principle: optimize grass as a whole pipeline (coverage, overdraw, batching, shading, wind, shadows and power), not by polygon count alone. Persist meaningful destruction as sparse world-state deltas over immutable base assets; cosmetic debris is transient.
